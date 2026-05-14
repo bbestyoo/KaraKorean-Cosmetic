@@ -36,8 +36,8 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 w-full z-40 transition-transform duration-300 border-b bg-[#f7f6f2]",
-        isVisible ? "translate-y-0" : "-translate-y-full"
+        " w-full z-40 transition-transform duration-300 border-b bg-[#f7f6f2]",
+        // isVisible ? "translate-y-0" : "-translate-y-full"
       )}
     >
       <div className=" h-24  px-6 lg:pl-4 lg:pr-8 flex items-center justify-between">
