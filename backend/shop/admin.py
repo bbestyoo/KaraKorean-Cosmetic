@@ -1,0 +1,99 @@
+from django.contrib import admin
+from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute,  Color, Variant, Size, SizeColorStock
+from import_export.admin import ImportExportModelAdmin
+from .resources import ProductResource, ProductAttributeResource, ProductImageResource, BrandResource, SeriesResource, CategoryResource, SubCategoryResource
+# Register your models here.
+
+class ColorInline(admin.TabularInline):
+    model = Color
+    extra = 0
+
+class ColorAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = Color
+    resource_class = ProductAttributeResource
+
+class VariantInline(admin.TabularInline):
+    model = Variant
+    extra = 0
+
+class VariantAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = Variant
+    resource_class = ProductAttributeResource
+
+class SizeColorStockInline(admin.TabularInline):
+    model = SizeColorStock
+    extra = 1
+    fields = ['size', 'color', 'stock']
+    raw_id_fields = ['size', 'color']
+
+class SizeInline(admin.TabularInline):
+    model = Size
+    extra = 1
+    fields = ['name', 'price_adjustment']
+    inlines = [SizeColorStockInline]
+
+class SizeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = Size
+    resource_class = ProductAttributeResource
+    inlines = [SizeColorStockInline]
+
+
+class SizeColorStockAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = SizeColorStock
+    resource_class = ProductAttributeResource
+
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 0
+
+class ProductImageAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = ProductImage
+    resource_class = ProductImageResource
+
+class RatingInLine(admin.TabularInline):
+    model = Rating
+    extra = 0
+
+class BrandAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = Brand
+    resource_class = ProductAttributeResource
+
+class SeriesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = Series
+    resource_class = ProductAttributeResource
+
+class CategoryAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = Category
+    resource_class = ProductAttributeResource
+
+class SubCategoryAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = SubCategory
+    resource_class = ProductAttributeResource
+
+class ProductAttributeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    model = ProductAttribute
+    resource_class = ProductAttributeResource
+
+class AttributeInline(admin.TabularInline):
+    model = ProductAttribute
+    extra = 0
+
+class ProductsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    inlines = [ColorInline, SizeInline, SizeColorStockInline, ProductImageInline, RatingInLine, AttributeInline]
+    resource_class = ProductResource
+
+
+admin.site.register(Product,ProductsAdmin)
+admin.site.register(Comment)
+admin.site.register(Repliess)
+admin.site.register(Brand, BrandAdmin)
+admin.site.register(Color, ColorAdmin)
+admin.site.register(Variant, VariantAdmin)
+admin.site.register(Size, SizeAdmin)
+admin.site.register(SizeColorStock, SizeColorStockAdmin)
+admin.site.register(ProductImage, ProductImageAdmin)
+admin.site.register(Series,SeriesAdmin)
+admin.site.register(Category,CategoryAdmin)
+admin.site.register(SubCategory,SubCategoryAdmin)
+admin.site.register(ProductAttribute, ProductAttributeAdmin)

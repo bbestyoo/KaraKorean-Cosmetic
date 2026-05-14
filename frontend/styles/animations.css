@@ -1,0 +1,66 @@
+/**
+ * Reveal Animation Styles
+ * 
+ * Provides smooth fade-in and slide-up animations for elements
+ * as they enter the viewport. Animations respect prefers-reduced-motion.
+ */
+
+/* Base reveal state - hidden before animation */
+[data-reveal="true"] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 1000ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              transform 1000ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Visible state - triggered by IntersectionObserver */
+[data-reveal="true"].reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children - only animate when they have this class */
+[data-reveal-child] {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+[data-reveal-child].reveal-visible {
+  animation: revealChild 800ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes revealChild {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Lazy-loaded image fade-in */
+[data-reveal-image] {
+  opacity: 0;
+  transition: opacity 600ms ease-out;
+}
+
+[data-reveal-image].image-loaded {
+  opacity: 1;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal="true"],
+  [data-reveal-child],
+  [data-reveal-image] {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  [data-reveal="true"].reveal-visible,
+  [data-reveal-child].reveal-visible,
+  [data-reveal-image].image-loaded {
+    opacity: 1;
+    transform: none;
+  }
+}
