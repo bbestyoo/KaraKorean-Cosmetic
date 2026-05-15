@@ -141,13 +141,13 @@ export function HomeHero({ children }: HomeHeroProps) {
         style={{ height: `${HERO_SCROLL_VH}vh` }}
         aria-label="Hero"
       >
-        <div className="sticky top-0 z-10 flex h-[100dvh] min-h-[640px] w-full flex-1 items-center justify-center overflow-hidden bg-[#f7f6f2] px-6 py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f]">
+        <div className="sticky top-0 flex h-[100dvh] min-h-[640px] w-full flex-1 items-center justify-center overflow-hidden bg-[#f7f6f2] px-6 py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f]">
           <Image
             src="/images/heromodel.png"
             alt="Hero image"
             width={800}
             height={1200}
-            className="absolute z-10 top-[-10%] select-none"
+            className="absolute z-30 top-[-10%] select-none"
             priority
           />
 

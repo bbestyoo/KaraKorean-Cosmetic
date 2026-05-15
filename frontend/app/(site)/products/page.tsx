@@ -4,389 +4,349 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { PremiumProductCard } from '@/components/PremiumProductCard';
-import { ChevronLeft, ChevronRight, X, Search, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
 
-// Colorful Category Bubbles configuration
-const CATEGORY_COLORS: Record<string, string> = {
-  'Moms': 'bg-gray-100 text-gray-800 hover:bg-gray-200',
-  'Babies': 'bg-gray-100 text-gray-800 hover:bg-gray-200',
-  'All': 'bg-gray-100 text-gray-800 hover:bg-gray-200',
-};
+// ─── Mock Data ───────────────────────────────────────────────────────────────
+const MOCK_PRODUCTS = [
+  { product_id: '1', name: 'COSRX Snail Mucin 96% Power Repairing Essence', price: 2800, old_price: 3200, category_name: 'Essence', brand: 'COSRX', images: [{ image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop' }] },
+  { product_id: '2', name: 'Anua Heartleaf 77% Soothing Toner', price: 3100, old_price: null, category_name: 'Toner', brand: 'Anua', images: [{ image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop' }] },
+  { product_id: '3', name: 'Some By Mi AHA BHA PHA 30 Days Miracle Toner', price: 1950, old_price: 2400, category_name: 'Toner', brand: 'Some By Mi', images: [{ image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop' }] },
+  { product_id: '4', name: 'Isntree Hyaluronic Acid Toner', price: 2200, old_price: null, category_name: 'Toner', brand: 'Isntree', images: [{ image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop' }] },
+  { product_id: '5', name: 'Skin1004 Madagascar Centella Ampoule', price: 3500, old_price: 4000, category_name: 'Ampoule', brand: 'Skin1004', images: [{ image: 'https://images.unsplash.com/photo-1617897903246-719242758050?w=600&auto=format&fit=crop' }] },
+  { product_id: '6', name: 'Medicube Age R Booster Shot', price: 5200, old_price: null, category_name: 'Serum', brand: 'Medicube', images: [{ image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&auto=format&fit=crop' }] },
+  { product_id: '7', name: 'Roundlab 1025 Dokdo Cleanser', price: 1800, old_price: 2000, category_name: 'Cleanser', brand: 'Roundlab', images: [{ image: 'https://images.unsplash.com/photo-1601612628452-9e99ced43524?w=600&auto=format&fit=crop' }] },
+  { product_id: '8', name: 'BOJ Ceramide Repair Cream', price: 4100, old_price: null, category_name: 'Moisturizer', brand: 'BOJ', images: [{ image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&auto=format&fit=crop' }] },
+  { product_id: '9', name: 'COSRX Advanced Snail 92 All in one Cream', price: 3300, old_price: 3800, category_name: 'Moisturizer', brand: 'COSRX', images: [{ image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop' }] },
+  { product_id: '10', name: 'Anua Heartleaf Pore Control Cleansing Oil', price: 2700, old_price: null, category_name: 'Cleanser', brand: 'Anua', images: [{ image: 'https://images.unsplash.com/photo-1614159102043-d3b56a98b8bc?w=600&auto=format&fit=crop' }] },
+  { product_id: '11', name: 'Skin1004 Centella Hyalu-Cica Water-Fit Sun Serum', price: 2900, old_price: 3500, category_name: 'Sunscreen', brand: 'Skin1004', images: [{ image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&auto=format&fit=crop' }] },
+  { product_id: '12', name: 'Isntree C-Niacin Toning Ampoule', price: 3800, old_price: null, category_name: 'Ampoule', brand: 'Isntree', images: [{ image: 'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=600&auto=format&fit=crop' }] },
+];
+
+const CATEGORIES = ['All', 'Toner', 'Essence', 'Serum', 'Ampoule', 'Moisturizer', 'Cleanser', 'Sunscreen'];
+const BRANDS = ['All', 'COSRX', 'Anua', 'Some By Mi', 'Isntree', 'Skin1004', 'Medicube', 'Roundlab', 'BOJ'];
+const PRICE_RANGES = [
+  { label: 'All Prices', min: 0, max: Infinity },
+  { label: 'Under Rs. 2,000', min: 0, max: 2000 },
+  { label: 'Rs. 2,000 – 3,000', min: 2000, max: 3000 },
+  { label: 'Rs. 3,000 – 4,000', min: 3000, max: 4000 },
+  { label: 'Above Rs. 4,000', min: 4000, max: Infinity },
+];
+const SORT_OPTIONS = [
+  { value: '', label: 'Default' },
+  { value: 'price_asc', label: 'Price: Low to High' },
+  { value: 'price_desc', label: 'Price: High to Low' },
+  { value: 'name_asc', label: 'Name: A–Z' },
+];
+
+const ITEMS_PER_PAGE = 8;
 
 interface Product {
   product_id: string;
   name: string;
   price: number;
-  old_price?: number;
+  old_price?: number | null;
   category_name: string;
+  brand: string;
   images: Array<{ image: string }>;
-  ratings?: {
-    stats: {
-      avg_rating: number;
-      total_ratings: number;
+}
+
+// ─── Dropdown Filter Component ────────────────────────────────────────────────
+function FilterDropdown({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-  };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-gray-700 hover:text-black transition-colors py-4 px-4 whitespace-nowrap"
+      >
+        {label}
+        <ChevronDown size={12} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-0 w-52 bg-white border border-gray-200 shadow-lg z-30">
+          {options.map((option) => (
+            <button
+              key={option}
+              onClick={() => { onChange(option); setOpen(false); }}
+              className={`w-full text-left px-5 py-3 text-[12px] tracking-wide transition-colors border-b border-gray-50 last:border-b-0 ${value === option ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
-interface ProductsResponse {
-  links: {
-    next: string | null;
-    previous: string | null;
-  };
-  count: number;
-  total_pages: number;
-  current_page: number;
-  results: Product[];
-}
-
-const CATEGORIES = ['All', 'Moms', 'Babies'];
-
+// ─── Main Content Component ───────────────────────────────────────────────────
 function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // State
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  // Filters state
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedBrand, setSelectedBrand] = useState('All');
+  const [selectedPriceRange, setSelectedPriceRange] = useState('All Prices');
+  const [selectedSort, setSelectedSort] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Search state
-  const [searchSuggestions, setSearchSuggestions] = useState<Product[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Filtered + sorted products
+  const filteredProducts = MOCK_PRODUCTS.filter((p) => {
+    const priceRange = PRICE_RANGES.find(r => r.label === selectedPriceRange) || PRICE_RANGES[0];
+    return (
+      (selectedCategory === 'All' || p.category_name === selectedCategory) &&
+      (selectedBrand === 'All' || p.brand === selectedBrand) &&
+      (p.price >= priceRange.min && p.price <= priceRange.max)
+    );
+  }).sort((a, b) => {
+    if (selectedSort === 'price_asc') return a.price - b.price;
+    if (selectedSort === 'price_desc') return b.price - a.price;
+    if (selectedSort === 'name_asc') return a.name.localeCompare(b.name);
+    return 0;
+  });
 
-  // Derived state
-  const currentPage = Number(searchParams.get('page')) || 1;
-  const currentCategory = searchParams.get('category') || '';
-  const currentSearch = searchParams.get('search') || '';
-  const currentSort = searchParams.get('ordering') || '';
-  const minPrice = Number(searchParams.get('min_price')) || 0;
-  const maxPrice = Number(searchParams.get('max_price')) || 100000;
-  const minRating = Number(searchParams.get('min_rating')) || 0;
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        params.set('page', currentPage.toString());
+  const resetPage = () => setCurrentPage(1);
 
-        if (currentCategory && currentCategory !== '') params.set('category', currentCategory);
-        if (currentSearch) params.set('search', currentSearch);
-        if (currentSort) params.set('ordering', currentSort);
-        if (minPrice > 0) params.set('min_price', minPrice.toString());
-        if (maxPrice < 100000) params.set('max_price', maxPrice.toString());
-        if (minRating > 0) params.set('min_rating', minRating.toString());
-
-        const endpoint = params.get("search") ? `${API_BASE_URL}/api/search/` : `${API_BASE_URL}/api/`;
-        const response = await fetch(`${endpoint}?${params.toString()}`);
-
-        if (response.ok) {
-          const data: ProductsResponse = await response.json();
-          setProducts(data.results);
-          setTotalPages(data.total_pages);
-        }
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, [currentPage, currentCategory, currentSearch, currentSort, minPrice, maxPrice, minRating]);
-
-  const updateParams = (newParams: Record<string, string | number | null>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value === null) params.delete(key);
-      else params.set(key, value.toString());
-    });
-    if (!newParams.page) params.set('page', '1');
-    router.push(`/products?${params.toString()}`);
-  };
-
-  const handleSearchInput = (value: string) => {
-    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-    if (!value.trim()) {
-      setSearchSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-    setSearchLoading(true);
-    searchTimeoutRef.current = setTimeout(async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/search/?search=${encodeURIComponent(value.trim())}`);
-        if (response.ok) {
-          const data = await response.json();
-          setSearchSuggestions(data.results.slice(0, 6));
-          setShowSuggestions(true);
-        }
-      } catch (e) { console.error(e); }
-      finally { setSearchLoading(false); }
-    }, 300);
-  };
+  const activeSortLabel = SORT_OPTIONS.find(o => o.value === selectedSort)?.label || 'Default';
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Vibrant Hero - using a fallback colorful gradient/image approach */}
-      <div className="relative w-full h-[40vh] md:h-[40vh] overflow-hidden bg-gradient-to-r from-rose-100 to-teal-100">
-        {/* If we had the image, we'd use it here. For now, a placeholder illustrative banner style */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/banner3.png" // Fallback to existing banner or a new one if available
-            alt="Shop Banner"
-            fill
-            className="object-cover opacity-90"
-            onError={(e) => {
-              // Fallback to gradient if image fails
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-          <div className="absolute inset-0 bg-black/20"></div> {/* Dark overlay for text pop */}
-        </div>
-        <nav className="flex absolute top-8 left-2 items-center gap-2 font-bold text-sm text-gray-800 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full">
-          <Link href="/" className="hover:text-black transition-colors">Home</Link>
-          <span>/</span>
-          <span className="text-black">Shop</span>
-          <span>/</span>
-          <span className="text-black">{currentCategory}</span>
-        </nav>
 
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-serif text-white font-bold drop-shadow-md mb-2">
-            {currentCategory || 'Our Collection'}
-          </h1>
-          <p className="text-white/90 text-lg md:text-xl font-medium max-w-lg drop-shadow-sm">
-            Soft, stylish, and made with love.
-          </p>
+      {/* ── TOP FILTER BAR ── */}
+      <div className="border-b border-gray-200 bg-white">
+        <div className="max-w-[1600px] mx-auto flex items-stretch divide-x divide-gray-200">
+          <FilterDropdown
+            label="Category"
+            options={CATEGORIES}
+            value={selectedCategory}
+            onChange={(v) => { setSelectedCategory(v); resetPage(); }}
+          />
+          <FilterDropdown
+            label="Brand"
+            options={BRANDS}
+            value={selectedBrand}
+            onChange={(v) => { setSelectedBrand(v); resetPage(); }}
+          />
+          <FilterDropdown
+            label="Price"
+            options={PRICE_RANGES.map(r => r.label)}
+            value={selectedPriceRange}
+            onChange={(v) => { setSelectedPriceRange(v); resetPage(); }}
+          />
         </div>
       </div>
 
-      <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-10">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-5">
 
-          {/* Filters Sidebar */}
-          <aside
-            className={`${mobileFiltersOpen ? 'fixed inset-0 z-50 bg-white p-6' : 'hidden'
-              } lg:block lg:w-60 flex-shrink-0 lg:sticky lg:top-24 h-fit`}
-          >
-            {mobileFiltersOpen && (
-              <div className="flex items-center justify-between mb-8 lg:hidden">
-                <h2 className="text-lg font-bold">Filters</h2>
-                <button
-                  onClick={() => setMobileFiltersOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            )}
-
-            <div className="space-y-8">
-              {/* Colorful Categories */}
-              <div>
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-4">Category</h3>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => updateParams({ category: cat === 'All' ? null : cat })}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-transform active:scale-95 ${(currentCategory === cat || (currentCategory === '' && cat === 'All'))
-                        ? 'bg-black text-white shadow-md'
-                        : CATEGORY_COLORS[cat] || 'bg-gray-100 text-gray-800'
-                        }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price Filter */}
-              <div className="pt-6 border-t border-gray-100">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-4">Price</h3>
-                <input
-                  type="range"
-                  min="0"
-                  max="100000"
-                  step="1000"
-                  value={minPrice}
-                  onChange={(e) => updateParams({ min_price: e.target.value })}
-                  className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
-                />
-                <div className="flex justify-between items-center mt-2 text-xs font-mono text-gray-600">
-                  <span>Rs. {minPrice.toLocaleString()}</span>
-                  <span>Rs. {maxPrice.toLocaleString()}</span>
-                </div>
-              </div>
-
-              {/* Rating Filter */}
-              <div className="pt-6 border-t border-gray-100">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-4">Rating</h3>
-                <div className="space-y-2">
-                  {[
-                    { value: 0, label: 'All Ratings' },
-                    { value: 4, label: '4★ & Above' },
-                    { value: 3, label: '3★ & Above' },
-                  ].map((option) => (
-                    <div
-                      key={option.value}
-                      onClick={() => updateParams({ min_rating: option.value || null })}
-                      className={`cursor-pointer text-sm py-1 transition-colors ${minRating === option.value
-                        ? 'font-bold text-gray-800'
-                        : 'text-gray-800 hover:text-black'
-                        }`}
-                    >
-                      {option.label}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          {/* Main Content */}
-          <div className="flex-1 w-full min-w-0">
-            {/* Toolbar */}
-            <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md py-3 mb-6 border-b border-gray-100 flex flex-wrap gap-4 items-center justify-between rounded-b-xl shadow-sm px-4">
-
-              <div className="flex flex-1 items-center gap-3 w-full md:w-auto">
-                <button
-                  onClick={() => setMobileFiltersOpen(true)}
-                  className="lg:hidden p-2 hover:bg-gray-50 rounded-md border border-gray-200"
-                >
-                  <SlidersHorizontal size={18} />
-                </button>
-
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-transparent hover:bg-gray-100 focus:bg-white focus:border-rose-200 focus:ring-2 focus:ring-rose-100 rounded-full text-sm outline-none transition-all"
-                    defaultValue={currentSearch}
-                    onChange={(e) => handleSearchInput(e.target.value)}
-                    onFocus={() => showSuggestions && setShowSuggestions(true)}
-                  />
-                  {showSuggestions && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-40 max-h-96 overflow-y-auto">
-                      {searchLoading ? (
-                        <div className="p-4 text-center text-gray-500">Searching...</div>
-                      ) : searchSuggestions.length > 0 ? (
-                        <div>
-                          {searchSuggestions.map((product) => (
-                            <Link
-                              key={product.product_id}
-                              href={`/products/${product.product_id}`}
-                              className="w-full flex items-center gap-3 p-3 hover:bg-gray-100 transition-colors border-b border-gray-100 last:border-b-0 text-left"
-                              onClick={() => setShowSuggestions(false)}
-                            >
-                              <Image
-                                src={product.images[0]?.image || '/images/placeholder.png'}
-                                alt={product.name}
-                                width={48}
-                                height={48}
-                                className="w-12 h-12 object-contain rounded"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                                <p className="text-xs text-gray-500">Rs. {product.price}</p>
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="p-4 text-center text-gray-500">No suggestions</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 ml-auto">
-                <span className="text-xs text-gray-500 uppercase font-bold tracking-wider hidden sm:block">{products.length} Items</span>
-                <div className="h-4 w-px bg-gray-200 hidden sm:block"></div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 uppercase tracking-widest hidden sm:block">Sort</span>
-                  <div className="relative group">
-                    <select
-                      value={currentSort}
-                      onChange={(e) => updateParams({ ordering: e.target.value })}
-                      className="appearance-none bg-transparent pl-2 pr-6 py-1 text-sm font-bold cursor-pointer outline-none text-right hover:text-rose-600 transition-colors"
-                    >
-                      <option value="">Featured</option>
-                      <option value="price">Low Price</option>
-                      <option value="-price">High Price</option>
-                    </select>
-                    <ArrowUpDown size={14} className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Grid - Standard Square Aspect */}
-            {loading ? (
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="aspect-square bg-gray-100 mb-3 rounded-xl"></div>
-                    <div className="h-3 bg-gray-100 w-3/4 mb-2 rounded"></div>
-                    <div className="h-3 bg-gray-100 w-1/4 rounded"></div>
-                  </div>
+        {/* ── SORT BAR + PAGINATION ── */}
+        <div className="flex items-center justify-between py-4 border-b border-gray-100">
+          {/* Sort by */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-gray-500 tracking-wider">Sort by</span>
+            <div className="relative">
+              <select
+                value={selectedSort}
+                onChange={(e) => { setSelectedSort(e.target.value); resetPage(); }}
+                className="appearance-none text-[12px] font-medium text-gray-800 pr-5 cursor-pointer bg-transparent outline-none border-b border-gray-300 pb-0.5 hover:border-gray-800 transition-colors"
+              >
+                {SORT_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
-              </div>
-            ) : products.length > 0 ? (
-              <>
-                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {products.map((product, idx) => (
-                    <div
-                      key={product.product_id}
-                      className="opacity-0 animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-forwards"
-                      style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'forwards' }}
-                    >
-                      <PremiumProductCard product={product} />
-                    </div>
-                  ))}
-                </div>
+              </select>
+              <ChevronDown size={11} className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" />
+            </div>
+          </div>
 
-                <div className="flex justify-center gap-2 mt-20">
-                  <button
-                    onClick={() => updateParams({ page: Math.max(1, currentPage - 1) })}
-                    disabled={currentPage === 1}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-full hover:border-rose-500 hover:text-rose-500 disabled:opacity-30 disabled:border-gray-200 transition-colors"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-
-                  <div className="flex items-center gap-1 font-mono text-sm">
-                    <span className="font-bold ">{currentPage}</span>
-                    <span className="text-gray-400">/</span>
-                    <span className="text-gray-400">{totalPages}</span>
-                  </div>
-
-                  <button
-                    onClick={() => updateParams({ page: Math.min(totalPages, currentPage + 1) })}
-                    disabled={currentPage === totalPages}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-full hover:border-rose-500 hover:text-rose-500 disabled:opacity-30 disabled:border-gray-200 transition-colors"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="py-20 text-center">
-                <p className="text-gray-500">No products found.</p>
-                <button onClick={() => router.push('/products')} className="mt-4 text-sm font-bold underline text-rose-500">Clear Filters</button>
-              </div>
-            )}
+          {/* Pagination controls */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-7 h-7 text-[12px] flex items-center justify-center transition-colors ${currentPage === page
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-600 hover:text-black'
+                  }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors"
+            >
+              <ChevronRight size={14} />
+            </button>
           </div>
         </div>
+
+        {/* ── PAGE TITLE ── */}
+        <h1 className="text-3xl font-serif text-gray-800 mt-8 mb-8 font-normal">
+          Korean Beauty Shop
+        </h1>
+
+        {/* ── ACTIVE FILTERS ── */}
+        {(selectedCategory !== 'All' || selectedBrand !== 'All' || selectedPriceRange !== 'All Prices') && (
+          <div className="flex items-center gap-2 mb-6 flex-wrap">
+            <span className="text-[11px] text-gray-400 uppercase tracking-wider">Active filters:</span>
+            {selectedCategory !== 'All' && (
+              <button
+                onClick={() => { setSelectedCategory('All'); resetPage(); }}
+                className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
+              >
+                {selectedCategory}
+                <X size={10} />
+              </button>
+            )}
+            {selectedBrand !== 'All' && (
+              <button
+                onClick={() => { setSelectedBrand('All'); resetPage(); }}
+                className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
+              >
+                {selectedBrand}
+                <X size={10} />
+              </button>
+            )}
+            {selectedPriceRange !== 'All Prices' && (
+              <button
+                onClick={() => { setSelectedPriceRange('All Prices'); resetPage(); }}
+                className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
+              >
+                {selectedPriceRange}
+                <X size={10} />
+              </button>
+            )}
+            <button
+              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); resetPage(); }}
+              className="text-[11px] text-gray-400 underline hover:text-gray-800 ml-2"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
+
+        {/* ── PRODUCT GRID ── */}
+        {paginatedProducts.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12 mb-20">
+              {paginatedProducts.map((product) => (
+                <Link
+                  key={product.product_id}
+                  href={`/products/${product.product_id}`}
+                  className="group"
+                >
+                  {/* Image */}
+                  <div className="aspect-square bg-[#f2f2f2] overflow-hidden relative mb-3">
+                    <Image
+                      src={product.images[0]?.image || '/images/placeholder.png'}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {product.old_price && (
+                      <div className="absolute top-3 left-3 bg-gray-900 text-white text-[9px] uppercase tracking-widest px-2 py-1">
+                        Sale
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Details */}
+                  <p className="text-[12px] text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black transition-colors">
+                    {product.name}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] text-gray-800">
+                      Rs. {product.price.toLocaleString()}
+                    </span>
+                    {product.old_price && (
+                      <span className="text-[12px] text-gray-400 line-through">
+                        Rs. {product.old_price.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* ── BOTTOM PAGINATION ── */}
+            <div className="flex items-center justify-center gap-1 pb-20">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors border border-gray-200"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-8 h-8 text-[12px] flex items-center justify-center transition-colors border ${currentPage === page
+                    ? 'bg-gray-900 text-white border-gray-900'
+                    : 'border-gray-200 text-gray-600 hover:border-gray-800 hover:text-black'
+                    }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors border border-gray-200"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="py-32 text-center">
+            <p className="text-gray-400 text-sm mb-4">No products found.</p>
+            <button
+              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); }}
+              className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
       </div>
     </main>
   );
@@ -394,7 +354,7 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white"></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
       <ProductsContent />
     </Suspense>
   );
