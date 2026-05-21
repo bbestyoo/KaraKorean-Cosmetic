@@ -345,15 +345,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         </section>
 
         <aside className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto bg-white px-6 py-10 sm:px-12 sm:py-14 lg:p-20 scrollbar-hide">
-          <div className="max-w-[480px] space-y-12">
+          <div className="max-w-[580px] space-y-12">
             {/* Header / Title */}
             <header className="space-y-6">
-              <h1 className="text-[1.75rem] font-light tracking-wide text-neutral-900 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-light tracking-wide text-neutral-900 leading-tight">
                 {product.name}
               </h1>
               <div className="flex items-baseline">
                 <p
-                  className="text-[1.5rem] text-neutral-800"
+                  className="text-2xl sm:text-3xl lg:text-[2rem] text-neutral-800"
                   style={{ fontFamily: 'var(--font-playfair), serif' }}
                 >
                   {formatRs(getFinalPrice())}
@@ -366,22 +366,22 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="w-full max-w-[240px] border border-neutral-300 bg-white py-3.5 text-xs font-medium tracking-widest text-neutral-600 uppercase transition-colors hover:border-neutral-900 hover:text-neutral-900"
+                className="w-full max-w-[320px] border border-[#0f3b2b] bg-[#0f3b2b] py-4.5 text-sm font-semibold tracking-widest text-white uppercase transition-all duration-300 hover:bg-transparent hover:text-[#0f3b2b] rounded-md shadow-md"
               >
                 Add to cart
               </button>
             </div>
 
             {/* Selectors */}
-            <div className="space-y-6 pt-4">
+            <div className="space-y-8 pt-4">
               {/* Size */}
-              <div className="grid grid-cols-[80px_1fr] items-center gap-4">
-                <span className="text-[15px] font-medium text-neutral-900">Size:</span>
-                <div className="relative max-w-[200px]">
+              <div className="grid grid-cols-[100px_1fr] items-center gap-6">
+                <span className="text-base md:text-lg font-semibold text-neutral-900">Size:</span>
+                <div className="relative w-full max-w-[280px] border border-neutral-300 rounded-md bg-neutral-50 px-1 py-0.5">
                   <select
                     value={selectedSize ?? ''}
                     onChange={(e) => setSelectedSize(e.target.value || null)}
-                    className="w-full appearance-none bg-transparent py-2 pl-3 pr-8 text-[15px] text-neutral-500 outline-none cursor-pointer"
+                    className="w-full appearance-none bg-transparent py-2.5 pl-3 pr-10 text-base text-neutral-700 outline-none cursor-pointer font-medium"
                   >
                     <option value="">Select Size</option>
                     {product.sizes && product.sizes.length > 0 ? (
@@ -402,16 +402,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       ))
                     )}
                   </select>
-                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-neutral-500" />
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-neutral-500" />
                 </div>
               </div>
 
               {/* Colors */}
-              <div className="grid grid-cols-[80px_1fr] items-start gap-4">
-                <span className="text-[15px] font-medium text-neutral-900 pt-1">Colors:</span>
+              <div className="grid grid-cols-[100px_1fr] items-start gap-6">
+                <span className="text-base md:text-lg font-semibold text-neutral-900 pt-1">Colors:</span>
                 <div>
-                  <p className="text-[15px] text-neutral-500 mb-3">{selectedColor ?? 'Black'}</p>
-                  <div className="flex flex-wrap gap-3">
+                  <p className="text-base md:text-lg text-neutral-500 mb-3">{selectedColor ?? 'Black'}</p>
+                  <div className="flex flex-wrap gap-3.5">
                     {displayColors.map((color) => {
                       const active = selectedColor === color.name;
                       return (
@@ -420,8 +420,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                           type="button"
                           onClick={() => handleColorSelect(color.name)}
                           title={color.name}
-                          className={`relative size-7 border transition-all ${
-                            active ? 'ring-2 ring-neutral-300 ring-offset-2 border-neutral-900' : 'border-neutral-300'
+                          className={`relative size-9 rounded-full border transition-all ${
+                            active ? 'ring-2 ring-neutral-400 ring-offset-2 border-neutral-900 scale-105' : 'border-neutral-300 hover:scale-105'
                           }`}
                           style={{
                             backgroundColor: color.hex || '#171717',
@@ -436,9 +436,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               </div>
 
               {/* Quantity */}
-              <div className="grid grid-cols-[80px_1fr] items-center gap-4 pt-2">
-                <span className="text-[15px] font-medium text-neutral-900">Quantity:</span>
-                <span className="text-[15px] text-neutral-900 pl-3">{quantity}</span>
+              <div className="grid grid-cols-[100px_1fr] items-center gap-6 pt-2">
+                <span className="text-base md:text-lg font-semibold text-neutral-900">Quantity:</span>
+                <span className="text-base md:text-lg text-neutral-900 pl-3">{quantity}</span>
               </div>
               
               {showValidationErrors && !selectedSize && (
@@ -456,15 +456,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       <button
                         type="button"
                         onClick={() => setOpenPolicy(open ? null : section.id)}
-                        className="flex w-full items-center justify-between py-4 text-left text-xs font-medium tracking-widest uppercase text-neutral-700 hover:text-neutral-900 transition-colors"
+                        className="flex w-full items-center justify-between py-5 text-left text-sm md:text-base font-bold tracking-widest uppercase text-neutral-800 hover:text-[#0f3b2b] transition-colors"
                       >
                         {section.title}
                         <ChevronDown
-                          className={`size-4 shrink-0 text-neutral-500 transition-transform ${open ? 'rotate-180' : ''}`}
+                          className={`size-5 shrink-0 text-neutral-500 transition-transform ${open ? 'rotate-180' : ''}`}
                         />
                       </button>
                       {open && (
-                        <p className="pb-5 text-[15px] leading-relaxed text-neutral-500">{section.body}</p>
+                        <p className="pb-6 text-base md:text-lg leading-relaxed text-neutral-600">{section.body}</p>
                       )}
                     </li>
                   );

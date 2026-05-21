@@ -11,10 +11,10 @@ import Brands from "@/components/brands";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Total scroll height for the hero “stage” (sticky hero + scrub phases).
- * Larger = more wheel travel before the next section fully covers.
+ * Total scroll height for the hero "stage".
+ * Keeps the BestSellers sticky slide-up effect.
  */
-const HERO_SCROLL_VH = 360;
+const HERO_SCROLL_VH = 96;
 
 type HomeHeroProps = {
   children: ReactNode;
@@ -29,69 +29,82 @@ export function HomeHero({ children }: HomeHeroProps) {
   const labelsRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
 
-  /** Mount-only fade for ELEGANCE / BEAUTY and “glow like / never before” (not tied to scroll). */
+  /**
+   * On-load animation for all visible hero elements:
+   * - Left panel slides in from the left
+   * - Right panel slides in from the right
+   * - Brands bar fades up
+   * - Labels (ELEGANCE/BEAUTY) and headline fade in
+   */
   useLayoutEffect(() => {
     const labels = labelsRef.current;
     const headline = headlineRef.current;
-    if (!labels || !headline) return;
+    const left = leftRef.current;
+    const right = rightRef.current;
+    const brands = brandsWrapRef.current;
+    if (!labels || !headline || !left || !right || !brands) return;
 
     const reduceMotion =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) {
-      gsap.set([labels, headline], { autoAlpha: 1, y: 0 });
+      gsap.set([labels, headline, left, right, brands], {
+        autoAlpha: 1,
+        x: 0,
+        y: 0,
+      });
       return;
     }
 
-    gsap.set([labels, headline], { autoAlpha: 0, y: 14 });
+    const off = Math.min(120, window.innerWidth * 0.1);
 
-    const intro = gsap.timeline({
-      defaults: { ease: "power2.out" },
-    });
+    // Start everything hidden
+    gsap.set([labels, headline], { autoAlpha: 0, y: 14 });
+    gsap.set(left, { autoAlpha: 0, x: -off });
+    gsap.set(right, { autoAlpha: 0, x: off });
+    gsap.set(brands, { autoAlpha: 0, y: 30 });
+
+    const intro = gsap.timeline({ defaults: { ease: "power2.out" } });
+    // Labels and headline
     intro.to(labels, { autoAlpha: 1, y: 0, duration: 0.95 }, 0);
     intro.to(headline, { autoAlpha: 1, y: 0, duration: 1.05 }, 0.12);
+    // Left panel slides in from left
+    intro.to(left, { autoAlpha: 1, x: 0, duration: 1.1 }, 0.15);
+    // Right panel slides in from right
+    intro.to(right, { autoAlpha: 1, x: 0, duration: 1.1 }, 0.25);
+    // Brands bar fades up
+    intro.to(brands, { autoAlpha: 1, y: 0, duration: 0.9 }, 0.35);
 
     return () => {
       intro.kill();
     };
   }, []);
 
+  /**
+   * Scroll animation: ONLY the "below" content (BestSellers+) slides up.
+   * Everything else in the hero is visible from the start.
+   */
   useLayoutEffect(() => {
     const root = scrollRootRef.current;
     const below = belowRef.current;
-    const left = leftRef.current;
-    const right = rightRef.current;
-    const brands = brandsWrapRef.current;
-    if (!root || !below || !left || !right || !brands) return;
+    if (!root || !below) return;
 
     const reduceMotion =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) {
-      gsap.set([left, right, brands], {
-        x: 0,
-        y: 0,
-        opacity: 1,
-        clearProps: "visibility",
-      });
       gsap.set(below, { y: 0, clearProps: "willChange" });
       return;
     }
 
-    const off = Math.min(120, window.innerWidth * 0.1);
     const lift = Math.round(window.innerHeight);
+    const belowStart = 2;
+    const belowDur = 10;
 
     const ctx = gsap.context(() => {
-      gsap.set(left, { x: -off, opacity: 0, visibility: "visible" });
-      gsap.set(right, { x: off, opacity: 0, visibility: "visible" });
-      gsap.set(brands, { y: 40, opacity: 0, visibility: "visible" });
       gsap.set(below, { y: lift, willChange: "transform" });
-
-      const revealDur = 3;
-      const belowStart = 2;
-      const belowDur = 10;
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -102,17 +115,6 @@ export function HomeHero({ children }: HomeHeroProps) {
           invalidateOnRefresh: true,
         },
       });
-
-      tl.to(
-        [left, right],
-        { x: 0, opacity: 1, duration: revealDur, ease: "none" },
-        0
-      );
-      tl.to(
-        brands,
-        { y: 0, opacity: 1, duration: revealDur * 0.95, ease: "none" },
-        0
-      );
 
       tl.fromTo(
         below,
@@ -141,19 +143,22 @@ export function HomeHero({ children }: HomeHeroProps) {
         style={{ height: `${HERO_SCROLL_VH}vh` }}
         aria-label="Hero"
       >
-        <div className="sticky top-0 flex h-[100dvh] min-h-[640px] w-full flex-1 items-center justify-center overflow-hidden bg-[#f7f6f2] px-6 py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f]">
+        <div className="sticky top-0  flex h-[88vh] min-h-[540px] w-full flex-1 items-center justify-center overflow-hidden bg-[#f7f6f2] px-6 py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f]">
+
+          {/* Hero model — fills full viewport height, bottom-anchored */}
           <Image
             src="/images/heromodel.png"
             alt="Hero image"
             width={800}
-            height={1200}
-            className="absolute z-30 top-[-10%] select-none"
+            height={1800}
+            className="absolute z-30 bottom-0 h-[96vh] w-auto select-none object-contain object-bottom"
             priority
-          />
+          />1
 
+          {/* Left panel — New Arrivals + Glow Ampoule card */}
           <div
             ref={leftRef}
-            className="invisible absolute left-10 top-16 z-20 flex flex-col gap-0"
+            className="absolute left-10 top-16 z-20 flex flex-col gap-0"
           >
             <span className="self-start border border-[#0f3b2b] text-[#0f3b2b] text-mdz tracking-[0.25em] font-sans px-4 py-1 rounded-full mb-5">
               ✦ NEW ARRIVALS
@@ -222,6 +227,7 @@ export function HomeHero({ children }: HomeHeroProps) {
             </Link>
           </div>
 
+          {/* ELEGANCE / BEAUTY labels */}
           <div
             ref={labelsRef}
             className="pointer-events-none absolute inset-0 z-20"
@@ -234,6 +240,7 @@ export function HomeHero({ children }: HomeHeroProps) {
             </div>
           </div>
 
+          {/* Headline — glow like / never before */}
           <div ref={headlineRef} className="absolute inset-0 z-10">
             <div className="pointer-events-none absolute top-40 right-40 opacity-95">
               <div className="font-symphony lowercase text-[#0f3b2b] text-6xl md:text-[6.8rem] lg:text-[14rem] leading-none">
@@ -247,9 +254,10 @@ export function HomeHero({ children }: HomeHeroProps) {
             </div>
           </div>
 
+          {/* Right panel — tagline + CTAs */}
           <div
             ref={rightRef}
-            className="invisible absolute right-10 bottom-40 z-20 flex flex-col items-start gap-5 text-left"
+            className="absolute right-10 bottom-40 z-20 flex flex-col items-start gap-5 text-left"
           >
             <p className="font-sans text-xs tracking-[0.2em] text-[#6b766f] leading-relaxed normal-case">
               Rituals rooted in nature.
@@ -271,12 +279,14 @@ export function HomeHero({ children }: HomeHeroProps) {
             </Link>
           </div>
 
-          <div ref={brandsWrapRef} className="invisible absolute inset-x-0 bottom-0 z-20">
+          {/* Brands bar */}
+          <div ref={brandsWrapRef} className="absolute inset-x-0 bottom-0 z-20">
             <Brands />
           </div>
         </div>
       </section>
 
+      {/* BestSellers + rest of page — slides up over the hero on scroll */}
       <div
         ref={belowRef}
         className="relative z-[100] -mt-[100vh] bg-[#f7f6f2]"

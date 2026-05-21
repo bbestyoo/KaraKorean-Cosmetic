@@ -88,50 +88,82 @@ export function SiteHeader() {
             </div>
 
             {/* Desktop Navigation - Centered */}
-            <nav className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 gap-10 text-[12px] font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
+            <nav className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 gap-20 text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
               <Link
-                href="/products"
+                href="/"
                 className={cn(
-                  "pb-1 transition-colors hover:text-black",
-                  currentCategory === "products" || currentCategory === "" // Default active for demo matching picture
-                    ? "border-b-2 border-[#5c6e69] text-[#4a5a56]"
-                    : "border-b-2 border-transparent hover:border-[#5c6e69]"
+                  "relative pb-1 transition-colors hover:text-black group",
+                  currentCategory === "products" || currentCategory === ""
+                    ? "text-[#4a5a56]"
+                    : ""
                 )}
               >
-                Skincare
+                Home
+                <span
+                  className={cn(
+                    "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
+                    currentCategory === "products" || currentCategory === ""
+                      ? "w-full scale-x-100"
+                      : "w-full scale-x-0 group-hover:scale-x-100"
+                  )}
+                />
               </Link>
               <Link
                 href="/products?category=Sets"
                 className={cn(
-                  "pb-1 transition-colors hover:text-black",
+                  "relative pb-1 transition-colors hover:text-black group",
                   currentCategory === "sets"
-                    ? "border-b-2 border-[#5c6e69] text-[#4a5a56]"
-                    : "border-b-2 border-transparent hover:border-[#5c6e69]"
+                    ? "text-[#4a5a56]"
+                    : ""
                 )}
               >
-                Sets
+                Products
+                <span
+                  className={cn(
+                    "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
+                    currentCategory === "sets"
+                      ? "w-full scale-x-100"
+                      : "w-full scale-x-0 group-hover:scale-x-100"
+                  )}
+                />
               </Link>
               <Link
                 href="/products?category=Editorial"
                 className={cn(
-                  "pb-1 transition-colors hover:text-black",
+                  "relative pb-1 transition-colors hover:text-black group",
                   currentCategory === "editorial"
-                    ? "border-b-2 border-[#5c6e69] text-[#4a5a56]"
-                    : "border-b-2 border-transparent hover:border-[#5c6e69]"
+                    ? "text-[#4a5a56]"
+                    : ""
                 )}
               >
-                Editorial
+                Skincare
+                <span
+                  className={cn(
+                    "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
+                    currentCategory === "editorial"
+                      ? "w-full scale-x-100"
+                      : "w-full scale-x-0 group-hover:scale-x-100"
+                  )}
+                />
               </Link>
               <Link
                 href="/journal"
                 className={cn(
-                  "pb-1 transition-colors hover:text-black",
+                  "relative pb-1 transition-colors hover:text-black group",
                   pathname === "/journal"
-                    ? "border-b-2 border-[#5c6e69] text-[#4a5a56]"
-                    : "border-b-2 border-transparent hover:border-[#5c6e69]"
+                    ? "text-[#4a5a56]"
+                    : ""
                 )}
               >
                 Journal
+                <span
+                  className={cn(
+                    "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
+                    pathname === "/journal"
+                      ? "w-full scale-x-100"
+                      : "w-full scale-x-0 group-hover:scale-x-100"
+                  )}
+                />
               </Link>
             </nav>
 
