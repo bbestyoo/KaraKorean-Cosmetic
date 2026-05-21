@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger);
  * Total scroll height for the hero "stage".
  * Keeps the BestSellers sticky slide-up effect.
  */
-const HERO_SCROLL_VH = 96;
+const HERO_SCROLL_VH = 88;
 
 type HomeHeroProps = {
   children: ReactNode;
@@ -23,11 +23,12 @@ type HomeHeroProps = {
 export function HomeHero({ children }: HomeHeroProps) {
   const scrollRootRef = useRef<HTMLElement>(null);
   const belowRef = useRef<HTMLDivElement>(null);
-  const leftRef = useRef<HTMLDivElement>(null);
-  const rightRef = useRef<HTMLDivElement>(null);
-  const brandsWrapRef = useRef<HTMLDivElement>(null);
-  const labelsRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLDivElement>(null);
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const rightPanelRef = useRef<HTMLDivElement>(null);
+  const glowLikeRef = useRef<HTMLDivElement>(null);
+  const neverBeforeRef = useRef<HTMLDivElement>(null);
+  const beautyRef = useRef<HTMLDivElement>(null);
+  const eleganceRef = useRef<HTMLDivElement>(null);
 
   /**
    * On-load animation for all visible hero elements:
@@ -36,50 +37,6 @@ export function HomeHero({ children }: HomeHeroProps) {
    * - Brands bar fades up
    * - Labels (ELEGANCE/BEAUTY) and headline fade in
    */
-  useLayoutEffect(() => {
-    const labels = labelsRef.current;
-    const headline = headlineRef.current;
-    const left = leftRef.current;
-    const right = rightRef.current;
-    const brands = brandsWrapRef.current;
-    if (!labels || !headline || !left || !right || !brands) return;
-
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (reduceMotion) {
-      gsap.set([labels, headline, left, right, brands], {
-        autoAlpha: 1,
-        x: 0,
-        y: 0,
-      });
-      return;
-    }
-
-    const off = Math.min(120, window.innerWidth * 0.1);
-
-    // Start everything hidden
-    gsap.set([labels, headline], { autoAlpha: 0, y: 14 });
-    gsap.set(left, { autoAlpha: 0, x: -off });
-    gsap.set(right, { autoAlpha: 0, x: off });
-    gsap.set(brands, { autoAlpha: 0, y: 30 });
-
-    const intro = gsap.timeline({ defaults: { ease: "power2.out" } });
-    // Labels and headline
-    intro.to(labels, { autoAlpha: 1, y: 0, duration: 0.95 }, 0);
-    intro.to(headline, { autoAlpha: 1, y: 0, duration: 1.05 }, 0.12);
-    // Left panel slides in from left
-    intro.to(left, { autoAlpha: 1, x: 0, duration: 1.1 }, 0.15);
-    // Right panel slides in from right
-    intro.to(right, { autoAlpha: 1, x: 0, duration: 1.1 }, 0.25);
-    // Brands bar fades up
-    intro.to(brands, { autoAlpha: 1, y: 0, duration: 0.9 }, 0.35);
-
-    return () => {
-      intro.kill();
-    };
-  }, []);
 
   /**
    * Scroll animation: ONLY the "below" content (BestSellers+) slides up.
@@ -88,6 +45,12 @@ export function HomeHero({ children }: HomeHeroProps) {
   useLayoutEffect(() => {
     const root = scrollRootRef.current;
     const below = belowRef.current;
+    const leftPanel = leftPanelRef.current;
+    const rightPanel = rightPanelRef.current;
+    const glowLike = glowLikeRef.current;
+    const neverBefore = neverBeforeRef.current;
+    const beauty = beautyRef.current;
+    const elegance = eleganceRef.current;
     if (!root || !below) return;
 
     const reduceMotion =
@@ -100,7 +63,7 @@ export function HomeHero({ children }: HomeHeroProps) {
     }
 
     const lift = Math.round(window.innerHeight);
-    const belowStart = 2;
+    const belowStart = 1;
     const belowDur = 10;
 
     const ctx = gsap.context(() => {
@@ -109,10 +72,10 @@ export function HomeHero({ children }: HomeHeroProps) {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
-          start: "top top",
+          start: "top 5%",
           end: "bottom bottom",
           scrub: 2,
-          invalidateOnRefresh: true,
+          invalidateOnRefresh: false,
         },
       });
 
@@ -122,10 +85,61 @@ export function HomeHero({ children }: HomeHeroProps) {
         {
           y: 0,
           duration: belowDur,
-          ease: "power2.inOut",
+          ease: "easein",
         },
         belowStart
       );
+
+      // On-load animations for left and right panels
+      if (leftPanel) {
+        gsap.fromTo(
+          leftPanel,
+          { x: -50, opacity: 0 },
+          { x: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.2 }
+        );
+      }
+
+      if (rightPanel) {
+        gsap.fromTo(
+          rightPanel,
+          { x: 50, opacity: 0 },
+          { x: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.2 }
+        );
+      }
+
+      // On-load animations for elegance/beauty labels
+      if (elegance) {
+        gsap.fromTo(
+          elegance,
+          { x: -50, opacity: 0 },
+          { x: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.3 }
+        );
+      }
+
+      if (beauty) {
+        gsap.fromTo(
+          beauty,
+          { x: 50, opacity: 0 },
+          { x: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.3 }
+        );
+      }
+
+      // On-load animations for headline elements
+      if (glowLike) {
+        gsap.fromTo(
+          glowLike,
+          { x: 50, opacity: 0 },
+          { x: 0, opacity: 1, duration: 1.4, ease: "power3.out", delay: 0.4 }
+        );
+      }
+
+      if (neverBefore) {
+        gsap.fromTo(
+          neverBefore,
+          { x: 50, opacity: 0 },
+          { x: 0, opacity: 1, duration: 1.4, ease: "power3.out", delay: 0.5 }
+        );
+      }
     }, root);
 
     requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -157,18 +171,27 @@ export function HomeHero({ children }: HomeHeroProps) {
 
           {/* Left panel — New Arrivals + Glow Ampoule card */}
           <div
-            ref={leftRef}
+            ref={leftPanelRef}
             className="absolute left-10 top-16 z-20 flex flex-col gap-0"
           >
             <span className="self-start border border-[#0f3b2b] text-[#0f3b2b] text-mdz tracking-[0.25em] font-sans px-4 py-1 rounded-full mb-5">
               ✦ NEW ARRIVALS
             </span>
 
-            <div className="bg-[#eeebd8]/70 p-3 flex gap-3 mb-6">
+            <div className="bg-[#eeebd8]/70 py-4 flex gap-3 mb-6">
               <div className="w-48 h-64 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center">
-                <span className="text-[#6b766f] text-[0.5rem] font-sans">img</span>
+                <span className="text-[#6b766f] text-[0.5rem] font-sans">
+                  <Image
+                    src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=600&auto=format&fit=crop"
+                    alt="Hero image"
+                    width={400}
+                    height={400}
+                    className=""
+                    priority
+                  />
+                </span>
               </div>
-              <div className="flex flex-col justify-between py-1">
+              <div className="flex flex-col justify-between px-4">
                 <div>
                   <p className="font-serif italic text-[#0f3b2b] text-2xl leading-tight">
                     Glow Ampoule
@@ -229,25 +252,36 @@ export function HomeHero({ children }: HomeHeroProps) {
 
           {/* ELEGANCE / BEAUTY labels */}
           <div
-            ref={labelsRef}
             className="pointer-events-none absolute inset-0 z-20"
           >
-            <div className="absolute left-[65%] bottom-64 text-4xl uppercase tracking-[0.4em] text-[#6b766f]">
+            <div
+              ref={beautyRef}
+              className="absolute left-[65%] bottom-64 text-4xl uppercase tracking-[0.4em] text-[#6b766f]"
+            >
               BEAUTY
             </div>
-            <div className="absolute left-[25%] bottom-64 text-4xl uppercase tracking-[0.4em] text-[#6b766f]">
+            <div
+              ref={eleganceRef}
+              className="absolute left-[25%] bottom-64 text-4xl uppercase tracking-[0.4em] text-[#6b766f]"
+            >
               ELEGANCE
             </div>
           </div>
 
           {/* Headline — glow like / never before */}
-          <div ref={headlineRef} className="absolute inset-0 z-10">
-            <div className="pointer-events-none absolute top-40 right-40 opacity-95">
+          <div className="absolute inset-0 z-10">
+            <div
+              ref={glowLikeRef}
+              className="pointer-events-none absolute top-40 right-40 opacity-95"
+            >
               <div className="font-symphony lowercase text-[#0f3b2b] text-6xl md:text-[6.8rem] lg:text-[14rem] leading-none">
                 glow like
               </div>
             </div>
-            <div className="pointer-events-auto absolute top-90 right-24">
+            <div
+              ref={neverBeforeRef}
+              className="pointer-events-auto absolute top-90 right-24"
+            >
               <span className="font-serif lowercase text-[#0f3b2b] text-[8rem] leading-tight tracking-tight">
                 never before
               </span>
@@ -256,7 +290,7 @@ export function HomeHero({ children }: HomeHeroProps) {
 
           {/* Right panel — tagline + CTAs */}
           <div
-            ref={rightRef}
+            ref={rightPanelRef}
             className="absolute right-10 bottom-40 z-20 flex flex-col items-start gap-5 text-left"
           >
             <p className="font-sans text-xs tracking-[0.2em] text-[#6b766f] leading-relaxed normal-case">
@@ -280,7 +314,7 @@ export function HomeHero({ children }: HomeHeroProps) {
           </div>
 
           {/* Brands bar */}
-          <div ref={brandsWrapRef} className="absolute inset-x-0 bottom-0 z-20">
+          <div className="absolute inset-x-0 bottom-0 z-20">
             <Brands />
           </div>
         </div>
