@@ -3,12 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useRef } from "react";
 import Brands from "@/components/brands";
-
-gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Total scroll height for the hero "stage".
@@ -30,125 +26,6 @@ export function HomeHero({ children }: HomeHeroProps) {
   const beautyRef = useRef<HTMLDivElement>(null);
   const eleganceRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * On-load animation for all visible hero elements:
-   * - Left panel slides in from the left
-   * - Right panel slides in from the right
-   * - Brands bar fades up
-   * - Labels (ELEGANCE/BEAUTY) and headline fade in
-   */
-
-  /**
-   * Scroll animation: ONLY the "below" content (BestSellers+) slides up.
-   * Everything else in the hero is visible from the start.
-   */
-  useLayoutEffect(() => {
-    const root = scrollRootRef.current;
-    const below = belowRef.current;
-    const leftPanel = leftPanelRef.current;
-    const rightPanel = rightPanelRef.current;
-    const glowLike = glowLikeRef.current;
-    const neverBefore = neverBeforeRef.current;
-    const beauty = beautyRef.current;
-    const elegance = eleganceRef.current;
-    if (!root || !below) return;
-
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (reduceMotion) {
-      gsap.set(below, { y: 0, clearProps: "willChange" });
-      return;
-    }
-
-    const lift = Math.round(window.innerHeight);
-    const belowStart = 1;
-    const belowDur = 10;
-
-    const ctx = gsap.context(() => {
-      gsap.set(below, { y: lift, willChange: "transform" });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: root,
-          start: "top 5%",
-          end: "bottom bottom",
-          scrub: 2,
-          invalidateOnRefresh: false,
-        },
-      });
-
-      tl.fromTo(
-        below,
-        { y: lift },
-        {
-          y: 0,
-          duration: belowDur,
-          ease: "easein",
-        },
-        belowStart
-      );
-
-      // On-load animations for left and right panels
-      if (leftPanel) {
-        gsap.fromTo(
-          leftPanel,
-          { x: -50, opacity: 0 },
-          { x: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.2 }
-        );
-      }
-
-      if (rightPanel) {
-        gsap.fromTo(
-          rightPanel,
-          { x: 50, opacity: 0 },
-          { x: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.2 }
-        );
-      }
-
-      // On-load animations for elegance/beauty labels
-      if (elegance) {
-        gsap.fromTo(
-          elegance,
-          { x: -50, opacity: 0 },
-          { x: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.3 }
-        );
-      }
-
-      if (beauty) {
-        gsap.fromTo(
-          beauty,
-          { x: 50, opacity: 0 },
-          { x: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.3 }
-        );
-      }
-
-      // On-load animations for headline elements
-      if (glowLike) {
-        gsap.fromTo(
-          glowLike,
-          { x: 50, opacity: 0 },
-          { x: 0, opacity: 1, duration: 1.4, ease: "power3.out", delay: 0.4 }
-        );
-      }
-
-      if (neverBefore) {
-        gsap.fromTo(
-          neverBefore,
-          { x: 50, opacity: 0 },
-          { x: 0, opacity: 1, duration: 1.4, ease: "power3.out", delay: 0.5 }
-        );
-      }
-    }, root);
-
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-
-    return () => {
-      ctx.revert();
-    };
-  }, []);
-
   return (
     <>
       <section
@@ -167,7 +44,7 @@ export function HomeHero({ children }: HomeHeroProps) {
             height={1800}
             className="absolute z-30 bottom-0 h-[96vh] w-auto select-none object-contain object-bottom"
             priority
-          />1
+          />
           {/* Left panel — New Arrivals + Glow Ampoule card */}
           <div
             ref={leftPanelRef}

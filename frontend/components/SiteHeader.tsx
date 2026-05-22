@@ -5,15 +5,14 @@ import Image from "next/image";
 import { Search, User, Menu } from "lucide-react";
 import { CartButton } from "@/components/CartButton";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { PromoBanner } from "./PromoBanner";
 
 export function SiteHeader() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -25,19 +24,17 @@ export function SiteHeader() {
       const currentScrollY = window.scrollY;
 
       // Hide if scrolling down and passed the header height, show if scrolling up
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
+      const shouldShow = !(currentScrollY > lastScrollYRef.current && currentScrollY > 100);
 
-      setLastScrollY(currentScrollY);
-      setIsScrolled(currentScrollY > 20);
+      setIsVisible((previousVisible) =>
+        previousVisible === shouldShow ? previousVisible : shouldShow
+      );
+      lastScrollYRef.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   return (
     <>
