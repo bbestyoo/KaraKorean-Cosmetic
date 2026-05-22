@@ -257,34 +257,44 @@ load_dotenv()
 # ImproperlyConfigured error if boto3 is missing).
 
 
-# Tell django-storages to use the S3Boto3 backend:
+# # Tell django-storages to use the S3Boto3 backend:
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "storages.backends.s3.S3Storage",
+#         "OPTIONS": {
+#             "access_key": os.getenv('AWS_ACCESS_KEY_ID'),
+#             "secret_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
+#             "bucket_name": os.getenv('AWS_STORAGE_BUCKET_NAME'),
+#             "endpoint_url": os.getenv('AWS_S3_ENDPOINT_URL'),
+#             "location":'media/',
+#             "default_acl": "public-read",
+#             "custom_domain": os.getenv('AWS_S3_CUSTOM_DOMAIN'),
+#         }
+#     },
+#     "staticfiles": {
+#         "BACKEND": "storages.backends.s3.S3Storage",
+#         "OPTIONS": {
+#             "access_key": os.getenv('AWS_ACCESS_KEY_ID'),
+#             "secret_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
+#             "bucket_name": os.getenv('AWS_STORAGE_BUCKET_NAME'),
+#             "endpoint_url": os.getenv('AWS_S3_ENDPOINT_URL'),
+#             "location":'static',
+#             "default_acl": "public-read",
+#             "custom_domain": os.getenv('AWS_S3_CUSTOM_DOMAIN'),
+#         }
+#     },
+# }
+#okay
+
+
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "access_key": os.getenv('AWS_ACCESS_KEY_ID'),
-            "secret_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
-            "bucket_name": os.getenv('AWS_STORAGE_BUCKET_NAME'),
-            "endpoint_url": os.getenv('AWS_S3_ENDPOINT_URL'),
-            "location":'media/',
-            "default_acl": "public-read",
-            "custom_domain": os.getenv('AWS_S3_CUSTOM_DOMAIN'),
-        }
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "access_key": os.getenv('AWS_ACCESS_KEY_ID'),
-            "secret_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
-            "bucket_name": os.getenv('AWS_STORAGE_BUCKET_NAME'),
-            "endpoint_url": os.getenv('AWS_S3_ENDPOINT_URL'),
-            "location":'static',
-            "default_acl": "public-read",
-            "custom_domain": os.getenv('AWS_S3_CUSTOM_DOMAIN'),
-        }
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-#okay
 
 # You can also configure additional options if needed:
 AWS_S3_OBJECT_PARAMETERS = {
@@ -305,3 +315,12 @@ CELERY_TIMEZONE = 'UTC'
 
 FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN')
 FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID')
+
+
+DEBUG = True
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
