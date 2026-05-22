@@ -2,45 +2,54 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, User, Menu } from "lucide-react";
+import { Menu, Heart } from "lucide-react";
 import { CartButton } from "@/components/CartButton";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useRef } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { PromoBanner } from "./PromoBanner";
+import { useWishlist } from "@/context/WishlistContext";
+
+const NAV_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "Products", href: "/products" },
+  { label: "Blog", href: "/blog" },
+  { label: "Quiz", href: "/quiz" },
+  { label: "About", href: "/about" },
+];
 
 export function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const lastScrollYRef = useRef(0);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { wishlist: wishlistItems } = useWishlist();
 
-  const isHome = pathname === "/";
-  const currentCategory = searchParams.get("category")?.toLowerCase() || "";
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      // Hide if scrolling down and passed the header height, show if scrolling up
-      const shouldShow = !(currentScrollY > lastScrollYRef.current && currentScrollY > 100);
-
-      setIsVisible((previousVisible) =>
-        previousVisible === shouldShow ? previousVisible : shouldShow
-      );
-      lastScrollYRef.current = currentScrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   return (
     <>
       <header
         className={cn(
-          "sticky top-[0] w-full z-40 transition-transform duration-300 border-b bg-[#f7f6f2]",
+          "sticky top-0 w-full z-40 transition-transform duration-300 border-b bg-[#f7f6f2]",
           isVisible ? "translate-y-0" : "-translate-y-full"
         )}
       >
@@ -55,7 +64,7 @@ export function SiteHeader() {
             <Menu className="w-6 h-6" />
           </button>
 
-          {/* Logo - Left */}
+          {/* Logo */}
           <div className="flex items-center">
             <Link href="/">
               <Image
@@ -63,160 +72,98 @@ export function SiteHeader() {
                 alt="Kara KOREAN BEAUTY STORE"
                 width={180}
                 height={60}
-                className="object-contain "
+                className="object-contain"
               />
             </Link>
           </div>
 
-          {/* Desktop Navigation - Centered */}
-          <nav className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 gap-20 text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
-            <Link
-              href="/"
-              className={cn(
-                "relative pb-1 transition-colors hover:text-black group",
-                currentCategory === "products" || currentCategory === ""
-                  ? "text-[#4a5a56]"
-                  : ""
-              )}
-            >
-              Home
-              <span
-                className={cn(
-                  "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
-                  currentCategory === "products" || currentCategory === ""
-                    ? "w-full scale-x-100"
-                    : "w-full scale-x-0 group-hover:scale-x-100"
-                )}
-              />
-            </Link>
-            <Link
-              href="/products?category=Sets"
-              className={cn(
-                "relative pb-1 transition-colors hover:text-black group",
-                currentCategory === "sets"
-                  ? "text-[#4a5a56]"
-                  : ""
-              )}
-            >
-              Products
-              <span
-                className={cn(
-                  "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
-                  currentCategory === "sets"
-                    ? "w-full scale-x-100"
-                    : "w-full scale-x-0 group-hover:scale-x-100"
-                )}
-              />
-            </Link>
-            <Link
-              href="/products?category=Editorial"
-              className={cn(
-                "relative pb-1 transition-colors hover:text-black group",
-                currentCategory === "editorial"
-                  ? "text-[#4a5a56]"
-                  : ""
-              )}
-            >
-              Skincare
-              <span
-                className={cn(
-                  "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
-                  currentCategory === "editorial"
-                    ? "w-full scale-x-100"
-                    : "w-full scale-x-0 group-hover:scale-x-100"
-                )}
-              />
-            </Link>
-            <Link
-              href="/blog"
-              className={cn(
-                "relative pb-1 transition-colors hover:text-black group",
-                pathname === "/blog"
-                  ? "text-[#4a5a56]"
-                  : ""
-              )}
-            >
-              Blog
-              <span
-                className={cn(
-                  "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
-                  pathname === "/blog"
-                    ? "w-full scale-x-100"
-                    : "w-full scale-x-0 group-hover:scale-x-100"
-                )}
-              />
-            </Link>
-            <Link
-              href="/wishlist"
-              className={cn(
-                "relative pb-1 transition-colors hover:text-black group",
-                pathname === "/wishlist"
-                  ? "text-[#4a5a56]"
-                  : ""
-              )}
-            >
-              Wishlist
-              <span
-                className={cn(
-                  "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
-                  pathname === "/wishlist"
-                    ? "w-full scale-x-100"
-                    : "w-full scale-x-0 group-hover:scale-x-100"
-                )}
-              />
-            </Link>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 gap-16 text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
+            {NAV_LINKS.map(({ label, href }) => {
+              const active = isActive(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "relative pb-1 transition-colors hover:text-black group",
+                    active ? "text-[#4a5a56]" : ""
+                  )}
+                >
+                  {label}
+                  <span
+                    className={cn(
+                      "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left w-full",
+                      active
+                        ? "scale-x-100"
+                        : "scale-x-0 group-hover:scale-x-100"
+                    )}
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Actions - Right */}
-          <div className="flex items-center justify-end">
-            <div className="relative">
-              <CartButton />
-            </div>
+          {/* Actions - Right: Wishlist icon + Cart */}
+          <div className="flex items-center gap-1">
+            <Link
+              href="/wishlist"
+              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Wishlist"
+            >
+              <Heart
+                size={22}
+                className={cn(
+                  "transition-colors",
+                  pathname === "/wishlist"
+                    ? "fill-red-500 text-red-500"
+                    : "text-gray-900"
+                )}
+              />
+              {wishlistItems.length > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                  {wishlistItems.length}
+                </span>
+              )}
+            </Link>
+            <CartButton />
           </div>
         </div>
 
-        {/* Mobile Menu Overlay */}
+        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-[#f5f5f5] border-b border-neutral-200 shadow-lg md:hidden p-4 flex flex-col gap-4 z-50">
+            {NAV_LINKS.map(({ label, href }) => (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "text-lg font-medium uppercase tracking-wider transition-colors",
+                  isActive(href)
+                    ? "text-[#4a5a56] font-bold"
+                    : "text-neutral-900"
+                )}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {label}
+              </Link>
+            ))}
             <Link
-              href="/products?category=Skincare"
-              className="text-lg font-medium text-neutral-900 uppercase tracking-wider"
+              href="/wishlist"
+              className="text-lg font-medium uppercase tracking-wider text-neutral-900 flex items-center gap-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Skincare
+              <Heart size={18} />
+              Wishlist
+              {wishlistItems.length > 0 && (
+                <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                  {wishlistItems.length}
+                </span>
+              )}
             </Link>
-            <Link
-              href="/products?category=Sets"
-              className="text-lg font-medium text-neutral-900 uppercase tracking-wider"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Sets
-            </Link>
-            <Link
-              href="/products?category=Editorial"
-              className="text-lg font-medium text-neutral-900 uppercase tracking-wider"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Editorial
-            </Link>
-             <Link
-               href="/blog"
-               className="text-lg font-medium text-neutral-900 uppercase tracking-wider"
-               onClick={() => setIsMobileMenuOpen(false)}
-             >
-               Blog
-             </Link>
-             <Link
-               href="/wishlist"
-               className="text-lg font-medium text-neutral-900 uppercase tracking-wider"
-               onClick={() => setIsMobileMenuOpen(false)}
-             >
-               Wishlist
-             </Link>
           </div>
         )}
       </header>
-
     </>
   );
 }
