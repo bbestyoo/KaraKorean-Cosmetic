@@ -1,99 +1,184 @@
 from django.contrib import admin
-from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute,  Color, Variant, Size, SizeColorStock
 from import_export.admin import ImportExportModelAdmin
-from .resources import ProductResource, ProductAttributeResource, ProductImageResource, BrandResource, SeriesResource, CategoryResource, SubCategoryResource
-# Register your models here.
+
+from .models import (
+    Product,
+    Comment,
+    Repliess,
+    ProductImage,
+    Rating,
+    Brand,
+    Series,
+    Category,
+    SubCategory,
+    ProductAttribute,
+    Color,
+    Variant,
+    Size,
+    SizeColorStock,
+)
+
+from .resources import (
+    ProductResource,
+    ProductAttributeResource,
+    ProductImageResource,
+)
+
+
+# =========================
+# Inlines
+# =========================
 
 class ColorInline(admin.TabularInline):
     model = Color
     extra = 0
 
-class ColorAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = Color
-    resource_class = ProductAttributeResource
 
 class VariantInline(admin.TabularInline):
     model = Variant
     extra = 0
 
-class VariantAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = Variant
-    resource_class = ProductAttributeResource
-
-class SizeColorStockInline(admin.TabularInline):
-    model = SizeColorStock
-    extra = 1
-    fields = ['size', 'color', 'stock']
-    raw_id_fields = ['size', 'color']
 
 class SizeInline(admin.TabularInline):
     model = Size
     extra = 1
-    fields = ['name', 'price_adjustment']
-    inlines = [SizeColorStockInline]
-
-class SizeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = Size
-    resource_class = ProductAttributeResource
-    inlines = [SizeColorStockInline]
+    fields = ["name", "price_adjustment"]
 
 
-class SizeColorStockAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class SizeColorStockInline(admin.TabularInline):
     model = SizeColorStock
-    resource_class = ProductAttributeResource
+    extra = 1
+    fields = ["size", "color", "stock"]
+    raw_id_fields = ["size", "color"]
 
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 0
 
-class ProductImageAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = ProductImage
-    resource_class = ProductImageResource
 
-class RatingInLine(admin.TabularInline):
+class RatingInline(admin.TabularInline):
     model = Rating
     extra = 0
 
-class BrandAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = Brand
-    resource_class = ProductAttributeResource
-
-class SeriesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = Series
-    resource_class = ProductAttributeResource
-
-class CategoryAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = Category
-    resource_class = ProductAttributeResource
-
-class SubCategoryAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = SubCategory
-    resource_class = ProductAttributeResource
-
-class ProductAttributeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = ProductAttribute
-    resource_class = ProductAttributeResource
 
 class AttributeInline(admin.TabularInline):
     model = ProductAttribute
     extra = 0
 
-class ProductsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    inlines = [ColorInline, SizeInline, SizeColorStockInline, ProductImageInline, RatingInLine, AttributeInline]
+
+# =========================
+# Admin Classes
+# =========================
+
+@admin.register(Product)
+class ProductsAdmin(ImportExportModelAdmin):
     resource_class = ProductResource
 
+    inlines = [
+        ColorInline,
+        VariantInline,
+        SizeInline,
+        ProductImageInline,
+        RatingInline,
+        AttributeInline,
+    ]
 
-admin.site.register(Product,ProductsAdmin)
+    list_display = [
+        "name",
+        "category",
+        "brand",
+        "price",
+        "featured",
+        "best_seller",
+        "trending",
+    ]
+
+    search_fields = [
+        "name",
+        "seo_friendly_name",
+        "product_id",
+    ]
+
+    list_filter = [
+        "category",
+        "brand",
+        "featured",
+        "best_seller",
+        "trending",
+    ]
+
+
+@admin.register(Color)
+class ColorAdmin(ImportExportModelAdmin):
+    model = Color
+    resource_class = ProductAttributeResource
+
+
+@admin.register(Variant)
+class VariantAdmin(ImportExportModelAdmin):
+    model = Variant
+    resource_class = ProductAttributeResource
+
+
+@admin.register(Size)
+class SizeAdmin(ImportExportModelAdmin):
+    model = Size
+    resource_class = ProductAttributeResource
+
+
+@admin.register(SizeColorStock)
+class SizeColorStockAdmin(ImportExportModelAdmin):
+    model = SizeColorStock
+    resource_class = ProductAttributeResource
+
+    list_display = [
+        "product",
+        "size",
+        "color",
+        "stock",
+    ]
+
+
+@admin.register(ProductImage)
+class ProductImageAdmin(ImportExportModelAdmin):
+    model = ProductImage
+    resource_class = ProductImageResource
+
+
+@admin.register(Brand)
+class BrandAdmin(ImportExportModelAdmin):
+    model = Brand
+    resource_class = ProductAttributeResource
+
+
+@admin.register(Series)
+class SeriesAdmin(ImportExportModelAdmin):
+    model = Series
+    resource_class = ProductAttributeResource
+
+
+@admin.register(Category)
+class CategoryAdmin(ImportExportModelAdmin):
+    model = Category
+    resource_class = ProductAttributeResource
+
+
+@admin.register(SubCategory)
+class SubCategoryAdmin(ImportExportModelAdmin):
+    model = SubCategory
+    resource_class = ProductAttributeResource
+
+
+@admin.register(ProductAttribute)
+class ProductAttributeAdmin(ImportExportModelAdmin):
+    model = ProductAttribute
+    resource_class = ProductAttributeResource
+
+
+# =========================
+# Simple Registrations
+# =========================
+
 admin.site.register(Comment)
 admin.site.register(Repliess)
-admin.site.register(Brand, BrandAdmin)
-admin.site.register(Color, ColorAdmin)
-admin.site.register(Variant, VariantAdmin)
-admin.site.register(Size, SizeAdmin)
-admin.site.register(SizeColorStock, SizeColorStockAdmin)
-admin.site.register(ProductImage, ProductImageAdmin)
-admin.site.register(Series,SeriesAdmin)
-admin.site.register(Category,CategoryAdmin)
-admin.site.register(SubCategory,SubCategoryAdmin)
-admin.site.register(ProductAttribute, ProductAttributeAdmin)
