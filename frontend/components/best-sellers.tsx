@@ -4,13 +4,13 @@ import { RevealOnScroll } from "@/components/RevealOnScroll";
 
 const cards = [
   {
-    title: "DESTINATION DRESSING",
+    title: "DESTINATION MAKEUP",
     subtitle: "THE VACATION SHOP",
     image: "/images/model1.png",
     link: "/shop/vacation",
   },
   {
-    title: "SUMMER NIGHT LOUNGE & LINGERIE",
+    title: "7 STEPS SKINCARE ROUTINE",
     subtitle: "NEW LINGERIE",
     image: "/images/model2.png",
     link: "/shop/lingerie",

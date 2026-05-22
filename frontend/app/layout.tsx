@@ -23,7 +23,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Aama Ko Nana – आमाको न्यानोपनको अनुभूति (Coming Soon)",
+  title: "Kara Korean Store(Coming Soon)",
   description:
     "Aama Ko Nana – आमाको न्यानोपनको अनुभूति | Countdown to a new crafted experience blending design, narrative & commerce.",
   keywords: [

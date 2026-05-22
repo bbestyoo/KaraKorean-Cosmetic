@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="w-full bg-white pt-16 px-4 sm:px-6 lg:px-12 flex flex-col justify-between overflow-hidden border-t border-gray-100">
       {/* Top Grid Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-4 mb-16 lg:mb-24 w-full max-w-screen-2xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-4 mb-16 lg:mb-5 w-full max-w-screen-2xl mx-auto">
 
         {/* Left Links - taking 4 columns */}
         <div className="lg:col-span-4 flex flex-col gap-3">
@@ -96,7 +96,7 @@ export default function Footer() {
       </div>
 
       {/* Huge Bottom Text */}
-      <div className="w-full flex items-end justify-center pointer-events-none select-none mt-auto">
+      <div className="w-full flex items-end justify-center pointer-events-none select-none ">
         <h1 className="text-[25vw] md:text-[23vw] leading-none font-serif font-bold tracking-tighter text-[#555f59] -mb-[4vw] md:-mb-[3vw] lg:-mb-[2vw]">
           KARA.
         </h1>

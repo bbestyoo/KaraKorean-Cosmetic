@@ -13,7 +13,7 @@ const brands = [
 
 export default function Brands() {
     return (
-        <div className="w-full absolute bottom-0 overflow-hidden py-6">
+        <div className="w-full absolute bottom-0 overflow-hidden py-10 bg-white/5  z-10 border-t border-white/10">
             <style>{`
                 @keyframes marquee {
                     0%   { transform: translateX(0); }
@@ -22,7 +22,7 @@ export default function Brands() {
                 .marquee-track {
                     display: flex;
                     width: max-content;
-                    animation: marquee 20s linear infinite;
+                    animation: marquee 25s linear infinite;
                     will-change: transform;
                 }
                 .marquee-track:hover {
@@ -31,23 +31,23 @@ export default function Brands() {
             `}</style>
             <div className="relative overflow-hidden w-full">
                 <div className="marquee-track">
-                    {/* Original set */}
+                    {/* First set */}
                     {brands.map((brand, idx) => (
-                        <div key={`a-${idx}`} className="flex-shrink-0 px-10 flex items-center">
+                        <div key={`a-${idx}`} className="flex-shrink-0 px-16 flex items-center">
                             <img
                                 src={brand.src}
                                 alt={brand.alt}
-                                className="h-10 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                                className="h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
                             />
                         </div>
                     ))}
-                    {/* Exact duplicate — makes -50% land back at start */}
+                    {/* Second set */}
                     {brands.map((brand, idx) => (
-                        <div key={`b-${idx}`} className="flex-shrink-0 px-10 flex items-center">
+                        <div key={`b-${idx}`} className="flex-shrink-0 px-16 flex items-center">
                             <img
                                 src={brand.src}
                                 alt={brand.alt}
-                                className="h-10 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                                className="h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
                             />
                         </div>
                     ))}
