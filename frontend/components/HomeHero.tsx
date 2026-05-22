@@ -157,7 +157,7 @@ export function HomeHero({ children }: HomeHeroProps) {
         style={{ height: `${HERO_SCROLL_VH}vh` }}
         aria-label="Hero"
       >
-        <div className="sticky top-0  flex h-[88vh] min-h-[540px] w-full flex-1 items-center justify-center overflow-hidden bg-[#f7f6f2] px-6 py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f]">
+        <div className="sticky top-0  flex h-[88dvh] min-h-[540px] w-full flex-1 items-center justify-center overflow-hidden bg-[#f7f6f2] px-6 py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f]">
 
           {/* Hero model — fills full viewport height, bottom-anchored */}
           <Image
@@ -168,7 +168,6 @@ export function HomeHero({ children }: HomeHeroProps) {
             className="absolute z-30 bottom-0 h-[96vh] w-auto select-none object-contain object-bottom"
             priority
           />1
-
           {/* Left panel — New Arrivals + Glow Ampoule card */}
           <div
             ref={leftPanelRef}
