@@ -6,7 +6,7 @@ import Lenis from 'lenis';
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  
+
   // Disable Lenis for admin routes
   const isAdminRoute = pathname.startsWith('/admin');
 
@@ -19,24 +19,46 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       smoothWheel: true,
     });
 
-    const handleResize = () => {
-      lenis.resize();
+    let frameId = 0;
+    let resizeFrameId = 0;
+
+    const scheduleResize = () => {
+      if (resizeFrameId) return;
+
+      resizeFrameId = window.requestAnimationFrame(() => {
+        resizeFrameId = 0;
+        lenis.resize();
+      });
     };
 
     // Handle frame updates
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      frameId = window.requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
+    frameId = window.requestAnimationFrame(raf);
 
-    window.addEventListener("resize", handleResize);
+    const resizeObserver = new ResizeObserver(scheduleResize);
+    resizeObserver.observe(document.documentElement);
+
+    window.addEventListener("resize", scheduleResize);
+    window.addEventListener("load", scheduleResize);
+    scheduleResize();
 
     return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+      if (resizeFrameId) {
+        window.cancelAnimationFrame(resizeFrameId);
+      }
+
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", scheduleResize);
+      window.removeEventListener("load", scheduleResize);
       lenis.destroy();
-      window.removeEventListener("resize", handleResize);
     };
-  }, [isAdminRoute]);
+  }, [isAdminRoute, pathname]);
 
   return <>{children}</>;
 }

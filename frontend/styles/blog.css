@@ -15,12 +15,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 70% 50% at 20% 80%,
-      rgba(15, 59, 43, 0.04),
-      transparent),
-    radial-gradient(ellipse 60% 40% at 80% 20%,
-      rgba(107, 118, 111, 0.05),
-      transparent);
+
   pointer-events: none;
 }
 
@@ -61,8 +56,9 @@
   justify-content: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-  padding: 0 2rem 3rem;
-  background: #f7f6f2;
+  padding: 0 2rem ;
+  /* background: #f7f6f2;
+ */
 }
 
 .blog-filter-tag {

@@ -116,7 +116,7 @@ export default function BlogPage() {
       : blogPosts.filter((post) => post.category === activeFilter);
 
   return (
-    <section id="blog-page">
+    <section id="blog-page" className="bg-[rgba(107,118,111,0.05)]">
       {/* ── Hero ── */}
       <div className="blog-hero">
         <p className="blog-hero-eyebrow">✦ The Kara Journal</p>
@@ -125,10 +125,8 @@ export default function BlogPage() {
           Stories, rituals, and secrets from the world of Korean beauty — curated
           for the conscious skin enthusiast.
         </p>
-      </div>
-
       {/* ── Filter Tags ── */}
-      <div className="blog-filters">
+      <div className="blog-filters mt-8">
         {categories.map((cat) => (
           <button
             key={cat}
@@ -139,6 +137,8 @@ export default function BlogPage() {
           </button>
         ))}
       </div>
+      </div>
+
 
       {/* ── Dynamic Grid ── */}
       <div className="blog-grid-section">

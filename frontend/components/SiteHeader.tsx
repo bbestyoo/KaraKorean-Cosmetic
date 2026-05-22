@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Menu, Heart } from "lucide-react";
 import { CartButton } from "@/components/CartButton";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { PromoBanner } from "./PromoBanner";
 import { useWishlist } from "@/context/WishlistContext";
@@ -21,7 +21,7 @@ const NAV_LINKS = [
 export function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
   const pathname = usePathname();
   const { wishlist: wishlistItems } = useWishlist();
 
@@ -33,17 +33,17 @@ export function SiteHeader() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      setLastScrollY(currentScrollY);
+      const shouldShow = !(currentScrollY > lastScrollYRef.current && currentScrollY > 100);
+
+      setIsVisible((previousVisible) =>
+        previousVisible === shouldShow ? previousVisible : shouldShow
+      );
+      lastScrollYRef.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   return (
     <>
@@ -70,9 +70,9 @@ export function SiteHeader() {
               <Image
                 src="/images/logos/karalogo.png"
                 alt="Kara KOREAN BEAUTY STORE"
-                width={180}
-                height={60}
-                className="object-contain"
+                width={250}
+                height={90}
+                className="object-contain mt-4 mb-2"
               />
             </Link>
           </div>
