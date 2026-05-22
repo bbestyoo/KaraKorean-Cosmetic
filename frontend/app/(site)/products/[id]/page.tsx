@@ -8,9 +8,6 @@ import { ProductRecommendations } from '@/components/ProductRecommendations';
 
 interface ProductImage {
   image: string;
-  color: number | null;
-  color_name: string | null;
-  hex: string | null;
 }
 
 interface Rating {
@@ -32,26 +29,13 @@ interface Size {
   id: number;
   name: string;
   price_adjustment: number;
-  color_stocks: ColorStock[];
-}
-
-interface ColorStock {
-  id: number;
-  color_id: number | null;
-  color_name: string;
   stock: number;
-}
-
-interface Color {
-  id: number;
-  name: string;
-  hex: string | null;
 }
 
 interface Product {
   product_id: string;
   name: string;
-  category_name: string;
+  category: string;
   price: number;
   old_price: number | null;
   before_deal_price: number | null;
@@ -60,16 +44,10 @@ interface Product {
   ratings: Rating;
   variants: Variant[];
   sizes: Size[];
-  colors: Color[];
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
-
-/**
- * Flip to `false` to load real product data from the API.
- * While `true`, the page uses `MOCK_PRODUCT` so the layout can be reviewed without a backend.
- */
-const USE_MOCK_DATA = true;
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
 const emptyRatingDict = (): Record<number, number> => ({
   1: 0,
@@ -79,77 +57,31 @@ const emptyRatingDict = (): Record<number, number> => ({
   5: 0,
 });
 
-const MOCK_PRODUCT: Product = {
-  product_id: 'mock-huba-tee',
-  name: 'HUBA Slimline Tee - Black',
-  category_name: 'Apparel',
-  price: 1800,
-  old_price: null,
-  before_deal_price: null,
-  stock: 24,
-  images: [
-    {
-      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1000&auto=format&fit=crop',
-      color: 1,
-      color_name: 'Black',
-      hex: '#000000',
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=1000&auto=format&fit=crop',
-      color: 1,
-      color_name: 'Black',
-      hex: '#000000',
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=1000&auto=format&fit=crop',
-      color: 1,
-      color_name: 'Black',
-      hex: '#000000',
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1503342394128-c104d54dba01?q=80&w=1000&auto=format&fit=crop',
-      color: 1,
-      color_name: 'Black',
-      hex: '#000000',
-    },
-  ],
-  ratings: {
-    stats: {
-      total_ratings: 0,
-      rating_dict: emptyRatingDict(),
-      avg_rating: 0,
-    },
-    data: [],
-  },
-  variants: [],
-  sizes: [
-    {
-      id: 1,
-      name: 'S',
-      price_adjustment: 0,
-      color_stocks: [{ id: 1, color_id: 1, color_name: 'Black', stock: 6 }],
-    },
-    {
-      id: 2,
-      name: 'M',
-      price_adjustment: 0,
-      color_stocks: [{ id: 2, color_id: 1, color_name: 'Black', stock: 8 }],
-    },
-    {
-      id: 3,
-      name: 'L',
-      price_adjustment: 0,
-      color_stocks: [{ id: 3, color_id: 1, color_name: 'Black', stock: 6 }],
-    },
-    {
-      id: 4,
-      name: 'XL',
-      price_adjustment: 0,
-      color_stocks: [{ id: 4, color_id: 1, color_name: 'Black', stock: 4 }],
-    },
-  ],
-  colors: [{ id: 1, name: 'Black', hex: '#000000' }],
-};
+interface ApiProduct extends Omit<Product, 'category' | 'images'> {
+  category?: string | null;
+  images?: ProductImage[];
+}
+
+function resolveImageUrl(image?: string | null) {
+  if (!image) return '/images/placeholder.png';
+  if (image.startsWith('http://') || image.startsWith('https://')) return image;
+
+  const normalizedPath = image.startsWith('/') ? image : `/${image}`;
+  return new URL(normalizedPath, API_ORIGIN).toString();
+}
+
+function normalizeProduct(product: ApiProduct): Product {
+  return {
+    ...product,
+    category: product.category || 'Uncategorized',
+    images: Array.isArray(product.images)
+      ? product.images.map((image) => ({
+          ...image,
+          image: resolveImageUrl(image.image),
+        }))
+      : [],
+  };
+}
 
 function formatRs(amount: number): string {
   const formatted = amount.toLocaleString('en-IN', {
@@ -180,7 +112,6 @@ const POLICY_SECTIONS = [
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedColor, setSelectedColor] = useState<string | null>('Black');
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [mainImage, setMainImage] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
@@ -189,24 +120,25 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const { addItem } = useCart();
 
   useEffect(() => {
-    if (USE_MOCK_DATA) {
-      setProduct(MOCK_PRODUCT);
-      setMainImage(MOCK_PRODUCT.images[0]?.image ?? '');
-      setLoading(false);
-      return;
-    }
+
 
     const fetchProduct = async () => {
       try {
         const resolvedParams = await params;
         const response = await fetch(`${API_BASE_URL}/api/${resolvedParams.id}/`);
-        if (response.ok) {
-          const data = await response.json();
-          setProduct(data);
-          if (data.images && data.images.length > 0) {
-            setMainImage(data.images[0].image);
-          }
+        if (!response.ok) {
+          throw new Error('Failed to fetch product');
         }
+
+        const data = (await response.json()) as ApiProduct;
+        const normalizedProduct = normalizeProduct(data);
+
+        setProduct(normalizedProduct);
+
+        if (normalizedProduct.images.length > 0) {
+          setMainImage(normalizedProduct.images[0].image);
+        }
+
       } catch (error) {
         console.error('Error fetching product:', error);
       } finally {
@@ -217,31 +149,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     fetchProduct();
   }, [params]);
 
-  const handleColorSelect = (colorName: string) => {
-    setSelectedColor(colorName);
-
-    if (product?.images) {
-      const colorImageIndex = product.images.findIndex((img) => img.color_name === colorName);
-      if (colorImageIndex !== -1) {
-        setMainImage(product.images[colorImageIndex].image);
-      }
-    }
-  };
-
   const getSizeAdjustment = () => {
     if (!selectedSize || !product?.sizes) return 0;
     const selectedSizeObj = product.sizes.find((s) => s.name === selectedSize);
     return selectedSizeObj?.price_adjustment || 0;
-  };
-
-  const getStockForSizeColor = () => {
-    if (!selectedSize || !selectedColor || !product?.sizes) return 0;
-
-    const selectedSizeObj = product.sizes.find((s) => s.name === selectedSize);
-    if (!selectedSizeObj) return 0;
-
-    const colorStock = selectedSizeObj.color_stocks.find((cs) => cs.color_name === selectedColor);
-    return colorStock?.stock || 0;
   };
 
   const getFinalPrice = () => {
@@ -249,7 +160,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   };
 
   const handleAddToCart = () => {
-    if (!selectedSize || !selectedColor) {
+    if (!selectedSize) {
       setShowValidationErrors(true);
       return;
     }
@@ -260,7 +171,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         name: product.name,
         price: getFinalPrice(),
         size: selectedSize,
-        color: selectedColor,
         quantity,
         image: mainImage,
       });
@@ -279,14 +189,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               item_name: product.name,
               price: getFinalPrice(),
               quantity,
-              item_category: product.category_name,
+              item_category: product.category,
             },
           ],
         });
       }
 
-      setSelectedColor('Black');
-      setSelectedSize(null);
       setQuantity(1);
       setShowValidationErrors(false);
     }
@@ -312,14 +220,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     );
   }
 
-  const displayColors =
-    product.colors && product.colors.length > 0
-      ? product.colors
-      : [
-          { id: 1, name: 'Black', hex: '#000000' },
-          { id: 2, name: 'White', hex: '#ffffff' },
-        ];
-
   return (
     <main className="min-h-screen bg-white text-neutral-900">
       <div className="flex flex-col lg:flex-row lg:items-start">
@@ -327,7 +227,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           className="w-full lg:w-1/2 flex flex-col"
           aria-label="Product gallery"
         >
-          {product.images.map((img, idx) => (
+          {(product.images.length > 0 ? product.images : [{ image: '/images/placeholder.png' }]).map((img, idx) => (
             <div
               key={`${img.image}-${idx}`}
               className="relative w-full aspect-[3/4] bg-neutral-100"
@@ -386,13 +286,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     <option value="">Select Size</option>
                     {product.sizes && product.sizes.length > 0 ? (
                       product.sizes.map((size) => {
-                        const inStock = size.color_stocks?.some((cs) => cs.stock > 0) ?? true;
-                        return (
-                          <option key={size.id} value={size.name} disabled={!inStock}>
-                            {size.name}
-                            {!inStock ? ' — out of stock' : ''}
-                          </option>
-                        );
+                        return <option key={size.id} value={size.name} disabled={size.stock <= 0}>{size.name}{size.stock <= 0 ? ' — out of stock' : ''}</option>;
                       })
                     ) : (
                       ['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
@@ -403,35 +297,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     )}
                   </select>
                   <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-neutral-500" />
-                </div>
-              </div>
-
-              {/* Colors */}
-              <div className="grid grid-cols-[100px_1fr] items-start gap-6">
-                <span className="text-base md:text-lg font-semibold text-neutral-900 pt-1">Colors:</span>
-                <div>
-                  <p className="text-base md:text-lg text-neutral-500 mb-3">{selectedColor ?? 'Black'}</p>
-                  <div className="flex flex-wrap gap-3.5">
-                    {displayColors.map((color) => {
-                      const active = selectedColor === color.name;
-                      return (
-                        <button
-                          key={color.id}
-                          type="button"
-                          onClick={() => handleColorSelect(color.name)}
-                          title={color.name}
-                          className={`relative size-9 rounded-full border transition-all ${
-                            active ? 'ring-2 ring-neutral-400 ring-offset-2 border-neutral-900 scale-105' : 'border-neutral-300 hover:scale-105'
-                          }`}
-                          style={{
-                            backgroundColor: color.hex || '#171717',
-                          }}
-                        >
-                          <span className="sr-only">{color.name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
                 </div>
               </div>
 

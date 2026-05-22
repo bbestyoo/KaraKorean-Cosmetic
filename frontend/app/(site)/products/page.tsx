@@ -1,32 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ChevronDown, ChevronLeft, ChevronRight, X, Heart } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
-// ─── Mock Data ───────────────────────────────────────────────────────────────
-const MOCK_PRODUCTS = [
-  { product_id: '1', name: 'COSRX Snail Mucin 96% Power Repairing Essence', price: 2800, old_price: 3200, category_name: 'Essence', brand: 'COSRX', images: [{ image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop' }] },
-  { product_id: '2', name: 'Anua Heartleaf 77% Soothing Toner', price: 3100, old_price: null, category_name: 'Toner', brand: 'Anua', images: [{ image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop' }] },
-  { product_id: '3', name: 'Some By Mi AHA BHA PHA 30 Days Miracle Toner', price: 1950, old_price: 2400, category_name: 'Toner', brand: 'Some By Mi', images: [{ image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop' }] },
-  { product_id: '4', name: 'Isntree Hyaluronic Acid Toner', price: 2200, old_price: null, category_name: 'Toner', brand: 'Isntree', images: [{ image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop' }] },
-  { product_id: '5', name: 'Skin1004 Madagascar Centella Ampoule', price: 3500, old_price: 4000, category_name: 'Ampoule', brand: 'Skin1004', images: [{ image: 'https://images.unsplash.com/photo-1617897903246-719242758050?w=600&auto=format&fit=crop' }] },
-  { product_id: '6', name: 'Medicube Age R Booster Shot', price: 5200, old_price: null, category_name: 'Serum', brand: 'Medicube', images: [{ image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&auto=format&fit=crop' }] },
-  { product_id: '7', name: 'Roundlab 1025 Dokdo Cleanser', price: 1800, old_price: 2000, category_name: 'Cleanser', brand: 'Roundlab', images: [{ image: 'https://images.unsplash.com/photo-1601612628452-9e99ced43524?w=600&auto=format&fit=crop' }] },
-  { product_id: '8', name: 'BOJ Ceramide Repair Cream', price: 4100, old_price: null, category_name: 'Moisturizer', brand: 'BOJ', images: [{ image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&auto=format&fit=crop' }] },
-  { product_id: '9', name: 'COSRX Advanced Snail 92 All in one Cream', price: 3300, old_price: 3800, category_name: 'Moisturizer', brand: 'COSRX', images: [{ image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop' }] },
-  { product_id: '10', name: 'Anua Heartleaf Pore Control Cleansing Oil', price: 2700, old_price: null, category_name: 'Cleanser', brand: 'Anua', images: [{ image: 'https://images.unsplash.com/photo-1614159102043-d3b56a98b8bc?w=600&auto=format&fit=crop' }] },
-  { product_id: '11', name: 'Skin1004 Centella Hyalu-Cica Water-Fit Sun Serum', price: 2900, old_price: 3500, category_name: 'Sunscreen', brand: 'Skin1004', images: [{ image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&auto=format&fit=crop' }] },
-  { product_id: '12', name: 'Isntree C-Niacin Toning Ampoule', price: 3800, old_price: null, category_name: 'Ampoule', brand: 'Isntree', images: [{ image: 'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=600&auto=format&fit=crop' }] },
-];
-
-const CATEGORIES = ['All', 'Toner', 'Essence', 'Serum', 'Ampoule', 'Moisturizer', 'Cleanser', 'Sunscreen'];
-const BRANDS = ['All', 'COSRX', 'Anua', 'Some By Mi', 'Isntree', 'Skin1004', 'Medicube', 'Roundlab', 'BOJ'];
 const PRICE_RANGES = [
   { label: 'All Prices', min: 0, max: Infinity },
   { label: 'Under Rs. 2,000', min: 0, max: 2000 },
@@ -43,6 +26,18 @@ const SORT_OPTIONS = [
 
 const ITEMS_PER_PAGE = 8;
 
+interface ApiProduct {
+  product_id: string;
+  name: string;
+  price: number | string;
+  old_price?: number | string | null;
+  category_name?: string | null;
+  category?: string | { name?: string } | null;
+  brand?: string | { name?: string } | null;
+  brandName?: string | null;
+  images?: Array<{ image: string }>;
+}
+
 interface Product {
   product_id: string;
   name: string;
@@ -51,6 +46,35 @@ interface Product {
   category_name: string;
   brand: string;
   images: Array<{ image: string }>;
+}
+
+function resolveImageUrl(image?: string | null) {
+  if (!image) return '/images/placeholder.png';
+  if (image.startsWith('http://') || image.startsWith('https://')) return image;
+
+  const normalizedPath = image.startsWith('/') ? image : `/${image}`;
+  return new URL(normalizedPath, API_ORIGIN).toString();
+}
+
+function normalizeProduct(product: ApiProduct): Product {
+  const brandValue = typeof product.brand === 'string' ? product.brand : product.brand?.name;
+  const categoryValue =
+    product.category_name ||
+    (typeof product.category === 'string' ? product.category : product.category?.name) ||
+    'Uncategorized';
+
+  return {
+    product_id: product.product_id,
+    name: product.name,
+    price: Number(product.price) || 0,
+    old_price:
+      product.old_price === null || product.old_price === undefined ? null : Number(product.old_price),
+    category_name: categoryValue,
+    brand: product.brandName || brandValue || 'Unknown',
+    images: Array.isArray(product.images)
+      ? product.images.map((image) => ({ image: resolveImageUrl(image.image) }))
+      : [],
+  };
 }
 
 // ─── Dropdown Filter Component ────────────────────────────────────────────────
@@ -105,9 +129,12 @@ function FilterDropdown({
 
 // ─── Main Content Component ───────────────────────────────────────────────────
 function ProductsContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toggleWishlist, isInWishlist } = useWishlist();
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   // Filters state
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -116,8 +143,79 @@ function ProductsContent() {
   const [selectedSort, setSelectedSort] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    const brandParam = searchParams.get('brand');
+
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+
+    if (brandParam) {
+      setSelectedBrand(brandParam);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchAllProducts = async () => {
+      try {
+        setLoading(true);
+        setError('');
+
+        const firstResponse = await fetch(`${API_BASE_URL}/api/?page=1&page_size=100`);
+        if (!firstResponse.ok) {
+          throw new Error('Failed to fetch products');
+        }
+
+        const firstData = await firstResponse.json();
+        const totalPages = Number(firstData?.total_pages) || 1;
+        const results = Array.isArray(firstData?.results) ? firstData.results : [];
+
+        const additionalPages = await Promise.all(
+          Array.from({ length: Math.max(0, totalPages - 1) }, async (_, index) => {
+            const page = index + 2;
+            const response = await fetch(`${API_BASE_URL}/api/?page=${page}&page_size=100`);
+            if (!response.ok) return [];
+            const data = await response.json();
+            return Array.isArray(data?.results) ? data.results : [];
+          })
+        );
+
+        if (!isMounted) return;
+
+        const merged = [...results, ...additionalPages.flat()].map(normalizeProduct);
+        setProducts(merged);
+      } catch (fetchError) {
+        if (!isMounted) return;
+        console.error('Error fetching products:', fetchError);
+        setError('Unable to load products right now.');
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchAllProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(products.map((product) => product.category_name).filter(Boolean)))],
+    [products]
+  );
+  const brands = useMemo(
+    () => ['All', ...Array.from(new Set(products.map((product) => product.brand).filter(Boolean)))],
+    [products]
+  );
+
   // Filtered + sorted products
-  const filteredProducts = MOCK_PRODUCTS.filter((p) => {
+  const filteredProducts = products.filter((p) => {
     const priceRange = PRICE_RANGES.find(r => r.label === selectedPriceRange) || PRICE_RANGES[0];
     return (
       (selectedCategory === 'All' || p.category_name === selectedCategory) &&
@@ -131,15 +229,13 @@ function ProductsContent() {
     return 0;
   });
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
   const resetPage = () => setCurrentPage(1);
-
-  const activeSortLabel = SORT_OPTIONS.find(o => o.value === selectedSort)?.label || 'Default';
 
   return (
     <main className="min-h-screen bg-white">
@@ -149,13 +245,13 @@ function ProductsContent() {
         <div className="max-w-[1600px] mx-auto flex items-stretch divide-x divide-gray-200">
           <FilterDropdown
             label="Category"
-            options={CATEGORIES}
+            options={categories}
             value={selectedCategory}
             onChange={(v) => { setSelectedCategory(v); resetPage(); }}
           />
           <FilterDropdown
             label="Brand"
-            options={BRANDS}
+            options={brands}
             value={selectedBrand}
             onChange={(v) => { setSelectedBrand(v); resetPage(); }}
           />
@@ -224,6 +320,24 @@ function ProductsContent() {
         <h1 className="text-3xl font-serif text-gray-800 mt-8 mb-8 font-normal">
           Korean Beauty Shop
         </h1>
+
+        {loading && products.length === 0 && (
+          <div className="py-24 text-center text-sm text-gray-500">
+            Loading products...
+          </div>
+        )}
+
+        {!loading && error && products.length === 0 && (
+          <div className="py-24 text-center">
+            <p className="text-gray-500 text-sm mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* ── ACTIVE FILTERS ── */}
         {(selectedCategory !== 'All' || selectedBrand !== 'All' || selectedPriceRange !== 'All Prices') && (
@@ -300,7 +414,7 @@ function ProductsContent() {
                         name: product.name,
                         price: product.price,
                         old_price: product.old_price || undefined,
-                        image: product.images[0]?.image || '/images/placeholder.png',
+                            image: product.images[0]?.image || '/images/placeholder.png',
                         category_name: product.category_name,
                       });
                     }}

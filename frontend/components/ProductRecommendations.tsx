@@ -7,7 +7,6 @@ import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 
 interface ProductImage {
   image: string;
-  color: number | null;
 }
 
 interface Product {

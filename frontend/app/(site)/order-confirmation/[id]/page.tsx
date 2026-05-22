@@ -10,7 +10,6 @@ interface OrderItem {
   product_id: string;
   quantity: number;
   price: number;
-  color_name?: string;
   size_name?: string;
 }
 
@@ -157,12 +156,6 @@ export default function OrderConfirmationPage({ params }: PageProps) {
                       <h3 className="font-semibold text-gray-900 text-lg">{item.product_name}</h3>
                       <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
                         <span>Qty: {item.quantity}</span>
-                        {item.color_name && (
-                          <>
-                            <span className="text-gray-300">•</span>
-                            <span>Color: {item.color_name}</span>
-                          </>
-                        )}
                         {item.size_name && (
                           <>
                             <span className="text-gray-300">•</span>

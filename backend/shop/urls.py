@@ -8,9 +8,7 @@ from rest_framework_simplejwt.views import (
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'color', views.ColorViewSet)
 router.register(r'size', views.SizeViewSet)
-router.register(r'size-color-stock', views.SizeColorStockViewSet)
 router.register(r'product-image', views.ProductImageViewSet)
 router.register(r'category', views.CategoryViewSet)
 router.register(r'brand', views.BrandViewSet)

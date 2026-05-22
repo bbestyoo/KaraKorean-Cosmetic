@@ -110,7 +110,6 @@ export default function CheckoutPage() {
             product_id: item.product_id,
             quantity: item.quantity,
             price: item.price,
-            color: item.color,
             size: item.size,
           })),
         }),
@@ -392,7 +391,7 @@ export default function CheckoutPage() {
               {/* Cart Items */}
               <div className="space-y-4 mb-6 pb-6 border-b border-gray-200">
                 {items.map((item) => (
-                  <div key={`${item.product_id}-${item.size}-${item.color}`} className="flex gap-4">
+                  <div key={`${item.product_id}-${item.size}`} className="flex gap-4">
                     <div className="w-16 h-16 bg-gray-200 rounded flex-shrink-0">
                       {item.image && (
                         <Image
@@ -407,7 +406,7 @@ export default function CheckoutPage() {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">{item.name}</h3>
                       <p className="text-xs text-gray-600 mt-1">
-                        {item.size} | {item.color} | Qty: {item.quantity}
+                        {item.size} | Qty: {item.quantity}
                       </p>
                       <p className="text-sm font-bold text-gray-900 mt-2">NPR {item.price}</p>
                     </div>

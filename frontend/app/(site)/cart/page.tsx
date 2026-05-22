@@ -50,7 +50,7 @@ export default function CartPage() {
             <div className="bg-white rounded-lg shadow-sm">
               {items.map((item) => (
                 <div
-                  key={`${item.product_id}-${item.size}-${item.color}`}
+                  key={`${item.product_id}-${item.size}`}
                   className="flex gap-4 p-6 border-b last:border-b-0"
                 >
                   {/* Product Image */}
@@ -77,13 +77,6 @@ export default function CartPage() {
                       >
                         <option>{item.size}</option>
                       </select>
-                      <select
-                        value={item.color}
-                        onChange={() => {}}
-                        className="bg-white border border-gray-300 rounded px-2 py-1"
-                      >
-                        <option>{item.color}</option>
-                      </select>
                     </div>
                   </div>
 
@@ -96,7 +89,6 @@ export default function CartPage() {
                           updateQuantity(
                             item.product_id,
                             item.size,
-                            item.color,
                             Math.max(1, item.quantity - 1)
                           )
                         }
@@ -112,7 +104,6 @@ export default function CartPage() {
                           updateQuantity(
                             item.product_id,
                             item.size,
-                            item.color,
                             item.quantity + 1
                           )
                         }
@@ -122,7 +113,7 @@ export default function CartPage() {
                       </button>
                     </div>
                     <button
-                      onClick={() => removeItem(item.product_id, item.size, item.color)}
+                      onClick={() => removeItem(item.product_id, item.size)}
                       className="text-red-500 hover:text-red-700 transition-colors"
                     >
                       <Trash2 size={18} />

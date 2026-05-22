@@ -10,7 +10,6 @@ const DEMO_PRODUCT = {
   name: 'DROP 6 THE ARGYLE KNIT SET',
   price: 1000.00,
   size: 'M',
-  color: 'Grey',
   quantity: 2,
   image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop',
 };
@@ -56,7 +55,7 @@ export function CartSidebar() {
             <div className="flex-1 overflow-y-auto px-8 space-y-8 mt-2">
               {displayItems.map((item) => (
                 <div
-                  key={`${item.product_id}-${item.size}-${item.color}`}
+                  key={`${item.product_id}-${item.size}`}
                   className="flex gap-6 relative"
                 >
                   <div className="w-32 h-40 bg-gray-200 flex-shrink-0 relative">
@@ -77,7 +76,7 @@ export function CartSidebar() {
                       </h3>
                       <button
                         onClick={() =>
-                          items.length > 0 && removeItem(item.product_id, item.size, item.color)
+                          items.length > 0 && removeItem(item.product_id, item.size)
                         }
                         className="text-gray-900 hover:text-gray-500 absolute right-0 top-0"
                         aria-label="Remove item"
@@ -99,7 +98,6 @@ export function CartSidebar() {
                               items.length > 0 && updateQuantity(
                                 item.product_id,
                                 item.size,
-                                item.color,
                                 Math.max(1, item.quantity - 1)
                               )
                             }
@@ -115,7 +113,6 @@ export function CartSidebar() {
                               items.length > 0 && updateQuantity(
                                 item.product_id,
                                 item.size,
-                                item.color,
                                 item.quantity + 1
                               )
                             }

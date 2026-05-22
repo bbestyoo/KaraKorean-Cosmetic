@@ -1,16 +1,8 @@
 from django.contrib import admin
-from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute,  Color, Variant, Size, SizeColorStock
+from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute, Variant, Size
 from import_export.admin import ImportExportModelAdmin
 from .resources import ProductResource, ProductAttributeResource, ProductImageResource, BrandResource, SeriesResource, CategoryResource, SubCategoryResource
 # Register your models here.
-
-class ColorInline(admin.TabularInline):
-    model = Color
-    extra = 0
-
-class ColorAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = Color
-    resource_class = ProductAttributeResource
 
 class VariantInline(admin.TabularInline):
     model = Variant
@@ -20,26 +12,13 @@ class VariantAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     model = Variant
     resource_class = ProductAttributeResource
 
-class SizeColorStockInline(admin.TabularInline):
-    model = SizeColorStock
-    extra = 1
-    fields = ['size', 'color', 'stock']
-    raw_id_fields = ['size', 'color']
-
 class SizeInline(admin.TabularInline):
     model = Size
     extra = 1
-    fields = ['name', 'price_adjustment']
-    inlines = [SizeColorStockInline]
+    fields = ['name', 'price_adjustment', 'stock']
 
 class SizeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     model = Size
-    resource_class = ProductAttributeResource
-    inlines = [SizeColorStockInline]
-
-
-class SizeColorStockAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    model = SizeColorStock
     resource_class = ProductAttributeResource
 
 
@@ -80,7 +59,7 @@ class AttributeInline(admin.TabularInline):
     extra = 0
 
 class ProductsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    inlines = [ColorInline, SizeInline, SizeColorStockInline, ProductImageInline, RatingInLine, AttributeInline]
+    inlines = [SizeInline, ProductImageInline, RatingInLine, AttributeInline]
     resource_class = ProductResource
 
 
@@ -88,10 +67,8 @@ admin.site.register(Product,ProductsAdmin)
 admin.site.register(Comment)
 admin.site.register(Repliess)
 admin.site.register(Brand, BrandAdmin)
-admin.site.register(Color, ColorAdmin)
 admin.site.register(Variant, VariantAdmin)
 admin.site.register(Size, SizeAdmin)
-admin.site.register(SizeColorStock, SizeColorStockAdmin)
 admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(Series,SeriesAdmin)
 admin.site.register(Category,CategoryAdmin)
