@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ChevronDown, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, X, Heart } from 'lucide-react';
+import { useWishlist } from '@/context/WishlistContext';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
 
@@ -106,6 +107,7 @@ function FilterDropdown({
 function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   // Filters state
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -268,41 +270,65 @@ function ProductsContent() {
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12 mb-20">
               {paginatedProducts.map((product) => (
-                <Link
+                <div
                   key={product.product_id}
-                  href={`/products/${product.product_id}`}
-                  className="group"
+                  className="group relative"
                 >
-                  {/* Image */}
-                  <div className="aspect-square bg-[#f2f2f2] overflow-hidden relative mb-3">
-                    <Image
-                      src={product.images[0]?.image || '/images/placeholder.png'}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  <Link href={`/products/${product.product_id}`} className="block">
+                    {/* Image */}
+                    <div className="aspect-square bg-[#f2f2f2] overflow-hidden relative mb-3">
+                      <Image
+                        src={product.images[0]?.image || '/images/placeholder.png'}
+                        alt={product.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {product.old_price && (
+                        <div className="absolute top-3 left-3 bg-gray-900 text-white text-[9px] uppercase tracking-widest px-2 py-1">
+                          Sale
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+
+                  {/* Heart Icon Overlay */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleWishlist({
+                        product_id: product.product_id,
+                        name: product.name,
+                        price: product.price,
+                        old_price: product.old_price || undefined,
+                        image: product.images[0]?.image || '/images/placeholder.png',
+                        category_name: product.category_name,
+                      });
+                    }}
+                    className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-sm"
+                  >
+                    <Heart
+                      size={16}
+                      className={isInWishlist(product.product_id) ? 'fill-red-600 text-red-600' : 'text-neutral-900'}
                     />
-                    {product.old_price && (
-                      <div className="absolute top-3 left-3 bg-gray-900 text-white text-[9px] uppercase tracking-widest px-2 py-1">
-                        Sale
-                      </div>
-                    )}
-                  </div>
+                  </button>
 
                   {/* Details */}
-                  <p className="text-[12px] text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black transition-colors">
-                    {product.name}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[13px] text-gray-800">
-                      Rs. {product.price.toLocaleString()}
-                    </span>
-                    {product.old_price && (
-                      <span className="text-[12px] text-gray-400 line-through">
-                        Rs. {product.old_price.toLocaleString()}
+                  <Link href={`/products/${product.product_id}`} className="block">
+                    <p className="text-[12px] text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black transition-colors">
+                      {product.name}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px] text-gray-800">
+                        Rs. {product.price.toLocaleString()}
                       </span>
-                    )}
-                  </div>
-                </Link>
+                      {product.old_price && (
+                        <span className="text-[12px] text-gray-400 line-through">
+                          Rs. {product.old_price.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                </div>
               ))}
             </div>
 

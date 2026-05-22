@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, Heart } from 'lucide-react';
 import { useState } from 'react';
+import { useWishlist } from '@/context/WishlistContext';
 
 interface ProductCardProps {
   product: {
@@ -23,8 +24,10 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const [showSecondaryImage, setShowSecondaryImage] = useState(false);
+
+  const isWishlisted = isInWishlist(product.product_id);
 
   const discount = product.old_price
     ? Math.round(((product.old_price - product.price) / product.old_price) * 100)
@@ -32,6 +35,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const avgRating = product.ratings?.stats?.avg_rating || 0;
   const totalRatings = product.ratings?.stats?.total_ratings || 0;
+
+  const mainImage = product.images?.[0]?.image || '/placeholder.png';
 
   return (
     <Link href={`/products/${product.product_id}`}>
@@ -60,9 +65,16 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={(e) => {
               e.preventDefault();
-              setIsWishlisted(!isWishlisted);
+              toggleWishlist({
+                product_id: product.product_id,
+                name: product.name,
+                price: product.price,
+                old_price: product.old_price,
+                image: mainImage,
+                category_name: product.category_name,
+              });
             }}
-            className="absolute top-4 left-4 p-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <Heart
               size={18}

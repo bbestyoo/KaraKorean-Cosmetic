@@ -149,6 +149,25 @@ export function SiteHeader() {
                 )}
               />
             </Link>
+            <Link
+              href="/wishlist"
+              className={cn(
+                "relative pb-1 transition-colors hover:text-black group",
+                pathname === "/wishlist"
+                  ? "text-[#4a5a56]"
+                  : ""
+              )}
+            >
+              Wishlist
+              <span
+                className={cn(
+                  "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left",
+                  pathname === "/wishlist"
+                    ? "w-full scale-x-100"
+                    : "w-full scale-x-0 group-hover:scale-x-100"
+                )}
+              />
+            </Link>
           </nav>
 
           {/* Actions - Right */}
@@ -183,13 +202,20 @@ export function SiteHeader() {
             >
               Editorial
             </Link>
-            <Link
-              href="/journal"
-              className="text-lg font-medium text-neutral-900 uppercase tracking-wider"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Journal
-            </Link>
+             <Link
+               href="/blog"
+               className="text-lg font-medium text-neutral-900 uppercase tracking-wider"
+               onClick={() => setIsMobileMenuOpen(false)}
+             >
+               Blog
+             </Link>
+             <Link
+               href="/wishlist"
+               className="text-lg font-medium text-neutral-900 uppercase tracking-wider"
+               onClick={() => setIsMobileMenuOpen(false)}
+             >
+               Wishlist
+             </Link>
           </div>
         )}
       </header>

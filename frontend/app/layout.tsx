@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { LenisProvider } from "@/components/LenisProvider";
 
@@ -81,7 +82,9 @@ export default function RootLayout({
         <LenisProvider>
           <AuthProvider>
             <CartProvider>
-              {children}
+              <WishlistProvider>
+                {children}
+              </WishlistProvider>
             </CartProvider>
           </AuthProvider>
         </LenisProvider>

@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Heart } from 'lucide-react';
+import { useWishlist } from '@/context/WishlistContext';
 
 interface PremiumProductCardProps {
   product: {
@@ -17,7 +19,10 @@ interface PremiumProductCardProps {
 }
 
 export function PremiumProductCard({ product }: PremiumProductCardProps) {
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
+
+  const isWishlisted = isInWishlist(product.product_id);
 
   const discount = product.old_price
     ? Math.round(((product.old_price - product.price) / product.old_price) * 100)
@@ -50,6 +55,27 @@ export function PremiumProductCard({ product }: PremiumProductCardProps) {
           }`}
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
         />
+
+        {/* Wishlist Button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            toggleWishlist({
+              product_id: product.product_id,
+              name: product.name,
+              price: product.price,
+              old_price: product.old_price,
+              image: mainImage,
+              category_name: product.category_name,
+            });
+          }}
+          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-sm"
+        >
+          <Heart
+            size={16}
+            className={isWishlisted ? 'fill-red-600 text-red-600' : 'text-neutral-900'}
+          />
+        </button>
 
         {/* Badges - Minimal */}
         {discount > 0 && (

@@ -3,6 +3,7 @@ import { Heart, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { RevealOnScroll } from "./RevealOnScroll";
 import useEmblaCarousel from "embla-carousel-react";
+import { useWishlist } from "@/context/WishlistContext";
 
 const products = [
   {
@@ -52,6 +53,7 @@ const products = [
 ];
 
 export default function FeaturedProducts() {
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const [emblaRef] = useEmblaCarousel({ align: "start", loop: true });
 
   return (
@@ -106,8 +108,28 @@ export default function FeaturedProducts() {
                     <span className="bg-[#E9F3A4] text-neutral-900 text-[0.65rem] font-bold tracking-widest px-2 py-1 rounded">
                       {product.badge}
                     </span>
-                    <button className="text-white hover:text-red-400 transition-colors">
-                      <Heart className="w-6 h-6 fill-current" />
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const pId = `featured-${index}`;
+                        const numericPrice = Number(product.price.replace('$', '')) || 0;
+                        const numericOldPrice = product.oldPrice ? Number(product.oldPrice.replace('$', '')) : undefined;
+                        toggleWishlist({
+                          product_id: pId,
+                          name: product.name,
+                          price: numericPrice,
+                          old_price: numericOldPrice,
+                          image: product.image,
+                          category_name: product.category,
+                        });
+                      }}
+                      className="text-white hover:text-red-500 transition-colors"
+                    >
+                      <Heart
+                        className={`w-6 h-6 transition-colors ${
+                          isInWishlist(`featured-${index}`) ? 'fill-red-500 text-red-500' : 'fill-none text-white'
+                        }`}
+                      />
                     </button>
                   </div>
 
