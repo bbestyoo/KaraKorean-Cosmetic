@@ -81,7 +81,7 @@ class VariantSerializer(serializers.ModelSerializer):
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
-        fields = ['id', 'name', 'price_adjustment', 'stock', 'product']
+        fields = ['id', 'name', 'price_adjustment',  'product']
     
 class GetProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many = True, read_only = True)
@@ -121,7 +121,7 @@ class ProductSerializer(serializers.ModelSerializer):
     ratings = serializers.SerializerMethodField()
     category_name = serializers.SerializerMethodField()
     sub_category_name = serializers.SerializerMethodField()
-    stock = serializers.SerializerMethodField()
+    # stock = serializers.SerializerMethodField()
     attributes = ProductAttributeSerializer(many=True, read_only=True)
     variants = VariantSerializer(many=True, read_only=True)
     sizes = SizeSerializer(many=True, read_only=True)

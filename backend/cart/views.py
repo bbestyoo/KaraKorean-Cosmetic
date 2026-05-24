@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 import random
 from rest_framework import generics
 from .utils import Util
-from shop.models import Product, Color, Size
+from shop.models import Product,  Size
 import datetime
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
@@ -60,8 +60,8 @@ class CheckoutAPIView(APIView):
                 color = None
                 size = None
                 
-                if item.get('color'):
-                    color = Color.objects.filter(name=item.get('color'), product=product).first()
+                # if item.get('color'):
+                #     color = Color.objects.filter(name=item.get('color'), product=product).first()
                 
                 if item.get('size'):
                     size = Size.objects.filter(name=item.get('size')).first()

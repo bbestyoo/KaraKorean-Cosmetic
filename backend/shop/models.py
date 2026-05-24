@@ -57,7 +57,7 @@ class Size(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sizes')
     name = models.CharField(max_length=50)  # e.g., XS, S, M, L, XL, XXL
     price_adjustment = models.FloatField(default=0)  # Additional cost for this size, if any
-    stock = models.PositiveIntegerField(default=0)
+    # stock = models.PositiveIntegerField(default=0)
 
     class Meta:
         unique_together = ['product', 'name']

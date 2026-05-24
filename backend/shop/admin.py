@@ -15,7 +15,7 @@ class VariantAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class SizeInline(admin.TabularInline):
     model = Size
     extra = 1
-    fields = ['name', 'price_adjustment', 'stock']
+    fields = ['name', 'price_adjustment']
 
 class SizeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     model = Size
