@@ -122,10 +122,10 @@ export default function CheckoutPage() {
       }
 
       const orderData = await response.json();
-      
+
       // Clear cart
       clearCart();
-      
+
       // Redirect to success page
       router.push(`/order-confirmation/${orderData.id}`);
     } catch (error) {
@@ -148,7 +148,7 @@ export default function CheckoutPage() {
             <ChevronLeft size={20} />
             <span className="font-medium">Back</span>
           </button>
-          
+
           <h1 className="text-4xl font-bold text-gray-900 mb-6">Checkout</h1>
         </div>
 
@@ -156,71 +156,69 @@ export default function CheckoutPage() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="space-y-6">
-                {/* Sign In Prompt */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                  <div className="flex gap-3 items-start">
-                    <Mail size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">Already have an account?</h3>
-                      <p className="text-sm text-gray-600 mb-4">Sign in to use saved addresses and track your orders.</p>
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition-colors">
-                        Sign In
-                      </button>
-                    </div>
+              {/* Sign In Prompt */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="flex gap-3 items-start">
+                  <Mail size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Already have an account?</h3>
+                    <p className="text-sm text-gray-600 mb-4">Sign in to use saved addresses and track your orders.</p>
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition-colors">
+                      Sign In
+                    </button>
                   </div>
                 </div>
+              </div>
 
-                {/* Contact Information */}
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <Mail size={20} className="text-red-500" />
-                    Contact Information
-                  </h2>
+              {/* Contact Information */}
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <Mail size={20} className="text-red-500" />
+                  Contact Information
+                </h2>
 
-                  <div className="space-y-4">
-                    {/* Name Fields */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-2">
-                          First Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          placeholder="Enter first name"
-                          value={formData.firstName}
-                          onChange={(e) => {
-                            handleInputChange(e);
-                            setErrors(prev => ({ ...prev, firstName: '' }));
-                          }}
-                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                            errors.firstName ? 'border-red-500' : 'border-gray-300'
+                <div className="space-y-4">
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        First Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        placeholder="Enter first name"
+                        value={formData.firstName}
+                        onChange={(e) => {
+                          handleInputChange(e);
+                          setErrors(prev => ({ ...prev, firstName: '' }));
+                        }}
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${errors.firstName ? 'border-red-500' : 'border-gray-300'
                           }`}
-                        />
-                        {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-2">
-                          Last Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          placeholder="Enter last name"
-                          value={formData.lastName}
-                          onChange={(e) => {
-                            handleInputChange(e);
-                            setErrors(prev => ({ ...prev, lastName: '' }));
-                          }}
-                          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                            errors.lastName ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                        />
-                        {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
-                      </div>
+                      />
+                      {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Last Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        placeholder="Enter last name"
+                        value={formData.lastName}
+                        onChange={(e) => {
+                          handleInputChange(e);
+                          setErrors(prev => ({ ...prev, lastName: '' }));
+                        }}
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${errors.lastName ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                      />
+                      {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                    </div>
+                  </div>
 
-                <div className='grid grid-cols-2 gap-4'>
+                  <div className='grid grid-cols-2 gap-4'>
                     {/* Phone */}
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -235,9 +233,8 @@ export default function CheckoutPage() {
                           handleInputChange(e);
                           setErrors(prev => ({ ...prev, phoneNumber: '' }));
                         }}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                          errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>}
                     </div>
@@ -254,49 +251,48 @@ export default function CheckoutPage() {
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
-                    </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Shipping Address */}
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <MapPin size={20} className="text-red-500" />
-                    Shipping Address
-                  </h2>
+              {/* Shipping Address */}
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <MapPin size={20} className="text-red-500" />
+                  Shipping Address
+                </h2>
 
-                  <div className="space-y-4">
-                    {/* Street Address */}
+                <div className="space-y-4">
+                  {/* Street Address */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      Street Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="shippingAddress"
+                      placeholder="Enter street address"
+                      value={formData.shippingAddress}
+                      onChange={(e) => {
+                        handleInputChange(e);
+                        setErrors(prev => ({ ...prev, shippingAddress: '' }));
+                      }}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${errors.shippingAddress ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    />
+                    {errors.shippingAddress && <p className="text-red-500 text-xs mt-1">{errors.shippingAddress}</p>}
+                  </div>
+
+                  {/* City and Area */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">
-                        Street Address <span className="text-red-500">*</span>
-                      </label>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">City</label>
                       <input
                         type="text"
-                        name="shippingAddress"
-                        placeholder="Enter street address"
-                        value={formData.shippingAddress}
-                        onChange={(e) => {
-                          handleInputChange(e);
-                          setErrors(prev => ({ ...prev, shippingAddress: '' }));
-                        }}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                          errors.shippingAddress ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        placeholder="Enter city"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
-                      {errors.shippingAddress && <p className="text-red-500 text-xs mt-1">{errors.shippingAddress}</p>}
                     </div>
-
-                    {/* City and Area */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-2">City</label>
-                        <input
-                          type="text"
-                          placeholder="Enter city"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        />
-                      </div>
 
                     {/* ZIP Code */}
                     <div>
@@ -305,81 +301,81 @@ export default function CheckoutPage() {
                         type="text"
                         placeholder="Enter ZIP code"
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        />
-                    </div>
-                        </div>
-                  </div>
-                </div>
-
-                {/* Payment Method - COD Only */}
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <CreditCard size={20} className="text-red-500" />
-                    Payment Method
-                  </h2>
-
-                  <div className="bg-white border border-gray-300 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="flex items-center h-6">
-                        <input
-                          type="radio"
-                          id="cod"
-                          checked={true}
-                          disabled
-                          className="w-4 h-4 cursor-default"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label htmlFor="cod" className="font-semibold text-gray-900 cursor-default">
-                          Cash on Delivery
-                        </label>
-                        <p className="text-sm text-gray-600 mt-1">Pay when you receive your order</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Create Account */}
-                <div className="pt-2">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      id="createAccount"
-                      name="createAccount"
-                      checked={formData.createAccount}
-                      onChange={handleInputChange}
-                      className="w-4 h-4 rounded border-gray-300 cursor-pointer"
-                    />
-                    <label htmlFor="createAccount" className="text-sm text-gray-900 cursor-pointer">
-                      Create an account
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-2">Save your information for faster checkout next time</p>
-
-                  {/* Password Field (if creating account) */}
-                  {formData.createAccount && (
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-900 mb-2">Password</label>
-                      <input
-                        type="password"
-                        name="password"
-                        placeholder="Create a password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
-                  )}
+                  </div>
                 </div>
+              </div>
 
-                {/* Continue Button */}
-                <button
-                  onClick={handleContinueToPayment}
-                  disabled={isLoading}
-                  className="w-full bg-red-500 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? 'Processing...' : `Place Order - NPR ${total.toLocaleString()}`}
-                </button>
+              {/* Payment Method - COD Only */}
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <CreditCard size={20} className="text-red-500" />
+                  Payment Method
+                </h2>
+
+                <div className="bg-white border border-gray-300 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex items-center h-6">
+                      <input
+                        type="radio"
+                        id="cod"
+                        checked={true}
+                        disabled
+                        className="w-4 h-4 cursor-default"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label htmlFor="cod" className="font-semibold text-gray-900 cursor-default">
+                        Cash on Delivery
+                      </label>
+                      <p className="text-sm text-gray-600 mt-1">Pay when you receive your order</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Create Account */}
+              <div className="pt-2">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="createAccount"
+                    name="createAccount"
+                    checked={formData.createAccount}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+                  />
+                  <label htmlFor="createAccount" className="text-sm text-gray-900 cursor-pointer">
+                    Create an account
+                  </label>
+                </div>
+                <p className="text-xs text-gray-600 mt-2">Save your information for faster checkout next time</p>
+
+                {/* Password Field (if creating account) */}
+                {formData.createAccount && (
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-900 mb-2">Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Create a password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Continue Button */}
+              <button
+                onClick={handleContinueToPayment}
+                disabled={isLoading}
+                className="w-full bg-red-500 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Processing...' : `Place Order - NPR ${total.toLocaleString()}`}
+              </button>
             </div>
           </div>
 

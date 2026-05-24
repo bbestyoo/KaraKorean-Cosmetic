@@ -90,7 +90,7 @@ export default function FeaturedProducts() {
                 delay={index * 150}
                 className="h-full"
               >
-                <div 
+                <div
                   className="relative bg-[#EBE7DD] rounded-t-lg pt-6 px-5 pb-8 h-full flex flex-col group"
                   style={{
                     maskImage: "linear-gradient(to bottom, black calc(100% - 10px), transparent calc(100% - 10px)), radial-gradient(circle at 10px 100%, transparent 10px, black 10.5px)",
@@ -126,9 +126,8 @@ export default function FeaturedProducts() {
                       className="text-white hover:text-red-500 transition-colors"
                     >
                       <Heart
-                        className={`w-6 h-6 transition-colors ${
-                          isInWishlist(`featured-${index}`) ? 'fill-red-500 text-red-500' : 'fill-none text-white'
-                        }`}
+                        className={`w-6 h-6 transition-colors ${isInWishlist(`featured-${index}`) ? 'fill-red-500 text-red-500' : 'fill-none text-white'
+                          }`}
                       />
                     </button>
                   </div>

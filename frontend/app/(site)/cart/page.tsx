@@ -72,7 +72,7 @@ export default function CartPage() {
                     <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
                       <select
                         value={item.size}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         className="bg-white border border-gray-300 rounded px-2 py-1"
                       >
                         <option>{item.size}</option>
@@ -145,7 +145,7 @@ export default function CartPage() {
                 <span className="text-green-600">NPR {total.toLocaleString()}</span>
               </div>
 
-              <button 
+              <button
                 onClick={() => router.push('/checkout')}
                 className="w-full bg-purple-500 text-white py-3 rounded-lg font-semibold hover:bg-purple-600 transition-colors"
               >

@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart } from 'lucide-react';
+import { Star, Heart, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
+import { useCart } from '@/context/CartContext';
 
 interface ProductCardProps {
   product: {
@@ -25,6 +26,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addItem } = useCart();
   const [showSecondaryImage, setShowSecondaryImage] = useState(false);
 
   const isWishlisted = isInWishlist(product.product_id);
@@ -40,7 +42,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.product_id}`}>
-      <div 
+      <div
         className="group cursor-pointer"
         onMouseEnter={() => setShowSecondaryImage(true)}
         onMouseLeave={() => setShowSecondaryImage(false)}
@@ -62,25 +64,49 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
 
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              toggleWishlist({
-                product_id: product.product_id,
-                name: product.name,
-                price: product.price,
-                old_price: product.old_price,
-                image: mainImage,
-                category_name: product.category_name,
-              });
-            }}
-            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <Heart
-              size={18}
-              className={isWishlisted ? 'fill-red-600 text-red-600' : 'text-gray-900'}
-            />
-          </button>
+          {/* Actions Overlay */}
+          <div className="absolute top-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleWishlist({
+                  product_id: product.product_id,
+                  name: product.name,
+                  price: product.price,
+                  old_price: product.old_price,
+                  image: mainImage,
+                  category_name: product.category_name,
+                });
+              }}
+              className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
+            >
+              <Heart
+                size={18}
+                className={isWishlisted ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}
+              />
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addItem({
+                  product_id: product.product_id,
+                  name: product.name,
+                  price: product.price,
+                  size: 'Standard',
+                  quantity: 1,
+                  image: mainImage,
+                });
+              }}
+              className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
+            >
+              <ShoppingBag
+                size={18}
+                className="text-neutral-900 hover:text-[#c9a46b] transition-colors"
+              />
+            </button>
+          </div>
         </div>
 
         <div className="space-y-3">

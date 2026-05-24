@@ -11,12 +11,6 @@ const QUIZ_QUESTIONS = [
   { id: 3, question: 'What is your #1 skin concern?', options: ['Acne & breakouts', 'Dullness & uneven tone', 'Fine lines & aging', 'Dryness & sensitivity'] },
   { id: 4, question: 'How sensitive is your skin?', options: ['Very sensitive — reacts easily', 'Somewhat sensitive', 'Rarely reacts', 'Not sensitive at all'] },
   { id: 5, question: 'How many steps is your current routine?', options: ['1–2 steps', '3–4 steps', '5–7 steps', '8+ steps (full K-beauty!)'] },
-  { id: 6, question: 'Which texture do you prefer for moisturisers?', options: ['Lightweight gel', 'Rich cream', 'Water-based lotion', 'Oil-based balm'] },
-  { id: 7, question: 'How often do you apply SPF?', options: ['Every single day', 'Only on sunny days', 'Rarely', 'Never — oops!'] },
-  { id: 8, question: 'Which ingredient excites you most?', options: ['Snail mucin', 'Centella asiatica', 'Niacinamide', 'Hyaluronic acid'] },
-  { id: 9, question: 'How much time do you spend on skincare each morning?', options: ['Under 5 minutes', '5–10 minutes', '10–20 minutes', '20+ minutes'] },
-  { id: 10, question: 'What best describes your glow goal?', options: ['Glass skin — dewy & luminous', 'Matte & pore-minimised', 'Healthy & natural', 'Radiant & even-toned'] },
-  { id: 11, question: 'How would you rate your current skin happiness?', options: ['Love it — minor tweaks', 'Pretty good overall', 'Needs some work', 'Starting from scratch'] },
 ];
 
 const RESULTS = [
@@ -29,13 +23,13 @@ const RESULTS = [
 const LABELS = ['A', 'B', 'C', 'D'];
 
 // Site palette
-const SAGE = '#4a5a56';
-const SAGE_DARK = '#3d4e4a';
-const SAGE_MID = '#5c6e69';
-const CARD_BG = '#f2ebe4';        // warm beige-rose card
-const PAGE_BG = '#e8e1d8';        // warm beige page bg
-const CARD_BG2 = '#ead9d0';       // slightly darker for stacked cards
-const CARD_BG3 = '#e0cdc3';       // deepest stacked card
+const SAGE = '#f4c2c2'
+const SAGE_DARK = '#000000'
+const SAGE_MID = '#000000'
+const CARD_BG = '#f4c2c2'        // warm beige-rose card
+const PAGE_BG = '#f4c2c2'        // warm beige page bg
+const CARD_BG2 = '#f4c2c2'       // slightly darker for stacked cards
+const CARD_BG3 = '#f4c2c2'       // deepest stacked card
 
 function getResult(answers: (number | null)[]) {
   const tally = [0, 0, 0, 0];
@@ -158,8 +152,8 @@ export default function QuizPage() {
   // ── Quiz screen ────────────────────────────────────────────────────────────
   return (
     <main
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden"
-      style={{ background: PAGE_BG }}
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-20  overflow-hidden"
+      style={{ background: '#fff8e7' }}
     >
       {/* Progress bar */}
       <div className="w-full max-w-4xl mb-8">
@@ -291,8 +285,8 @@ export default function QuizPage() {
               className="px-16 py-4 rounded-full border-2 font-black uppercase tracking-[0.18em] text-sm transition-all duration-200"
               style={{
                 background: selected !== null ? SAGE_DARK : 'transparent',
-                color: selected !== null ? '#c8f535' : '#b0a89e',
-                borderColor: selected !== null ? SAGE_DARK : '#c9bfb7',
+                color: selected !== null ? '#c8f535' : '#000000',
+                borderColor: selected !== null ? SAGE_DARK : '#000000',
                 cursor: selected !== null ? 'pointer' : 'not-allowed',
                 boxShadow: selected !== null ? `3px 3px 0 ${SAGE}` : 'none',
               }}

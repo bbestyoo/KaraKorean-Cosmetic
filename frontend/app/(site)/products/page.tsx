@@ -4,8 +4,9 @@ import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { ChevronDown, ChevronLeft, ChevronRight, X, Heart } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, X, Heart, ShoppingBag } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
+import { useCart } from '@/context/CartContext';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
 const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
@@ -131,6 +132,7 @@ function FilterDropdown({
 function ProductsContent() {
   const searchParams = useSearchParams();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addItem } = useCart();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -405,26 +407,49 @@ function ProductsContent() {
                     </div>
                   </Link>
 
-                  {/* Heart Icon Overlay */}
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toggleWishlist({
-                        product_id: product.product_id,
-                        name: product.name,
-                        price: product.price,
-                        old_price: product.old_price || undefined,
-                            image: product.images[0]?.image || '/images/placeholder.png',
-                        category_name: product.category_name,
-                      });
-                    }}
-                    className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-sm"
-                  >
-                    <Heart
-                      size={16}
-                      className={isInWishlist(product.product_id) ? 'fill-red-600 text-red-600' : 'text-neutral-900'}
-                    />
-                  </button>
+                  {/* Actions Overlay */}
+                  <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleWishlist({
+                          product_id: product.product_id,
+                          name: product.name,
+                          price: product.price,
+                          old_price: product.old_price || undefined,
+                          image: product.images[0]?.image || '/images/placeholder.png',
+                          category_name: product.category_name,
+                        });
+                      }}
+                      className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
+                    >
+                      <Heart
+                        size={16}
+                        className={isInWishlist(product.product_id) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}
+                      />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addItem({
+                          product_id: product.product_id,
+                          name: product.name,
+                          price: product.price,
+                          size: 'Standard',
+                          quantity: 1,
+                          image: product.images[0]?.image || '/images/placeholder.png',
+                        });
+                      }}
+                      className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
+                    >
+                      <ShoppingBag
+                        size={16}
+                        className="text-neutral-900 hover:text-[#c9a46b] transition-colors"
+                      />
+                    </button>
+                  </div>
 
                   {/* Details */}
                   <Link href={`/products/${product.product_id}`} className="block">

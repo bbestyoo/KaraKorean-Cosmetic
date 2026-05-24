@@ -76,9 +76,9 @@ function normalizeProduct(product: ApiProduct): Product {
     category: product.category || 'Uncategorized',
     images: Array.isArray(product.images)
       ? product.images.map((image) => ({
-          ...image,
-          image: resolveImageUrl(image.image),
-        }))
+        ...image,
+        image: resolveImageUrl(image.image),
+      }))
       : [],
   };
 }
@@ -305,7 +305,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <span className="text-base md:text-lg font-semibold text-neutral-900">Quantity:</span>
                 <span className="text-base md:text-lg text-neutral-900 pl-3">{quantity}</span>
               </div>
-              
+
               {showValidationErrors && !selectedSize && (
                 <p className="text-sm text-red-600 mt-2">Please select a size.</p>
               )}
