@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
 import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import '@/styles/blog.css';
-import { 
-  Heart, 
-  Send, 
-  Upload, 
-  MoreHorizontal, 
-  X, 
-  Star, 
-  Home, 
-  Flag, 
+import {
+  Heart,
+  Send,
+  Upload,
+  MoreHorizontal,
+  X,
+  Star,
+  Home,
+  Flag,
   User,
   Eye,
   Clock,
@@ -26,7 +26,7 @@ import {
 import Footer from "@/components/footer";
 
 interface BlogPost {
-  id: number;
+  id: string | number;
   title: string;
   excerpt: string;
   category: string;
@@ -42,91 +42,51 @@ interface BlogPost {
   body: string[];
 }
 
-const detailedPosts: Record<string, BlogPost> = {
-  '1': {
-    id: 1,
-    title: "Life is a beautiful journey not a destination",
-    excerpt: "Sundarbans National Park, a must-visit place in Bangladesh. Part of the Sundarbans on the Ganges Delta.",
-    category: "Entertainment",
-    date: "12-03-2023",
-    image: "https://images.unsplash.com/photo-1522163182402-834f871fd851?q=80&w=1200&auto=format&fit=crop",
-    readTime: "8 min read",
-    author: "Madhu",
-    authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
-    rating: 4.9,
-    reviewsCount: 275,
-    location: "Bangladesh, Khulna division, West Bengal, India",
-    intro: "Sundarbans National Park, a must-visit place in Bangladesh. Part of the Sundarbans on the Ganges Delta and home to one of the largest Bengal tiger reserves, Sundarbans National Park is one of the most naturally productive biological ecosystems on earth.",
-    body: [
-      "Bangladesh offers many tourist attractions, including archaeological sites, historical mosques and monuments, longest natural beach in the world, picturesque landscape, hill forests and wildlife, rolling tea gardens and tribes. Tourists find the rich flora and fauna and colorful tribal life very enchanting.",
-      "Bangladesh offers many tourist attractions, including archaeological sites, historical mosques and monuments, longest natural beach in the world, picturesque landscape,",
-      "hill forests and wildlife, rolling tea gardens and tribes. Tourists find the rich flora and fauna and colorful tribal life very enchanting."
-    ]
-  },
-  '2': {
-    id: 2,
-    title: "Glass Skin: The Ultimate K-Beauty Guide",
-    excerpt: "Achieve that coveted translucent, dewy complexion with our step-by-step glass skin guide.",
-    category: "Trends",
-    date: "10-05-2025",
-    image: "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=1200&auto=format&fit=crop",
-    readTime: "6 min read",
-    author: "Sujana",
-    authorAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",
-    rating: 4.8,
-    reviewsCount: 192,
-    location: "Seoul, South Korea",
-    intro: "Glass skin is a term for exceptionally smooth, even-toned, and lustrous skin that looks so flawless it has the appearance of glass. Originating in South Korea, this trend emphasizes intense hydration and lightweight layering.",
-    body: [
-      "Achieving glass skin requires a dedicated routine focused on moisture and gentle exfoliation. By layering hydrating toners, essences, and ampoules, we create a deep reservoir of hydration within the skin cells.",
-      "Key products include hydrating toners, snail mucin essence, and rich barrier support creams. Consistent SPF application is also crucial to avoid hyperpigmentation and preserve that glass-like translucent finish."
-    ]
-  },
-  '3': {
-    id: 3,
-    title: "Korean Ingredients You Need to Know",
-    excerpt: "From snail mucin to centella asiatica — the powerhouse ingredients behind K-beauty's global revolution.",
-    category: "Ingredients",
-    date: "08-05-2025",
-    image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?q=80&w=1200&auto=format&fit=crop",
-    readTime: "10 min read",
-    author: "Kim Ji-Woo",
-    authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
-    rating: 4.95,
-    reviewsCount: 310,
-    location: "Jeju Island, South Korea",
-    intro: "Korean skincare relies heavily on natural, traditional herbal remedies (Hanbang) coupled with modern scientific innovation. Ingredients like Centella Asiatica, Mugwort, and Snail Mucin have taken the global beauty industry by storm.",
-    body: [
-      "Centella Asiatica (or Cica) is renowned for its skin-healing and soothing properties, making it a savior for acne-prone or compromised barriers. Mugwort offers powerful antibacterial and calming effects.",
-      "Snail Mucin, rich in glycoproteins and hyaluronic acid, provides unparalleled repair and plumping benefits. Incorporating these unique ingredients into your daily routine helps target specific concerns while maintaining skin vitality."
-    ]
-  }
-};
-
-// Fallback dynamic generator for other IDs
+// Fallback generator for when backend is unavailable
 const generatePost = (id: string): BlogPost => {
   const categories = ["Routines", "Trends", "Ingredients", "Reviews", "Self-Care"];
-  const category = categories[parseInt(id) % categories.length];
+  const category = categories[parseInt(id || '0') % categories.length];
   return {
-    id: parseInt(id),
+    id,
     title: `The Premium Guide to K-Beauty Curation #${id}`,
     excerpt: "Discover the legendary K-beauty routine that transformed complexions worldwide.",
     category: category,
-    date: "24-05-2026",
+    date: new Date().toISOString().split('T')[0],
     image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=1200&auto=format&fit=crop",
     readTime: "5 min read",
     author: "Kara Editor",
-    authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+    authorAvatar: "/images/model1.png",
     rating: 4.7,
     reviewsCount: 140,
-    location: "Busan, South Korea",
-    intro: "Skincare is not just a daily chore, it is an investment in your self-care and long-term health. Korean formulation techniques combine botanical wellness with lab-tested performance.",
+    location: "Unknown",
+    intro: "Skincare is not just a daily chore, it is an investment in your self-care and long-term health.",
     body: [
       "Consistency is the golden rule of K-beauty. Layering lightweight, nutrient-rich formulas allows active ingredients to penetrate deeply without overloading the pores.",
       "Ensure you cleanse thoroughly, tone gently, target concerns with targeted serums, and seal everything with a premium, skin-fitting moisturizer and broad-spectrum sunscreen."
     ]
   };
 };
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
+
+function resolveImageUrl(image?: string | null) {
+  if (!image) return '/images/blog/skincare-routine.png';
+  if (image.startsWith('http://') || image.startsWith('https://')) return image;
+  const normalizedPath = image.startsWith('/') ? image : `/${image}`;
+  return new URL(normalizedPath, API_ORIGIN).toString();
+}
+
+function stripHtml(html = '') {
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;|\n/g, ' ').trim();
+}
+
+function htmlToParagraphs(html = '') {
+  const parts = html.split(/<\/?p>|<br\s*\/?\s*>/i).map(s => stripHtml(s)).filter(Boolean);
+  if (parts.length) return parts;
+  const flat = stripHtml(html);
+  return flat ? [flat] : [];
+}
 
 const relatedPostsData = [
   {
@@ -149,7 +109,7 @@ const relatedPostsData = [
     views: "2983",
     readTime: "4 min",
     date: "Jan 11.2023",
-    arrowColor: "orange" // Center card highlights in orange
+    arrowColor: "orange"
   },
   {
     id: 103,
@@ -200,23 +160,71 @@ const relatedPostsData = [
 export default function SingleBlogPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const resolvedParams = use(params);
-  const blogId = resolvedParams.id;
-  const post = detailedPosts[blogId] || generatePost(blogId);
+  const blogId = String(resolvedParams.id || '');
 
-  // States
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
   const [wishlisted, setWishlisted] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(3); // matching picture 2 default pagination state "3" active
+  const [currentPage, setCurrentPage] = useState(3);
 
-  // Scroll to top on load
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    let mounted = true;
+    const fetchPost = async () => {
+      if (!blogId) return;
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_ORIGIN}/blog/api/${blogId}`);
+        if (!res.ok) {
+          throw new Error('Failed to fetch');
+        }
+        const data = await res.json();
+        const raw = Array.isArray(data) ? data[0] : data;
+
+        if (!raw) {
+          if (mounted) setPost(generatePost(blogId));
+          return;
+        }
+
+        const contentText = stripHtml(raw.content || '');
+        const wordCount = contentText.split(/\s+/).filter(Boolean).length || 0;
+        const mapped: BlogPost = {
+          id: raw.id || blogId,
+          title: raw.title || '',
+          excerpt: contentText.slice(0, 200) + (contentText.length > 200 ? '...' : ''),
+          category: raw.category || 'Other',
+          date: raw.date || '',
+          image: resolveImageUrl(raw.image),
+          readTime: `${Math.max(1, Math.ceil(wordCount / 200))} min read`,
+          author: raw.author || 'Admin',
+          authorAvatar: '/images/model1.png',
+          rating: 4.8,
+          reviewsCount: 0,
+          location: '',
+          intro: contentText.slice(0, 250),
+          body: htmlToParagraphs(raw.content || '')
+        };
+
+        if (mounted) setPost(mapped);
+      } catch (err) {
+        console.error('Error fetching blog post:', err);
+        if (mounted) setPost(generatePost(blogId));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchPost();
+    return () => { mounted = false; };
   }, [blogId]);
 
-  // Related Posts filter logic
+  useEffect(() => {
+    if (post) window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [post]);
+
   const filteredRelated = relatedPostsData.filter(p => {
     const matchesCategory = activeFilter === "All" || p.category === activeFilter;
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -224,11 +232,17 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
     return matchesCategory && matchesSearch;
   });
 
+  if (loading || !post) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#0f3b2b] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <>
       <main className="min-h-screen bg-white text-neutral-900">
-        
-        {/* ── BREADCRUMBS BANNER ── */}
         <section 
           className="single-blog-banner"
           style={{ backgroundImage: `url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop')` }}
@@ -238,13 +252,9 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
           </div>
         </section>
 
-        {/* ── MAIN CONTENT CONTAINER ── */}
         <div className="single-blog-container">
-
-          {/* ── META BAR ── */}
           <div className="single-blog-meta-bar">
             <div className="single-blog-meta-left">
-              {/* Author Avatar */}
               <div className="single-blog-author-avatar relative">
                 <Image 
                   src={post.authorAvatar} 
@@ -254,20 +264,17 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
                 />
               </div>
 
-              {/* Rating */}
               <div className="single-blog-meta-item">
                 <Star size={16} className="star-icon" />
                 <span className="font-bold text-neutral-900">{post.rating}</span>
                 <span className="text-neutral-500">({post.reviewsCount} reviews)</span>
               </div>
 
-              {/* Superhost */}
               <div className="single-blog-meta-item">
                 <Home size={16} />
                 <span>Superhost</span>
               </div>
 
-              {/* Location */}
               <div className="single-blog-meta-item">
                 <Flag size={16} />
                 <span className="text-neutral-600 underline font-light cursor-pointer hover:text-black">
@@ -276,7 +283,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="single-blog-meta-right">
               <button 
                 onClick={() => alert("Shared successfully!")}
@@ -318,25 +324,19 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
             </div>
           </div>
 
-          {/* ── TITLE & INTRO BLOCK ── */}
           <section className="single-blog-grid">
             <div>
-              <h1 className="single-blog-title">
-                {post.title}
-              </h1>
+              <h1 className="single-blog-title">{post.title}</h1>
               <div className="single-blog-category-wrap">
                 <div className="single-blog-category-underline" />
                 <span className="single-blog-category-name">{post.category}</span>
               </div>
             </div>
             <div>
-              <p className="single-blog-intro">
-                {post.intro}
-              </p>
+              <p className="single-blog-intro">{post.intro}</p>
             </div>
           </section>
 
-          {/* ── MAIN FEATURED IMAGE ── */}
           <div className="single-blog-featured-image-wrapper relative rounded-sm">
             <Image 
               src={post.image} 
@@ -348,7 +348,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
             />
           </div>
 
-          {/* ── POST DETAILS & CONTENT ── */}
           <section className="single-blog-details-section">
             <h2>Post Details</h2>
             <div className="single-blog-detail-host">
@@ -371,7 +370,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
             </div>
           </section>
 
-          {/* ── ADD A REVIEW ── */}
           <section className="single-blog-add-review-section">
             <h3>Add a Review</h3>
             <div className="single-blog-add-review-subtitle">
@@ -379,7 +377,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
                 Be the first to review <span>Spectacular views of Queenstown</span>
               </div>
 
-              {/* Star Rating Picker */}
               <div className="single-blog-review-stars">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -403,7 +400,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
             </div>
           </section>
 
-          {/* ── RELATED POSTS SECTION (PICTURE 2) ── */}
           <section className="related-posts-section">
             <div className="related-posts-header">
               <div className="related-posts-title-wrapper">
@@ -412,7 +408,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
               </div>
 
               <div className="related-posts-controls">
-                {/* Filters */}
                 <div className="related-posts-filters">
                   {["All", "Technology", "Entertainment", "Social Media", "Other"].map((filter) => (
                     <button
@@ -426,7 +421,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
                   ))}
                 </div>
 
-                {/* Search Bar */}
                 <div className="related-posts-search-wrapper">
                   <input 
                     type="text" 
@@ -440,11 +434,9 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
               </div>
             </div>
 
-            {/* Related Posts Grid */}
             <div className="related-posts-grid">
               {filteredRelated.slice(0, 3).map((item) => (
                 <article key={item.id} className="related-post-card">
-                  {/* Image Container with Arrow Overlay */}
                   <div className="related-post-image-wrapper relative">
                     <Image 
                       src={item.image} 
@@ -452,29 +444,15 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
                       fill 
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
-                    
-                    {/* Orange or Black slant-arrow overlay */}
                     <div className={`related-post-arrow-overlay ${item.arrowColor === 'black' ? 'black-arrow' : ''}`}>
                       <ArrowDownRight size={18} className="transform rotate-180" />
                     </div>
                   </div>
 
-                  {/* Category Tag */}
-                  <span className="related-post-category-tag">
-                    {item.category}
-                  </span>
+                  <span className="related-post-category-tag">{item.category}</span>
+                  <h3 className="related-post-title">{item.title}</h3>
+                  <p className="related-post-excerpt">{item.excerpt}</p>
 
-                  {/* Title */}
-                  <h3 className="related-post-title">
-                    {item.title}
-                  </h3>
-
-                  {/* Excerpt */}
-                  <p className="related-post-excerpt">
-                    {item.excerpt}
-                  </p>
-
-                  {/* Footer Stats */}
                   <div className="related-post-footer">
                     <div className="related-post-meta-item">
                       <Eye size={14} />
@@ -493,7 +471,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
               ))}
             </div>
 
-            {/* Pagination */}
             <div className="related-posts-pagination">
               <button 
                 type="button" 
@@ -503,53 +480,13 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
               >
                 <ChevronLeft size={16} />
               </button>
-              
-              <button 
-                type="button" 
-                className={`pagination-number-btn ${currentPage === 1 ? 'active' : ''}`}
-                onClick={() => setCurrentPage(1)}
-              >
-                1
-              </button>
-              <button 
-                type="button" 
-                className={`pagination-number-btn ${currentPage === 2 ? 'active' : ''}`}
-                onClick={() => setCurrentPage(2)}
-              >
-                2
-              </button>
-              <button 
-                type="button" 
-                className={`pagination-number-btn ${currentPage === 3 ? 'active' : ''}`}
-                onClick={() => setCurrentPage(3)}
-              >
-                3
-              </button>
-              
+              <button type="button" className={`pagination-number-btn ${currentPage === 1 ? 'active' : ''}`} onClick={() => setCurrentPage(1)}>1</button>
+              <button type="button" className={`pagination-number-btn ${currentPage === 2 ? 'active' : ''}`} onClick={() => setCurrentPage(2)}>2</button>
+              <button type="button" className={`pagination-number-btn ${currentPage === 3 ? 'active' : ''}`} onClick={() => setCurrentPage(3)}>3</button>
               <span className="pagination-ellipsis">.....</span>
-              
-              <button 
-                type="button" 
-                className={`pagination-number-btn ${currentPage === 22 ? 'active' : ''}`}
-                onClick={() => setCurrentPage(22)}
-              >
-                22
-              </button>
-              <button 
-                type="button" 
-                className={`pagination-number-btn ${currentPage === 23 ? 'active' : ''}`}
-                onClick={() => setCurrentPage(23)}
-              >
-                23
-              </button>
-              <button 
-                type="button" 
-                className={`pagination-number-btn ${currentPage === 24 ? 'active' : ''}`}
-                onClick={() => setCurrentPage(24)}
-              >
-                24
-              </button>
-              
+              <button type="button" className={`pagination-number-btn ${currentPage === 22 ? 'active' : ''}`} onClick={() => setCurrentPage(22)}>22</button>
+              <button type="button" className={`pagination-number-btn ${currentPage === 23 ? 'active' : ''}`} onClick={() => setCurrentPage(23)}>23</button>
+              <button type="button" className={`pagination-number-btn ${currentPage === 24 ? 'active' : ''}`} onClick={() => setCurrentPage(24)}>24</button>
               <button 
                 type="button" 
                 className="pagination-arrow-btn black-btn"

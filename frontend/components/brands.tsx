@@ -13,7 +13,7 @@ const brands = [
 
 export default function Brands() {
     return (
-        <div className="w-full absolute bottom-0 overflow-hidden py-10 bg-white/5  z-10 border-t border-white/10">
+        <div className="w-full absolute bottom-0 overflow-hidden py-5 lg:py-10 bg-white/5  z-10 border-t border-white/10">
             <style>{`
                 @keyframes marquee {
                     0%   { transform: translateX(0); }

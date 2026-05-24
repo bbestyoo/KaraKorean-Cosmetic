@@ -2,118 +2,72 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import "@/styles/blog.css";
 
-const blogPosts = [
-  {
-    id: 1,
-    title: "The 10-Step Korean Skincare Routine",
-    excerpt:
-      "Discover the legendary K-beauty routine that transformed millions of complexions worldwide.",
-    category: "Routines",
-    date: "May 18, 2025",
-    image: "/images/blog/skincare-routine.png",
-    readTime: "8 min read",
-  },
-  {
-    id: 2,
-    title: "Glass Skin: The Ultimate Guide",
-    excerpt:
-      "Achieve that coveted translucent, dewy complexion with our step-by-step glass skin guide.",
-    category: "Trends",
-    date: "May 12, 2025",
-    image: "/images/blog/glass-skin.png",
-    readTime: "6 min read",
-  },
-  {
-    id: 3,
-    title: "Korean Beauty Ingredients You Need to Know",
-    excerpt:
-      "From snail mucin to centella asiatica — the powerhouse ingredients behind K-beauty's global revolution.",
-    category: "Ingredients",
-    date: "May 8, 2025",
-    image: "/images/blog/ingredients.png",
-    readTime: "10 min read",
-  },
-  {
-    id: 4,
-    title: "Best Korean Sunscreens for Every Skin Type",
-    excerpt:
-      "Lightweight, invisible, and powerful — find your perfect SPF match from Korea's best.",
-    category: "Reviews",
-    date: "Apr 30, 2025",
-    image: "/images/blog/sunscreen.png",
-    readTime: "7 min read",
-  },
-  {
-    id: 5,
-    title: "The Art of Double Cleansing",
-    excerpt:
-      "Why two cleansers are better than one, and how to master this essential first step.",
-    category: "Routines",
-    date: "Apr 22, 2025",
-    image: "/images/blog/double-cleanse.png",
-    readTime: "5 min read",
-  },
-  {
-    id: 6,
-    title: "Sheet Mask Sunday: A Self-Care Ritual",
-    excerpt:
-      "Transform your weekends with the ultimate Korean sheet masking ritual for radiant skin.",
-    category: "Self-Care",
-    date: "Apr 15, 2025",
-    image: "/images/blog/sheet-mask.png",
-    readTime: "4 min read",
-  },
-  {
-    id: 7,
-    title: "Hydration Layering: The Korean Way",
-    excerpt:
-      "Learn the art of layering hydrating products for plump, bouncy skin all day long.",
-    category: "Routines",
-    date: "Apr 8, 2025",
-    image: "/images/blog/glass-skin.png",
-    readTime: "6 min read",
-  },
-  {
-    id: 8,
-    title: "K-Beauty Trends to Watch This Year",
-    excerpt:
-      "From skin flooding to skip-care — the trends shaping Korean beauty right now.",
-    category: "Trends",
-    date: "Mar 28, 2025",
-    image: "/images/blog/skincare-routine.png",
-    readTime: "9 min read",
-  },
-  {
-    id: 9,
-    title: "Building Your PM Skincare Routine",
-    excerpt:
-      "Night is when your skin works hardest. Build the perfect evening ritual with K-beauty essentials.",
-    category: "Routines",
-    date: "Mar 20, 2025",
-    image: "/images/blog/double-cleanse.png",
-    readTime: "7 min read",
-  },
-];
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
-const categories = [
-  "All",
-  "Routines",
-  "Trends",
-  "Ingredients",
-  "Reviews",
-  "Self-Care",
-];
+function resolveImageUrl(image?: string | null) {
+  if (!image) return '/images/blog/skincare-routine.png';
+  if (image.startsWith('http://') || image.startsWith('https://')) return image;
+
+  const normalizedPath = image.startsWith('/') ? image : `/${image}`;
+  return new URL(normalizedPath, API_ORIGIN).toString();
+}
+
+function stripHtml(html = '') {
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;|\n/g, ' ').trim();
+}
 
 export default function BlogPage() {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch(`${API_ORIGIN}/blog/api/`);
+        if (!res.ok) throw new Error('Failed to fetch blog posts');
+        const data = await res.json();
+
+        const normalized = (Array.isArray(data) ? data : []).map((p: any) => {
+          const contentText = stripHtml(p.content || '');
+          const wordCount = contentText.split(/\s+/).filter(Boolean).length || 0;
+          return {
+            id: p.id,
+            title: p.title,
+            excerpt: contentText.slice(0, 180) + (contentText.length > 180 ? '...' : ''),
+            category: p.category || 'Other',
+            date: p.date ? new Date(p.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+            image: resolveImageUrl(p.image),
+            readTime: `${Math.max(1, Math.ceil(wordCount / 200))} min read`,
+          };
+        });
+
+        if (mounted) setPosts(normalized);
+      } catch (err) {
+        console.error('Error fetching blog posts:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchPosts();
+    return () => { mounted = false; };
+  }, []);
+
+  const categories = useMemo(() => [
+    'All',
+    ...Array.from(new Set(posts.map(p => p.category).filter(Boolean)))
+  ], [posts]);
 
   const filteredPosts =
     activeFilter === "All"
-      ? blogPosts
-      : blogPosts.filter((post) => post.category === activeFilter);
+      ? posts
+      : posts.filter((post) => post.category === activeFilter);
 
   return (
     <section id="blog-page" className=" max-w-[1600px] mx-auto">

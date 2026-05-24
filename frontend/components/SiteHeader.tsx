@@ -72,13 +72,13 @@ export function SiteHeader() {
                 alt="Kara KOREAN BEAUTY STORE"
                 width={250}
                 height={90}
-                className="object-contain mt-4 mb-2"
+                className="object-contain mt-4 w-[25vw] md:w-[15vw] mb-2"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 gap-16 text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
+          <nav className="hidden md:flex md:gap-5 lg:gap-10 xl:gap-12 2xl:gap-16 items-center absolute left-1/2 -translate-x-1/2  text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
             {NAV_LINKS.map(({ label, href }) => {
               const active = isActive(href);
               return (
@@ -116,12 +116,12 @@ export function SiteHeader() {
                 className={cn(
                   "transition-colors",
                   pathname === "/wishlist"
-                    ? "fill-red-500 text-red-500"
+                    ? "fill-[#c9a46b] text-[#c9a46b]"
                     : "text-gray-900"
                 )}
               />
               {wishlistItems.length > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                <span className="absolute top-0 right-0 bg-[#c9a46b] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
                   {wishlistItems.length}
                 </span>
               )}
@@ -156,7 +156,7 @@ export function SiteHeader() {
               <Heart size={18} />
               Wishlist
               {wishlistItems.length > 0 && (
-                <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                <span className="bg-[#c9a46b] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
                   {wishlistItems.length}
                 </span>
               )}
