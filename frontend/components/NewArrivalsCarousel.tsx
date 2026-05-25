@@ -107,7 +107,7 @@ export default function NewArrivalsCarousel() {
 
   return (
     <div
-      className="flex flex-col xl:w-[520px]"
+      className="flex flex-col lg:w-[520px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
