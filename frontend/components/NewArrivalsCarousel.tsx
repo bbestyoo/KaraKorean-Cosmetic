@@ -107,12 +107,12 @@ export default function NewArrivalsCarousel() {
 
   return (
     <div
-      className="flex flex-col w-full xl:w-[520px]"
+      className="flex flex-col xl:w-[520px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Featured product card */}
-      <div className="bg-[#eeebd8]/70 flex gap-7 p-3 sm:gap-3 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90">
+      <div className="bg-[#eeebd8]/70 flex-col md:flex-row gap-7 p-3 sm:gap-3 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90">
 
         {/* Product Image Container */}
         <div className=" sm:w-38 h-38 w-40 sm:h-64 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
