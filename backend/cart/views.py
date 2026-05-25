@@ -33,12 +33,16 @@ class OrderPagination(PageNumberPagination):
         })
 
 
+import logging
+logger = logging.getLogger(__name__)
+
 class CheckoutAPIView(APIView):
     """Handle checkout with delivery info and order creation"""
     permission_classes = [AllowAny]
 
     def post(self, request):
         """Create order and delivery info from checkout form"""
+        logger.error("CHECKOUT HIT: %s", request.data) 
         data = request.data
         
         # Get cart items from request or user's cart
@@ -49,45 +53,102 @@ class CheckoutAPIView(APIView):
         
         # Create order
         user = request.user if request.user.is_authenticated else None
-        order = Order.objects.create(user=user, status='Placed')
+        order = Order.objects.create(user=user, status='Pending')
         
         # Create order items from cart items
+        # try:
+        #     for item in cart_items_data:
+        #         product = Product.objects.get(product_id=item.get('product_id'))
+                
+        #         # Get size if available
+        #         size = None
+                
+              
+        #         if item.get('size'):
+        #             size = Size.objects.filter(name=item.get('size')).first()
+                
+        #         OrderItem.objects.create(
+        #             order=order,
+        #             product=product,
+        #             size=size,
+        #             quantity=item.get('quantity', 1),
+        #             price=item.get('price', 0)
+        #         )
+        # except Product.DoesNotExist:
+        #     order.delete()
+        #     return Response({'detail': 'Product not found'}, status=status.HTTP_400_BAD_REQUEST)
+        # except Exception as e:
+        #     order.delete()
+        #     return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             for item in cart_items_data:
+                logger.error("PROCESSING ITEM: %s", item)
                 product = Product.objects.get(product_id=item.get('product_id'))
+                logger.error("PRODUCT FOUND: %s", product)
                 
-                # Get color and size if available
-                color = None
                 size = None
-                
-                # if item.get('color'):
-                #     color = Color.objects.filter(name=item.get('color'), product=product).first()
-                
                 if item.get('size'):
                     size = Size.objects.filter(name=item.get('size')).first()
+                logger.error("SIZE: %s", size)
                 
                 OrderItem.objects.create(
                     order=order,
                     product=product,
-                    color=color,
                     size=size,
                     quantity=item.get('quantity', 1),
                     price=item.get('price', 0)
                 )
+                logger.error("ITEM CREATED")
+                
         except Product.DoesNotExist:
             order.delete()
             return Response({'detail': 'Product not found'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
+            import traceback
+            logger.error("ORDER ITEM EXCEPTION: %s", str(e))
+            logger.error(traceback.format_exc())  # ← full traceback
             order.delete()
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         # Create delivery info
+        # try:
+        #     subtotal = data.get('subtotal', 0)
+        #     shipping_cost = data.get('shippingCost', 0)
+            
+        #     delivery_data = {
+        #         # 'order': order.id,
+        #         'phone_number': data.get('phoneNumber'),
+        #         'first_name': data.get('firstName'),
+        #         'last_name': data.get('lastName'),
+        #         'email': data.get('email', ''),
+        #         'shipping_address': data.get('shippingAddress'),
+        #         'payment_method': 'COD',
+        #         'shipping_cost': shipping_cost,
+        #         'subtotal': subtotal,
+        #         'discount': 0,
+        #         'payment_amount': subtotal + shipping_cost,
+        #         'payment_status': 'Pending'
+        #     }
+
+        #     print(type(subtotal), type(shipping_cost), delivery_data)
+            
+        #     delivery_serializer = DeliverySerializer(data=delivery_data)
+        #     if delivery_serializer.is_valid():
+        #         delivery = delivery_serializer.save(order=order)
+        #     else:
+        #         order.delete()
+        #         return Response(delivery_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # except Exception as e:
+        #     order.delete()
+        #     return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
         try:
-            subtotal = data.get('subtotal', 0)
-            shipping_cost = data.get('shippingCost', 0)
+            subtotal = float(data.get('subtotal', 0) or 0)
+            shipping_cost = float(data.get('shippingCost', 0) or 0)
             
             delivery_data = {
-                'order': order.id,
                 'phone_number': data.get('phoneNumber'),
                 'first_name': data.get('firstName'),
                 'last_name': data.get('lastName'),
@@ -101,16 +162,26 @@ class CheckoutAPIView(APIView):
                 'payment_status': 'Pending'
             }
             
+            logger.error("DELIVERY DATA: %s", delivery_data)
+            
             delivery_serializer = DeliverySerializer(data=delivery_data)
+
+            logger.error("SERIALIZER CREATED")
+            # Validate and save the delivery, associating it with the created order
             if delivery_serializer.is_valid():
                 delivery = delivery_serializer.save(order=order)
+                logger.error("DELIVERY SAVED: %s", delivery)
             else:
+                logger.error("DELIVERY SERIALIZER ERRORS: %s", delivery_serializer.errors)
                 order.delete()
                 return Response(delivery_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
         except Exception as e:
+            logger.error("EXCEPTION: %s", str(e))
+            import traceback
+            logger.error(traceback.format_exc())  # ← full traceback
             order.delete()
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
         # Clear user's cart if authenticated
         if user:
             Cart.objects.filter(user=user).delete()

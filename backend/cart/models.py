@@ -26,7 +26,6 @@ class OrderItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     order = models.ForeignKey(Order, related_name='order_items', on_delete=models.CASCADE)
     product = models.ForeignKey('shop.Product', related_name='order_items', on_delete=models.CASCADE)
-    color = models.ForeignKey('shop.Color', related_name='order_items', on_delete=models.SET_NULL, null=True, blank=True)
     size = models.ForeignKey('shop.Size', related_name='order_items', on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField(default=0)
@@ -35,7 +34,7 @@ class OrderItem(models.Model):
         return f"{self.quantity} x {self.product}"
 
     class Meta:
-        unique_together = ['order', 'product', 'color', 'size']
+        unique_together = ['order', 'product', 'size']
 
 class Delivery(models.Model):
     order = models.OneToOneField(Order, related_name='delivery', on_delete=models.CASCADE)
@@ -58,7 +57,6 @@ class Delivery(models.Model):
 class Cart(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='cart', on_delete=models.CASCADE)
     product = models.ForeignKey('shop.Product', related_name='cart', on_delete=models.CASCADE)
-    color = models.ForeignKey('shop.Color', related_name='cart', on_delete=models.CASCADE, null=True, blank=True)
     size = models.ForeignKey('shop.Size', related_name='cart', on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)  # Default to 1, but can be adjusted
     price = models.PositiveIntegerField(default=0)
@@ -67,7 +65,7 @@ class Cart(models.Model):
         return f"{self.quantity} x {self.product}"
 
     class Meta:
-        unique_together = ['user', 'product', 'color', 'size']
+        unique_together = ['user', 'product', 'size']
 
 
 class Coupon(models.Model):

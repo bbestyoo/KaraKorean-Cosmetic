@@ -3,7 +3,6 @@ import Brands from "../../components/brands";
 import Image from "next/image";
 import Link from "next/link";
 import Collections from "@/components/collections";
-import Footer from "@/components/footer";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import NewnessSection from "@/components/NewnessSection";
 import SpringCollection from "@/components/SpringCollection";
@@ -14,7 +13,7 @@ export default function Home() {
   return (
     <main>
       <div className="flex h-auto min-h-[90vh] md:h-[90vh] md:min-h-[90vh] bg-[#f7f6f2] relative overflow-hidden">
-        <div className="flex flex-col md:flex-row flex-1 relative items-center justify-start md:justify-center px-4 md:px-6 pt-5 sm:pt-12 pb-32 md:py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full gap-6 md:gap-0">
+        <div className="flex flex-col-reverse md:flex-row flex-1 relative items-center justify-start md:justify-center px-4 md:px-6 pt-5 sm:pt-12 pb-32 md:py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full gap-6 md:gap-0">
 
           {/* Desktop Model — absolute positioned, highest z-index */}
           <Image
@@ -27,7 +26,7 @@ export default function Home() {
           />
 
           {/* Mobile Model — centered and scaled down */}
-          <div className="block md:hidden relative w-[350px]  h-[400px] z-20 -my-9 shrink-0 order-3">
+          <div className="block md:hidden relative -mr-30 w-[350px]  h-[500px] z-20 -my-20 shrink-0 order-3">
             <Image
               src="/images/heromodel.png"
               alt="Hero image"
@@ -91,13 +90,13 @@ export default function Home() {
           </div>
 
           {/* Hero typography */}
-          <RevealOnScroll direction="down" delay={200} className="relative  md:absolute md:top-40 md:right-40 pointer-events-none opacity-95 z-10 w-full md:w-auto text-center md:text-left order-1 md:order-none">
-            <div className="font-symphony lowercase text-[#0f3b2b] text-4xl sm:text-6xl md:text-[6.8rem] lg:text-[14rem] leading-none">
+          <RevealOnScroll direction="down" delay={200} className="relative -top-70 ml-4 text-left md:absolute md:top-40 md:right-40 pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none">
+            <div className="font-symphony lowercase text-[#0f3b2b] text-6xl sm:text-6xl md:text-[6.8rem] lg:text-[14rem] leading-none">
               glow like
             </div>
           </RevealOnScroll>
-          <RevealOnScroll direction="up" delay={300} className="relative md:absolute md:top-90 md:right-24 z-10 w-full md:w-auto text-center md:text-left mt-[-20px] md:mt-0 order-2 md:order-none">
-            <span className="font-serif lowercase text-[#0f3b2b] text-3xl sm:text-6xl md:text-[8rem] leading-tight tracking-tight block">
+          <RevealOnScroll direction="up" delay={300} className="relative -top-40 text-left md:absolute md:top-90 md:right-24 z-10 w-full md:w-auto md:text-left mt-[-20px] md:mt-0 order-2 md:order-none">
+            <span className="font-serif lowercase text-[#0f3b2b] text-4xl sm:text-6xl md:text-[8rem] leading-tight tracking-tight block">
               never before
             </span>
           </RevealOnScroll>

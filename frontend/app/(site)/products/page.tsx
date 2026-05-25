@@ -7,7 +7,6 @@ import { useSearchParams } from 'next/navigation';
 import { ChevronDown, ChevronLeft, ChevronRight, X, Heart, ShoppingBag } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
-import Footer from '@/components/footer';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
 const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
@@ -516,7 +515,6 @@ function ProductsContent() {
         )}
       </div>
     </main>
-    <Footer />
     </>
   );
 }

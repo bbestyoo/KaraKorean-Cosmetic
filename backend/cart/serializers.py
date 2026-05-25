@@ -6,12 +6,11 @@ from shop.serializers import ProductSerializer
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
     product_id = serializers.CharField(source='product.product_id', read_only=True)
-    color_name = serializers.CharField(source='color.name', read_only=True)
     size_name = serializers.CharField(source='size.name', read_only=True)
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product_name', 'product_id', 'quantity', 'price', 'color_name', 'size_name']
+        fields = ['id', 'product_name', 'product_id', 'quantity', 'price', 'size_name']
 
 
 class DeliverySerializer(serializers.ModelSerializer):
@@ -22,6 +21,7 @@ class DeliverySerializer(serializers.ModelSerializer):
         fields = ['id', 'order', 'phone_number', 'first_name', 'last_name', 'email', 
                   'shipping_address', 'payment_method', 'shipping_cost', 'subtotal', 
                   'discount', 'payment_amount', 'payment_status', 'order_items', 'created_at']
+        read_only_fields = ['order']
     
     def get_order_items(self, obj):
         if obj.order:
@@ -49,7 +49,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ['id','product_id', 'image', 'quantity','name','price','color']
+        fields = ['id','product_id', 'image', 'quantity','name','price' ]
 
     def get_image(self, obj):
         request = self.context.get('request')  # Get request from context
