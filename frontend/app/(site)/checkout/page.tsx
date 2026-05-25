@@ -140,7 +140,7 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 text-gray-900 hover:text-gray-600 transition-colors mb-6"
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
           </button>
 
           <h1 className="text-4xl font-bold text-gray-900 mb-6">Checkout</h1>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}

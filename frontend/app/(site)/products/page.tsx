@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { ChevronDown, ChevronLeft, ChevronRight, X, Heart, ShoppingBag } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import Footer from '@/components/footer';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
 const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
@@ -240,6 +241,7 @@ function ProductsContent() {
   const resetPage = () => setCurrentPage(1);
 
   return (
+    <>
     <main className="min-h-screen bg-white">
 
       {/* ── TOP FILTER BAR ── */}
@@ -266,7 +268,7 @@ function ProductsContent() {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-5">
+      <div className="max-w-[1700px] mx-auto px-4 sm:px-5">
 
         {/* ── SORT BAR + PAGINATION ── */}
         <div className="flex items-center justify-between py-4 border-b border-gray-100">
@@ -458,11 +460,11 @@ function ProductsContent() {
                     </p>
                     <div className="flex items-center gap-2">
                       <span className="text-[13px] text-gray-800">
-                        Rs. {product.price.toLocaleString()}
+                        Rs.&nbsp;{product.price.toLocaleString()}
                       </span>
                       {product.old_price && (
                         <span className="text-[12px] text-gray-400 line-through">
-                          Rs. {product.old_price.toLocaleString()}
+                          Rs.&nbsp;{product.old_price.toLocaleString()}
                         </span>
                       )}
                     </div>
@@ -514,6 +516,8 @@ function ProductsContent() {
         )}
       </div>
     </main>
+    <Footer />
+    </>
   );
 }
 

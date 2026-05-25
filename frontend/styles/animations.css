@@ -10,7 +10,7 @@
   opacity: 0;
   transform: translateY(40px);
   transition: opacity 1000ms cubic-bezier(0.34, 1.56, 0.64, 1),
-              transform 1000ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform 1000ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Visible state - triggered by IntersectionObserver */
@@ -48,6 +48,7 @@
 
 /* Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
+
   [data-reveal="true"],
   [data-reveal-child],
   [data-reveal-image] {
@@ -63,4 +64,35 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* Cart slide-in animation */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.cart-slide-in {
+  animation: slideInFromRight 320ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.cart-overlay-fade {
+  animation: fadeIn 200ms ease-out forwards;
 }

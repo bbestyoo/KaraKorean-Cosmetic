@@ -424,7 +424,6 @@ function WishlistContent() {
                         price: item.price,
                         image: item.image,
                         size: '',
-                        color: '',
                         quantity: 1,
                       });
                     }}

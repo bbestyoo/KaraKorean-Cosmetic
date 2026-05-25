@@ -5,25 +5,25 @@ import { RevealOnScroll } from "./RevealOnScroll";
 
 export default function NewnessSection() {
   return (
-    <section className="relative w-full bg-white py-24 overflow-hidden">
-      {/* Top Tagline */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-full text-center z-10 px-4">
+    <section className="relative w-full bg-white py-10 md:py-24 overflow-hidden">
+      {/* Top Tagline — inline on mobile, absolute on md+ */}
+      <div className="relative md:absolute md:top-12 md:left-1/2 md:-translate-x-1/2 w-full text-center z-10 px-4 mb-2 md:mb-0 pt-6 md:pt-0">
         <RevealOnScroll direction="down" delay={100}>
-          <p className="text-sm md:text-base text-neutral-500 font-sans tracking-tight">
+          <p className="text-xs md:text-base text-neutral-500 font-sans tracking-tight">
             ALWAYS BE ON TOP WITH OUR COSMETICS
           </p>
         </RevealOnScroll>
       </div>
 
       {/* Typography layer */}
-      <div className="relative w-full max-w-full px-4 md:px-8 mx-auto pt-16 pb-12 flex flex-col md:flex-row justify-between items-start md:items-center z-10">
+      <div className="relative w-full max-w-full px-4 md:px-8 mx-auto pt-4 md:pt-16 md:pb-12 flex flex-col md:flex-row justify-between items-start md:items-center z-10">
         <RevealOnScroll direction="left" delay={200} className="w-full">
           <h2 className="text-[12vw] md:text-[8vw] font-bold leading-none tracking-tighter text-[#0f3b2b] uppercase">
             NEWNESS
           </h2>
         </RevealOnScroll>
 
-        <RevealOnScroll direction="right" delay={300} className="w-full text-right mt-10 md:mt-0 flex flex-col items-end">
+        <RevealOnScroll direction="right" delay={300} className="w-full text-right mt-4 md:mt-10 md:mt-0 flex flex-col items-end">
           <h2 className="text-[12vw] md:text-[8vw] font-bold leading-none tracking-tighter text-[#0f3b2b] uppercase relative">
             DESIRE SERIES
           </h2>
@@ -34,11 +34,11 @@ export default function NewnessSection() {
       </div>
 
       {/* Images Grid Layer */}
-      <div className="relative w-full h-full max-w-full mx-auto mt-12 px-4 md:px-8 z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-6 gap-6 md:gap-8 min-h-[800px] grid-flow-row-dense">
+      <div className="relative w-full h-full max-w-full mx-auto mt-6 md:mt-12 px-4 md:px-8 z-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-6 gap-4 md:gap-8 min-h-0 md:min-h-[800px] grid-flow-row-dense">
 
           {/* Left large leaf/face image (covers 50% width) */}
-          <RevealOnScroll direction="up" delay={200} className="col-span-1 md:col-span-2 row-span-6 relative h-[60vh] md:h-full">
+          <RevealOnScroll direction="up" delay={200} className="col-span-1 md:col-span-2 row-span-6 relative h-[55vw] md:h-full">
             <Link href="/products" className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md">
               <Image
                 src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=800&auto=format&fit=crop"
@@ -94,7 +94,7 @@ export default function NewnessSection() {
           </RevealOnScroll>
 
           {/* Bottom right cropped image (bottom stacked in far-right 25% column) */}
-          <RevealOnScroll direction="up" delay={800} className="col-span-1 md:col-span-1 md:col-start-4 md:row-start-4 md:row-span-3 relative h-[300px] md:h-full pt-4 md:pt-0">
+          <RevealOnScroll direction="up" delay={800} className="col-span-1 md:col-span-1 md:col-start-4 md:row-start-4 md:row-span-3 relative h-[50vw] md:h-full pt-0 md:pt-0">
             <Link href="/products" className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md">
               <Image
                 src="https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=600&auto=format&fit=crop"

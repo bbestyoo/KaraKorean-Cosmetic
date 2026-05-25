@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, Heart } from "lucide-react";
+import { Menu, X, Heart } from "lucide-react";
 import { CartButton } from "@/components/CartButton";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -20,6 +20,7 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [menuMounted, setMenuMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollYRef = useRef(0);
   const pathname = usePathname();
@@ -30,20 +31,36 @@ export function SiteHeader() {
     return pathname.startsWith(href);
   };
 
+  // Handle animated open/close: mount first, then animate in; animate out, then unmount
+  const openMenu = () => {
+    setMenuMounted(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsMobileMenuOpen(true));
+    });
+  };
+
+  const closeMenu = () => {
+    setIsMobileMenuOpen(false);
+    setTimeout(() => setMenuMounted(false), 350);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const shouldShow = !(currentScrollY > lastScrollYRef.current && currentScrollY > 100);
-
       setIsVisible((previousVisible) =>
         previousVisible === shouldShow ? previousVisible : shouldShow
       );
       lastScrollYRef.current = currentScrollY;
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Close menu on route change
+  useEffect(() => {
+    closeMenu();
+  }, [pathname]);
 
   return (
     <>
@@ -55,13 +72,29 @@ export function SiteHeader() {
       >
         <PromoBanner />
 
-        <div className="h-24 px-6 lg:px-8 flex items-center justify-between relative">
+        <div className="h-16 sm:h-20 md:h-24 px-6 lg:px-8 flex items-center justify-between relative">
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 -ml-2 text-neutral-800"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 -ml-2 text-neutral-800 transition-transform duration-200 active:scale-90"
+            onClick={isMobileMenuOpen ? closeMenu : openMenu}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            <Menu className="w-6 h-6" />
+            <span
+              className={cn(
+                "block transition-all duration-300",
+                isMobileMenuOpen ? "rotate-90 opacity-0 absolute" : "rotate-0 opacity-100"
+              )}
+            >
+              <Menu className="w-6 h-6" />
+            </span>
+            <span
+              className={cn(
+                "block transition-all duration-300",
+                isMobileMenuOpen ? "rotate-0 opacity-100" : "-rotate-90 opacity-0 absolute"
+              )}
+            >
+              <X className="w-6 h-6" />
+            </span>
           </button>
 
           {/* Logo */}
@@ -72,13 +105,13 @@ export function SiteHeader() {
                 alt="Kara KOREAN BEAUTY STORE"
                 width={250}
                 height={90}
-                className="object-contain mt-4 w-[25vw] md:w-[15vw] mb-2"
+                className="object-contain mt-4 w-[25vw] md:w-[14vw] mb-2"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex md:gap-5 lg:gap-10 xl:gap-12 2xl:gap-16 items-center absolute left-1/2 -translate-x-1/2  text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
+          <nav className="hidden md:flex md:gap-5 lg:gap-10 xl:gap-12 2xl:gap-16 items-center absolute left-1/2 -translate-x-1/2 text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
             {NAV_LINKS.map(({ label, href }) => {
               const active = isActive(href);
               return (
@@ -94,9 +127,7 @@ export function SiteHeader() {
                   <span
                     className={cn(
                       "absolute left-0 bottom-0 h-[2px] bg-[#5c6e69] transition-transform duration-300 ease-out origin-left w-full",
-                      active
-                        ? "scale-x-100"
-                        : "scale-x-0 group-hover:scale-x-100"
+                      active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     )}
                   />
                 </Link>
@@ -130,40 +161,61 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-[#f5f5f5] border-b border-neutral-200 shadow-lg md:hidden p-4 flex flex-col gap-4 z-50">
-            {NAV_LINKS.map(({ label, href }) => (
+        {/* Mobile Menu — animated slide-down */}
+        {menuMounted && (
+          <div
+            className={cn(
+              "absolute top-full left-0 w-full bg-[#f7f6f2] border-b border-neutral-200 shadow-xl md:hidden z-50 overflow-hidden",
+              "transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]",
+              isMobileMenuOpen
+                ? "opacity-100 translate-y-0 pointer-events-auto"
+                : "opacity-0 -translate-y-3 pointer-events-none"
+            )}
+          >
+            {/* Decorative top accent */}
+            <div className="h-0.5 w-full bg-gradient-to-r from-[#0f3b2b]/20 via-[#c9a46b]/40 to-[#0f3b2b]/20" />
+
+            <div className="px-6 pt-5 pb-6 flex flex-col gap-1">
+              {NAV_LINKS.map(({ label, href }, i) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "group flex items-center justify-between py-3.5 border-b border-neutral-100 last:border-0",
+                    "text-base font-semibold uppercase tracking-[0.15em] transition-colors duration-200",
+                    isActive(href)
+                      ? "text-[#0f3b2b]"
+                      : "text-neutral-700 hover:text-[#0f3b2b]"
+                  )}
+                  style={{ transitionDelay: isMobileMenuOpen ? `${i * 40}ms` : "0ms" }}
+                  onClick={closeMenu}
+                >
+                  {label}
+                  {isActive(href) && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#c9a46b]" />
+                  )}
+                </Link>
+              ))}
+
+              {/* Wishlist row */}
               <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "text-lg font-medium uppercase tracking-wider transition-colors",
-                  isActive(href)
-                    ? "text-[#4a5a56] font-bold"
-                    : "text-neutral-900"
-                )}
-                onClick={() => setIsMobileMenuOpen(false)}
+                href="/wishlist"
+                className="group flex items-center gap-3 py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b] transition-colors duration-200 border-t border-neutral-100 mt-1"
+                onClick={closeMenu}
               >
-                {label}
+                <Heart size={17} className="text-current" />
+                Wishlist
+                {wishlistItems.length > 0 && (
+                  <span className="ml-auto bg-[#c9a46b] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                    {wishlistItems.length}
+                  </span>
+                )}
               </Link>
-            ))}
-            <Link
-              href="/wishlist"
-              className="text-lg font-medium uppercase tracking-wider text-neutral-900 flex items-center gap-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <Heart size={18} />
-              Wishlist
-              {wishlistItems.length > 0 && (
-                <span className="bg-[#c9a46b] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                  {wishlistItems.length}
-                </span>
-              )}
-            </Link>
+            </div>
           </div>
         )}
       </header>
     </>
   );
 }
+

@@ -13,7 +13,7 @@ const brands = [
 
 export default function Brands() {
     return (
-        <div className="w-full absolute bottom-0 overflow-hidden py-5 lg:py-10 bg-white/5  z-10 border-t border-white/10">
+        <div className="w-full absolute bottom-10 md:bottom-0 overflow-hidden py-0 sm:py-5 lg:py-10 bg-white/5  z-10 border-t border-white/10">
             <style>{`
                 @keyframes marquee {
                     0%   { transform: translateX(0); }
@@ -37,7 +37,7 @@ export default function Brands() {
                             <img
                                 src={brand.src}
                                 alt={brand.alt}
-                                className="h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                                className="h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
                             />
                         </div>
                     ))}

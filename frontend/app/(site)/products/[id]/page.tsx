@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Minus, Plus } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { ProductRecommendations } from '@/components/ProductRecommendations';
 
@@ -159,6 +159,34 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     return product ? product.price + getSizeAdjustment() : 0;
   };
 
+  const getSelectedSizeStock = () => {
+    if (!product) return Infinity;
+    if (product.sizes && selectedSize) {
+      const s = product.sizes.find((s) => s.name === selectedSize);
+      return s?.stock ?? product.stock ?? Infinity;
+    }
+    return product.stock ?? Infinity;
+  };
+
+  const handleIncrement = () => {
+    setQuantity((q) => {
+      const stock = getSelectedSizeStock();
+      return Math.min(stock, q + 1);
+    });
+  };
+
+  const handleDecrement = () => {
+    setQuantity((q) => Math.max(1, q - 1));
+  };
+
+  useEffect(() => {
+    if (!product) return;
+    const stock = getSelectedSizeStock();
+    if (quantity > stock) {
+      setQuantity(Math.max(1, Math.min(stock, quantity)));
+    }
+  }, [selectedSize, product?.sizes]);
+
   const handleAddToCart = () => {
     if (!selectedSize) {
       setShowValidationErrors(true);
@@ -266,7 +294,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="w-full max-w-[320px] border border-[#0f3b2b] bg-[#0f3b2b] py-4.5 text-sm font-semibold tracking-widest text-white uppercase transition-all duration-300 hover:bg-transparent hover:text-[#0f3b2b] rounded-md shadow-md"
+                className="w-full max-w-[320px] cursor-pointer border border-[#0f3b2b] bg-[#0f3b2b] py-4.5 text-sm font-semibold tracking-widest text-white uppercase transition-all duration-300 hover:bg-transparent hover:text-[#0f3b2b] rounded-md shadow-md"
               >
                 Add to cart
               </button>
@@ -303,7 +331,25 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               {/* Quantity */}
               <div className="grid grid-cols-[100px_1fr] items-center gap-6 pt-2">
                 <span className="text-base md:text-lg font-semibold text-neutral-900">Quantity:</span>
-                <span className="text-base md:text-lg text-neutral-900 pl-3">{quantity}</span>
+                <div className="flex items-center gap-3 pl-3">
+                  <button
+                    type="button"
+                    onClick={handleDecrement}
+                    aria-label="Decrease quantity"
+                    className="px-3 py-2 border border-neutral-300 rounded hover:bg-neutral-100"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span className="w-10 text-center text-base md:text-lg">{quantity}</span>
+                  <button
+                    type="button"
+                    onClick={handleIncrement}
+                    aria-label="Increase quantity"
+                    className="px-3 py-2 border border-neutral-300 rounded hover:bg-neutral-100"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
               </div>
 
               {showValidationErrors && !selectedSize && (
@@ -340,7 +386,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         </aside>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 py-12">
         <ProductRecommendations productId={product.product_id} />
       </div>
     </main>

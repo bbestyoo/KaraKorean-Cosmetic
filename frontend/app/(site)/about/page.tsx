@@ -1,5 +1,6 @@
 'use client';
 
+import Footer from '@/components/footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRef, useEffect, useState } from 'react';
@@ -48,6 +49,7 @@ const STRIP_TEXT = ['Korean Beauty · Est. 2023', 'Kara', 'Authentic K-Beauty', 
 
 export default function AboutPage() {
   return (
+    <>
     <main className="bg-[#f7f6f2] text-[#111] overflow-x-hidden">
 
       {/* ══════════════════════════════════════════════════════════ */}
@@ -366,5 +368,7 @@ export default function AboutPage() {
         </Reveal>
       </section>
     </main>
+    <Footer />
+    </>
   );
 }
