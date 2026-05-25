@@ -39,7 +39,7 @@ function WishlistContent() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  
   // Shared items parsed from URL query parameter
   const [sharedItems, setSharedItems] = useState<WishlistItem[]>([]);
 
@@ -148,8 +148,8 @@ function WishlistContent() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] pt-10 pb-24 px-6 md:px-12 lg:px-20 relative">
-
+    <main className="min-h-screen bg-[#f7f6f2] pt-32 pb-24 px-6 md:px-12 lg:px-20 relative">
+      
       {/* Toast Notification */}
       {showShareToast && (
         <div className="fixed bottom-8 right-8 z-50 bg-[#0f3b2b] text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3 animate-slide-in">
@@ -160,7 +160,7 @@ function WishlistContent() {
 
       {/* Shared Curation Header Alert */}
       {sharedItems.length > 0 && (
-        <div className="max-w-[1600px] mx-auto mb-10 p-6 bg-[#0f3b2b]/5 border border-[#0f3b2b]/15 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto mb-10 p-6 bg-[#0f3b2b]/5 border border-[#0f3b2b]/15 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-[10px] tracking-widest text-[#0f3b2b] font-bold uppercase block mb-1">
               ✦ Shared With You
@@ -183,7 +183,7 @@ function WishlistContent() {
       )}
 
       {/* Header Info */}
-      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-end justify-between border-b border-[#0f3b2b]/10 pb-8 mb-12">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between border-b border-[#0f3b2b]/10 pb-8 mb-12">
         <div>
           <span className="text-[10px] tracking-[0.35em] text-[#6b766f] font-semibold uppercase block mb-3">
             ✦ Your Saved Luxuries
@@ -210,7 +210,7 @@ function WishlistContent() {
               </>
             )}
           </button>
-
+          
           {wishlist.length > 0 && (
             <button
               onClick={clearWishlist}
@@ -223,7 +223,7 @@ function WishlistContent() {
       </div>
 
       {/* Luxury Quick Links */}
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
         <div className="bg-white/50 border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
           <span className="text-[10px] tracking-[0.2em] text-[#6b766f] font-semibold uppercase">✦ EXPERIENCE</span>
           <h3 className="font-serif text-lg text-[#0f3b2b] mt-2 mb-4">Complimentary Consultation</h3>
@@ -268,7 +268,7 @@ function WishlistContent() {
       </div>
 
       {/* Main Grid or Empty state */}
-      <div className="max-w-[1600px] mx-auto">
+      <div className="max-w-7xl mx-auto">
         {wishlist.length === 0 && sharedItems.length === 0 ? (
           <div className="text-center py-24 bg-white/40 border border-dashed border-[#0f3b2b]/15 rounded-lg flex flex-col items-center">
             <Heart className="w-12 h-12 text-[#6b766f]/40 mb-6 animate-pulse" />
@@ -285,7 +285,7 @@ function WishlistContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-
+            
             {/* Render Shared Items first if any */}
             {sharedItems.map((item) => (
               <div
@@ -295,7 +295,7 @@ function WishlistContent() {
                 <div className="absolute top-4 left-4 z-20 bg-[#E9F3A4] text-[#0f3b2b] text-[8px] font-bold uppercase tracking-wider px-2.5 py-1 shadow-sm">
                   Shared
                 </div>
-
+                
                 <button
                   onClick={() => addToWishlist(item)}
                   className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white shadow-md hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-colors"
@@ -424,6 +424,7 @@ function WishlistContent() {
                         price: item.price,
                         image: item.image,
                         size: '',
+                        color: '',
                         quantity: 1,
                       });
                     }}

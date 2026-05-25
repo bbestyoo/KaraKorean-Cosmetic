@@ -12,8 +12,8 @@ import NewArrivalsCarousel from "@/components/NewArrivalsCarousel";
 export default function Home() {
   return (
     <main>
-      <div className="flex h-auto min-h-[90vh] md:h-[90vh] md:min-h-[90vh] bg-[#f7f6f2] relative overflow-hidden">
-        <div className="flex  md:flex-row flex-1 relative items-center justify-start md:justify-center px-4 md:px-6 pt-5 sm:pt-12 pb-32 md:py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full gap-6 md:gap-0">
+      <div className="flex h-auto md:h-[90vh] md:min-h-[90vh] bg-[#f7f6f2] relative overflow-hidden">
+        <div className="flex  md:flex-row flex-1 relative  justify-start md:justify-center px-4 md:px-6 pt-5 sm:pt-12 pb-32 md:py-16 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full gap-6 md:gap-0">
 
           {/* Desktop Model — absolute positioned, highest z-index */}
           <Image
@@ -26,7 +26,7 @@ export default function Home() {
           />
 
           {/* Mobile Model — centered and scaled down */}
-          <div className="block md:hidden relative w-[350px]  h-[500px] z-20 -my-40 shrink-0 order-3">
+          <div className="block md:hidden relative w-[350px] -mt-10  h-[500px] z-20 -ml-30 shrink-0 order-3">
             <Image
               src="/images/heromodel.png"
               alt="Hero image"
@@ -38,12 +38,16 @@ export default function Home() {
           </div>
 
           {/* ── LEFT SIDE ── */}
-          <RevealOnScroll direction="left" delay={200} className="relative md:absolute md:left-10 md:top-16 z-20 flex flex-col gap-0 items-center md:items-start w-full md:w-auto max-w-sm mt-6 md:mt-0 order-4 md:order-none">
+          <RevealOnScroll direction="left" delay={200} className="relative top-12 md:absolute md:left-10 md:top-12 z-20 flex flex-col gap-0 md:items-start w-full md:w-auto max-w-sm mt-6 md:mt-0 order-1 md:order-none">
 
             {/* New arrivals badge */}
-            <span className="self-center md:self-start border border-[#0f3b2b] text-[#0f3b2b] text-xs md:text-mdz tracking-[0.25em] font-sans px-4 py-1 rounded-full mb-5">
+            {/* <span className=" border border-[#0f3b2b] text-[#0f3b2b] text-[0.5rem] md:text-mdz tracking-[0.25em] font-sans p-1 w-full rounded-full mb-2">
               ✦ NEW ARRIVALS
-            </span>
+            </span> */}
+            <span className="inline-flex items-center gap-2 border border-[#0f3b2b] text-[#0f3b2b] text-[0.5rem] md:text-xs tracking-[0.2em] font-sans px-4 py-2 w-fit rounded-full mb-2">
+  <span>✦</span>
+  <span>NEW ARRIVALS</span>
+</span>
 
             {/* Featured product card carousel */}
             <NewArrivalsCarousel />

@@ -33,7 +33,7 @@ export default function Brands() {
                 <div className="marquee-track">
                     {/* First set */}
                     {brands.map((brand, idx) => (
-                        <div key={`a-${idx}`} className="flex-shrink-0 px-16 flex items-center">
+                        <div key={`a-${idx}`} className="flex-shrink-0 px-6 flex items-center">
                             <img
                                 src={brand.src}
                                 alt={brand.alt}
