@@ -126,7 +126,7 @@ export default function FeaturedProducts() {
                       className="text-white hover:text-red-500 transition-colors"
                     >
                       <Heart
-                        className={`w-6 h-6 transition-colors ${isInWishlist(`featured-${index}`) ? 'fill-red-500 text-red-500' : 'fill-none text-white'
+                        className={`w-6 cursor-pointer h-6 transition-colors ${isInWishlist(`featured-${index}`) ? 'fill-red-500 text-red-500' : 'fill-none text-white'
                           }`}
                       />
                     </button>

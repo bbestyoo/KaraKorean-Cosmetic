@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X, Heart, User } from "lucide-react";
 import { CartButton } from "@/components/CartButton";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -25,6 +25,8 @@ export function SiteHeader() {
   const lastScrollYRef = useRef(0);
   const pathname = usePathname();
   const { wishlist: wishlistItems } = useWishlist();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -57,10 +59,22 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menu on route change
+  // Close menu on route change (also close user menu)
   useEffect(() => {
     closeMenu();
+    setIsUserMenuOpen(false);
   }, [pathname]);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -134,7 +148,9 @@ export function SiteHeader() {
             })}
           </nav>
 
-          {/* Actions - Right: Wishlist icon + Cart */}
+          {/* User icon dropdown (desktop) */}
+         
+
           <div className="flex items-center gap-1">
             <Link
               href="/wishlist"
@@ -157,6 +173,25 @@ export function SiteHeader() {
               )}
             </Link>
             <CartButton />
+             <div className="hidden md:block mr-3" ref={userMenuRef}>
+            <button
+              onClick={() => setIsUserMenuOpen((v) => !v)}
+              className="p-2 rounded-full hover:bg-gray-100"
+              aria-label="User menu"
+            >
+              <User size={22} />
+            </button>
+            {isUserMenuOpen && (
+              <div className="absolute right-6 top-full mt-2 w-44 bg-white  z-50 py-1">
+                <Link href="/login" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  Sign In
+                </Link>
+                <Link href="/signup" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </div>
           </div>
         </div>
 
@@ -202,7 +237,7 @@ export function SiteHeader() {
                 className="group flex items-center gap-3 py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b] transition-colors duration-200 border-t border-neutral-100 mt-1"
                 onClick={closeMenu}
               >
-                <Heart size={17} className="text-current" />
+                {/* <Heart size={17} className="text-current" /> */}
                 Wishlist
                 {wishlistItems.length > 0 && (
                   <span className="ml-auto bg-[#c9a46b] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
@@ -210,6 +245,23 @@ export function SiteHeader() {
                   </span>
                 )}
               </Link>
+              {/* Auth links (mobile) */}
+              <div className="border-t border-neutral-100">
+                <Link
+                  href="/login"
+                  className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
+                  onClick={closeMenu}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
+                  onClick={closeMenu}
+                >
+                  Sign Up
+                </Link>
+              </div>
             </div>
           </div>
         )}

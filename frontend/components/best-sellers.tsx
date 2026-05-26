@@ -7,19 +7,19 @@ const cards = [
     title: "DESTINATION DRESSING",
     subtitle: "THE VACATION SHOP",
     image: "/images/model1.png",
-    link: "/shop/vacation",
+    link: "/shop/toner",
   },
   {
     title: "SUMMER NIGHT LOUNGE & LINGERIE",
     subtitle: "NEW LINGERIE",
     image: "/images/model2.png",
-    link: "/shop/lingerie",
+    link: "/shop/ampoule",
   },
   {
     title: "STEP INTO SUMMER",
     subtitle: "NEW SHOES",
     image: "/images/model3.png",
-    link: "/shop/shoes",
+    link: "/shop/essence",
   },
 ];
 
@@ -34,8 +34,13 @@ export default function BestSellers() {
             direction="up"
             className="flex-1 h-full block"
           >
+            
             <Link
-              href={card.link}
+              href={(() => {
+                const parts = (card.link || '').split('/').filter(Boolean);
+                const category = parts.length ? parts[parts.length - 1] : '';
+                return `/products${category ? `?category=${encodeURIComponent(category)}` : ''}`;
+              })()}
               className="group relative w-full h-full overflow-hidden block"
             >
               {/* Background Image */}

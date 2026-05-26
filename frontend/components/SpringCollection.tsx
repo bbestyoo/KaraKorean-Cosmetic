@@ -1,8 +1,10 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { RevealOnScroll } from "./RevealOnScroll";
 
 export default function SpringCollection() {
+  const toCategory = (s?: string) => (s ? s.split(/\s+/).join("-").toLowerCase() : "");
   return (
     <section className="w-full bg-[#f4f4f4] py-10 md:py-24 px-4 md:px-12 overflow-hidden">
       <div className="max-w-[1600px] mx-auto">
@@ -10,13 +12,23 @@ export default function SpringCollection() {
 
           {/* Left Column - Person Image */}
           <RevealOnScroll direction="right" delay={100} className="relative h-[45vw] md:h-full w-full overflow-hidden group">
-            <Image
-              src="images/karaimages/bojproduct.png" // Black and white fashion portrait
-              alt="Spring Collection Model"
-              fill
-              unoptimized
-              className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 cursor-pointer "
-            />
+            <Link
+              href={(() => {
+                const category = toCategory("Spring Collection Model");
+                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+              })()}
+              className="group relative h-full w-full block overflow-hidden"
+            >
+              <div className="absolute inset-0">
+                <Image
+                  src="images/karaimages/bojproduct.png" // Black and white fashion portrait
+                  alt="Spring Collection Model"
+                  fill
+                  unoptimized
+                  className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 cursor-pointer "
+                />
+              </div>
+            </Link>
           </RevealOnScroll>
 
           {/* Middle Column - Text Content */}
@@ -27,21 +39,35 @@ export default function SpringCollection() {
             <p className="text-sm md:text-base text-neutral-500 mb-6 md:mb-10 max-w-sm mx-auto leading-relaxed">
               Body text content goes here. This is where the main content will be displayed.
             </p>
-            <button className="border border-[#1a1a1a] text-[#1a1a1a] px-10 py-3 text-sm font-semibold tracking-widest uppercase hover:bg-[#1a1a1a] hover:text-white transition-colors duration-300">
+            <Link
+              href={(() => {
+                const category = toCategory("Spring Collection");
+                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+              })()}
+              className="border border-[#1a1a1a] text-[#1a1a1a] px-10 py-3 text-sm font-semibold tracking-widest uppercase hover:bg-[#1a1a1a] hover:text-white transition-colors duration-300 inline-block text-center"
+            >
               Shop Now
-            </button>
+            </Link>
           </RevealOnScroll>
 
           {/* Right Column - Shoes Image */}
           <RevealOnScroll direction="left" delay={500} className="relative h-[45vw] md:h-full w-full overflow-hidden group bg-white flex items-center justify-center">
             <div className="absolute inset-0">
-              <Image
-                src="images/karaimages/bojmodel.png" // Sneakers stacked
-                alt="Spring Collection Sneakers"
-                fill
-                unoptimized
-                className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 cursor-pointer"
-              />
+              <Link
+                href={(() => {
+                  const category = toCategory("Spring Collection Sneakers");
+                  return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+                })()}
+                className="group relative h-full w-full block overflow-hidden"
+              >
+                <Image
+                  src="images/karaimages/bojmodel.png" // Sneakers stacked
+                  alt="Spring Collection Sneakers"
+                  fill
+                  unoptimized
+                  className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 cursor-pointer"
+                />
+              </Link>
             </div>
           </RevealOnScroll>
 

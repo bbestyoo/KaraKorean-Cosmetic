@@ -4,6 +4,7 @@ import Link from "next/link";
 import { RevealOnScroll } from "./RevealOnScroll";
 
 export default function NewnessSection() {
+  const toCategory = (s?: string) => (s ? s.split(/\s+/).join("-").toLowerCase() : "");
   return (
     <section className="relative w-full bg-white py-10 md:py-24 overflow-hidden">
       {/* Top Tagline — inline on mobile, absolute on md+ */}
@@ -39,7 +40,13 @@ export default function NewnessSection() {
 
           {/* Left large leaf/face image (covers 50% width) */}
           <RevealOnScroll direction="up" delay={200} className="col-span-1 md:col-span-2 row-span-6 relative h-[55vw] md:h-full">
-            <Link href="/products" className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md">
+            <Link
+              href={(() => {
+                const category = toCategory("Natural beauty");
+                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+              })()}
+              className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md"
+            >
               <Image
                 src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=800&auto=format&fit=crop"
                 alt="Natural beauty"
@@ -57,7 +64,13 @@ export default function NewnessSection() {
 
           {/* Center cosmetics image (centered in middle-right 25% column) */}
           <RevealOnScroll direction="up" delay={400} className="col-span-1 md:col-span-1 md:col-start-3 md:row-start-2 md:row-span-4 relative flex flex-col justify-center items-center">
-            <Link href="/products" className="w-full max-w-[360px] aspect-[3/4] relative overflow-hidden mb-4 group cursor-pointer shadow-md">
+            <Link
+              href={(() => {
+                const category = toCategory("Capture Day Creme");
+                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+              })()}
+              className="w-full max-w-[360px] aspect-[3/4] relative overflow-hidden mb-4 group cursor-pointer shadow-md"
+            >
               <Image
                 src="https://images.unsplash.com/photo-1629198688000-71f23e745b6e?q=80&w=600&auto=format&fit=crop"
                 alt="Capture Day Creme"
@@ -76,7 +89,13 @@ export default function NewnessSection() {
 
           {/* Right top white tube image (top stacked in far-right 25% column) */}
           <RevealOnScroll direction="left" delay={600} className="col-span-1 md:col-span-1 md:col-start-4 md:row-start-1 md:row-span-3 relative flex flex-col justify-end items-center mb-4 md:mb-0">
-            <Link href="/products" className="w-full max-w-[340px] aspect-[4/5] relative overflow-hidden mb-4 group cursor-pointer shadow-md">
+            <Link
+              href={(() => {
+                const category = toCategory("Capture Le Serum");
+                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+              })()}
+              className="w-full max-w-[340px] aspect-[4/5] relative overflow-hidden mb-4 group cursor-pointer shadow-md"
+            >
               <Image
                 src="https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=600&auto=format&fit=crop"
                 alt="Capture Le Serum"
@@ -95,7 +114,13 @@ export default function NewnessSection() {
 
           {/* Bottom right cropped image (bottom stacked in far-right 25% column) */}
           <RevealOnScroll direction="up" delay={800} className="col-span-1 md:col-span-1 md:col-start-4 md:row-start-4 md:row-span-3 relative h-[50vw] md:h-full pt-0 md:pt-0">
-            <Link href="/products" className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md">
+            <Link
+              href={(() => {
+                const category = toCategory("Cosmetic detail");
+                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+              })()}
+              className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md"
+            >
               <Image
                 src="https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=600&auto=format&fit=crop"
                 alt="Cosmetic detail"

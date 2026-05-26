@@ -20,7 +20,7 @@ export default function Home() {
     relative  z-20 shrink-0 min-[420px]:shrink 
     h-[480px] sm:h-[500px] md:h-[760px] xl:h-[900px]
     md:aspect-[2/3] /* Forces the container to scale proportionally to the height */
-    -mt-10 lg:mt-0 order-2
+    -mt-10 lg:mt-0 order-2 pointer-events-none
   "
           >
             <Image

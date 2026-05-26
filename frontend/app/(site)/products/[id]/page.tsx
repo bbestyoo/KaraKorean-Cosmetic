@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { ChevronDown, Minus, Plus } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { ProductRecommendations } from '@/components/ProductRecommendations';
+import ProductReviews from '@/components/ProductReviews';
 
 interface ProductImage {
   image: string;
@@ -248,8 +249,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     );
   }
 
-  return (
-    <main className="min-h-screen bg-white text-neutral-900">
+  return <main className="min-h-screen bg-white text-neutral-900">
       <div className="flex flex-col lg:flex-row lg:items-start">
         <section
           className="w-full lg:w-1/2 flex flex-col"
@@ -360,26 +360,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             {/* Accordions */}
             <div className="pt-8">
               <ul className="flex flex-col">
-                {POLICY_SECTIONS.map((section) => {
-                  const open = openPolicy === section.id;
-                  return (
-                    <li key={section.id} className="border-b border-neutral-300">
-                      <button
-                        type="button"
-                        onClick={() => setOpenPolicy(open ? null : section.id)}
-                        className="flex w-full items-center justify-between py-5 text-left text-sm md:text-base font-bold tracking-widest uppercase text-neutral-800 hover:text-[#0f3b2b] transition-colors"
-                      >
-                        {section.title}
-                        <ChevronDown
-                          className={`size-5 shrink-0 text-neutral-500 transition-transform ${open ? 'rotate-180' : ''}`}
-                        />
-                      </button>
-                      {open && (
-                        <p className="pb-6 text-base md:text-lg leading-relaxed text-neutral-600">{section.body}</p>
-                      )}
-                    </li>
-                  );
-                })}
+                {POLICY_SECTIONS.map((section) => (
+                  <li key={section.id} className="border-b border-neutral-300">
+                    <div className="py-5 text-sm md:text-base font-bold tracking-widest uppercase text-neutral-800">
+                      {section.title}
+                    </div>
+                    <p className="pb-6 text-base md:text-lg leading-relaxed text-neutral-600">{section.body}</p>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -389,7 +377,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 py-12">
         <ProductRecommendations productId={product.product_id} />
       </div>
-    </main>
-  );
+
+      {/* Product Reviews Section */}
+      <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 py-6">
+        <ProductReviews productId={product.product_id} />
+      </div>
+    </main>;
 }
 

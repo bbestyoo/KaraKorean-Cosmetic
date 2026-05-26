@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ChevronDown, ChevronLeft, ChevronRight, X, Heart, ShoppingBag } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
@@ -131,6 +131,9 @@ function FilterDropdown({
 // ─── Main Content Component ───────────────────────────────────────────────────
 function ProductsContent() {
   const searchParams = useSearchParams();
+  const searchParamsString = searchParams ? searchParams.toString() : '';
+  const router = useRouter();
+  const pathname = usePathname();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addItem } = useCart();
 
@@ -146,17 +149,62 @@ function ProductsContent() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const categoryParam = searchParams.get('category');
-    const brandParam = searchParams.get('brand');
+    const sp = new URLSearchParams(searchParamsString);
+    const categoryParam = sp.get('category');
+    const brandParam = sp.get('brand');
+    const priceParam = sp.get('price');
+    const sortParam = sp.get('sort');
+    const pageParam = sp.get('page');
 
     if (categoryParam) {
       setSelectedCategory(categoryParam);
+    } else {
+      setSelectedCategory('All');
     }
 
     if (brandParam) {
       setSelectedBrand(brandParam);
+    } else {
+      setSelectedBrand('All');
     }
-  }, [searchParams]);
+
+    if (priceParam) {
+      setSelectedPriceRange(priceParam);
+    } else {
+      setSelectedPriceRange('All Prices');
+    }
+
+    if (sortParam) {
+      setSelectedSort(sortParam);
+    } else {
+      setSelectedSort('');
+    }
+
+    if (pageParam) {
+      setCurrentPage(Number(pageParam) || 1);
+    } else {
+      setCurrentPage(1);
+    }
+  }, [searchParamsString]);
+
+  // Update URL only on explicit user actions to avoid navigation loops
+  const updateUrl = (overrides: { category?: string; brand?: string; price?: string; sort?: string; page?: number } = {}) => {
+    const category = overrides.category !== undefined ? overrides.category : selectedCategory;
+    const brand = overrides.brand !== undefined ? overrides.brand : selectedBrand;
+    const price = overrides.price !== undefined ? overrides.price : selectedPriceRange;
+    const sort = overrides.sort !== undefined ? overrides.sort : selectedSort;
+    const page = overrides.page !== undefined ? overrides.page : currentPage;
+
+    const params = new URLSearchParams();
+    if (category && category !== 'All') params.set('category', category);
+    if (brand && brand !== 'All') params.set('brand', brand);
+    if (price && price !== 'All Prices') params.set('price', price);
+    if (sort) params.set('sort', sort);
+    if (page && page > 1) params.set('page', String(page));
+
+    const qs = params.toString();
+    router.push(`${pathname}${qs ? `?${qs}` : ''}`);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -216,6 +264,19 @@ function ProductsContent() {
     [products]
   );
 
+  // Normalize selectedCategory/Brand to match actual option casing after products load
+  useEffect(() => {
+    if (categories.length > 1 && selectedCategory && selectedCategory !== 'All') {
+      const match = categories.find((c) => c.toLowerCase() === selectedCategory.toLowerCase());
+      if (match && match !== selectedCategory) setSelectedCategory(match);
+    }
+
+    if (brands.length > 1 && selectedBrand && selectedBrand !== 'All') {
+      const matchB = brands.find((b) => b.toLowerCase() === selectedBrand.toLowerCase());
+      if (matchB && matchB !== selectedBrand) setSelectedBrand(matchB);
+    }
+  }, [categories, brands]);
+
   // Filtered + sorted products
   const filteredProducts = products.filter((p) => {
     const priceRange = PRICE_RANGES.find(r => r.label === selectedPriceRange) || PRICE_RANGES[0];
@@ -250,19 +311,31 @@ function ProductsContent() {
             label="Category"
             options={categories}
             value={selectedCategory}
-            onChange={(v) => { setSelectedCategory(v); resetPage(); }}
+            onChange={(v) => {
+              setSelectedCategory(v);
+              resetPage();
+              updateUrl({ category: v, page: 1 });
+            }}
           />
           <FilterDropdown
             label="Brand"
             options={brands}
             value={selectedBrand}
-            onChange={(v) => { setSelectedBrand(v); resetPage(); }}
+            onChange={(v) => {
+              setSelectedBrand(v);
+              resetPage();
+              updateUrl({ brand: v, page: 1 });
+            }}
           />
           <FilterDropdown
             label="Price"
             options={PRICE_RANGES.map(r => r.label)}
             value={selectedPriceRange}
-            onChange={(v) => { setSelectedPriceRange(v); resetPage(); }}
+            onChange={(v) => {
+              setSelectedPriceRange(v);
+              resetPage();
+              updateUrl({ price: v, page: 1 });
+            }}
           />
         </div>
       </div>
@@ -277,7 +350,12 @@ function ProductsContent() {
             <div className="relative">
               <select
                 value={selectedSort}
-                onChange={(e) => { setSelectedSort(e.target.value); resetPage(); }}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedSort(val);
+                  resetPage();
+                  updateUrl({ sort: val, page: 1 });
+                }}
                 className="appearance-none text-[12px] font-medium text-gray-800 pr-5 cursor-pointer bg-transparent outline-none border-b border-gray-300 pb-0.5 hover:border-gray-800 transition-colors"
               >
                 {SORT_OPTIONS.map(o => (
@@ -291,7 +369,11 @@ function ProductsContent() {
           {/* Pagination controls */}
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => setCurrentPage(p => {
+                const newP = Math.max(1, p - 1);
+                updateUrl({ page: newP });
+                return newP;
+              })}
               disabled={currentPage === 1}
               className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors"
             >
@@ -300,7 +382,10 @@ function ProductsContent() {
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
-                onClick={() => setCurrentPage(page)}
+                onClick={() => {
+                  setCurrentPage(page);
+                  updateUrl({ page });
+                }}
                 className={`w-7 h-7 text-[12px] flex items-center justify-center transition-colors ${currentPage === page
                   ? 'bg-gray-900 text-white'
                   : 'text-gray-600 hover:text-black'
@@ -310,7 +395,11 @@ function ProductsContent() {
               </button>
             ))}
             <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => setCurrentPage(p => {
+                const newP = Math.min(totalPages, p + 1);
+                updateUrl({ page: newP });
+                return newP;
+              })}
               disabled={currentPage === totalPages}
               className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors"
             >
@@ -348,7 +437,7 @@ function ProductsContent() {
             <span className="text-[11px] text-gray-400 uppercase tracking-wider">Active filters:</span>
             {selectedCategory !== 'All' && (
               <button
-                onClick={() => { setSelectedCategory('All'); resetPage(); }}
+                onClick={() => { setSelectedCategory('All'); resetPage(); updateUrl({ category: 'All', page: 1 }); }}
                 className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
               >
                 {selectedCategory}
@@ -357,7 +446,7 @@ function ProductsContent() {
             )}
             {selectedBrand !== 'All' && (
               <button
-                onClick={() => { setSelectedBrand('All'); resetPage(); }}
+                onClick={() => { setSelectedBrand('All'); resetPage(); updateUrl({ brand: 'All', page: 1 }); }}
                 className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
               >
                 {selectedBrand}
@@ -366,7 +455,7 @@ function ProductsContent() {
             )}
             {selectedPriceRange !== 'All Prices' && (
               <button
-                onClick={() => { setSelectedPriceRange('All Prices'); resetPage(); }}
+                onClick={() => { setSelectedPriceRange('All Prices'); resetPage(); updateUrl({ price: 'All Prices', page: 1 }); }}
                 className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
               >
                 {selectedPriceRange}
@@ -374,7 +463,7 @@ function ProductsContent() {
               </button>
             )}
             <button
-              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); resetPage(); }}
+              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); resetPage(); updateUrl({ category: 'All', brand: 'All', price: 'All Prices', page: 1 }); }}
               className="text-[11px] text-gray-400 underline hover:text-gray-800 ml-2"
             >
               Clear all
@@ -475,7 +564,11 @@ function ProductsContent() {
             {/* ── BOTTOM PAGINATION ── */}
             <div className="flex items-center justify-center gap-1 pb-20">
               <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => setCurrentPage(p => {
+                  const newP = Math.max(1, p - 1);
+                  updateUrl({ page: newP });
+                  return newP;
+                })}
                 disabled={currentPage === 1}
                 className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors border border-gray-200"
               >
@@ -484,7 +577,10 @@ function ProductsContent() {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
-                  onClick={() => setCurrentPage(page)}
+                  onClick={() => {
+                    setCurrentPage(page);
+                    updateUrl({ page });
+                  }}
                   className={`w-8 h-8 text-[12px] flex items-center justify-center transition-colors border ${currentPage === page
                     ? 'bg-gray-900 text-white border-gray-900'
                     : 'border-gray-200 text-gray-600 hover:border-gray-800 hover:text-black'
@@ -494,7 +590,11 @@ function ProductsContent() {
                 </button>
               ))}
               <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => setCurrentPage(p => {
+                  const newP = Math.min(totalPages, p + 1);
+                  updateUrl({ page: newP });
+                  return newP;
+                })}
                 disabled={currentPage === totalPages}
                 className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors border border-gray-200"
               >
