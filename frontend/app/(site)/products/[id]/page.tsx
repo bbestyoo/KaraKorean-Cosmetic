@@ -276,7 +276,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           <div className="max-w-[580px] space-y-12">
             {/* Header / Title */}
             <header className="space-y-6">
-              <h1 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-light tracking-wide text-neutral-900 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-[2.5rem] capitalize font-light tracking-wide text-neutral-900 leading-tight">
                 {product.name}
               </h1>
               <div className="flex items-baseline">
@@ -284,7 +284,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   className="text-2xl sm:text-3xl lg:text-[2rem] text-neutral-800"
                   style={{ fontFamily: 'var(--font-playfair), serif' }}
                 >
-                  {formatRs(getFinalPrice())}
+                  Rs.&nbsp;{(getFinalPrice())}
                 </p>
               </div>
             </header>
@@ -303,28 +303,41 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             {/* Selectors */}
             <div className="space-y-8 pt-4">
               {/* Size */}
-              <div className="grid grid-cols-[100px_1fr] items-center gap-6">
-                <span className="text-base md:text-lg font-semibold text-neutral-900">Size:</span>
-                <div className="relative w-full max-w-[280px] border border-neutral-300 rounded-md bg-neutral-50 px-1 py-0.5">
-                  <select
-                    value={selectedSize ?? ''}
-                    onChange={(e) => setSelectedSize(e.target.value || null)}
-                    className="w-full appearance-none bg-transparent py-2.5 pl-3 pr-10 text-base text-neutral-700 outline-none cursor-pointer font-medium"
-                  >
-                    <option value="">Select Size</option>
+              <div className="grid grid-cols-[100px_1fr] items-start gap-6">
+                <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Size:</span>
+                <div className="w-full max-w-[420px]">
+                  <div className="flex flex-wrap gap-2">
                     {product.sizes && product.sizes.length > 0 ? (
                       product.sizes.map((size) => {
-                        return <option key={size.id} value={size.name} disabled={size.stock <= 0}>{size.name}{size.stock <= 0 ? ' — out of stock' : ''}</option>;
+                        const disabled = size.stock <= 0;
+                        const selected = selectedSize === size.name;
+                        return (
+                          <button
+                            key={size.id}
+                            type="button"
+                            onClick={() => !disabled && setSelectedSize(size.name)}
+                            aria-pressed={selected}
+                            aria-disabled={disabled}
+                            disabled={disabled}
+                            className={`px-3 py-2  border rounded-md text-sm font-medium ${selected ? 'bg-[#0f3b2b] text-white border-[#0f3b2b]' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-100'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                          >
+                            {size.name}{disabled ? ' — out of stock' : ''}
+                          </button>
+                        );
                       })
                     ) : (
-                      ['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
-                        <option key={size} value={size}>
-                          {size}
-                        </option>
+                      ['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setSelectedSize(s)}
+                          className={`px-3 py-2 border rounded-md text-sm font-medium ${selectedSize === s ? 'bg-[#0f3b2b] text-white border-[#0f3b2b]' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-100'}`}
+                        >
+                          {s}
+                        </button>
                       ))
                     )}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-neutral-500" />
+                  </div>
                 </div>
               </div>
 
@@ -360,14 +373,24 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             {/* Accordions */}
             <div className="pt-8">
               <ul className="flex flex-col">
-                {POLICY_SECTIONS.map((section) => (
-                  <li key={section.id} className="border-b border-neutral-300">
-                    <div className="py-5 text-sm md:text-base font-bold tracking-widest uppercase text-neutral-800">
-                      {section.title}
-                    </div>
-                    <p className="pb-6 text-base md:text-lg leading-relaxed text-neutral-600">{section.body}</p>
-                  </li>
-                ))}
+                {POLICY_SECTIONS.map((section) => {
+                  const isOpen = openPolicy === section.id;
+                  return (
+                    <li key={section.id} className="border-b border-neutral-300">
+                      <button
+                        onClick={() => setOpenPolicy(isOpen ? null : section.id)}
+                        className="w-full flex items-center  justify-between py-5 text-sm md:text-base font-bold tracking-widest uppercase text-neutral-800 focus:outline-none"
+                        aria-expanded={isOpen}
+                      >
+                        <span>{section.title}</span>
+                        <ChevronDown className={`transform transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
+                      </button>
+                      <div className={`${isOpen ? 'block' : 'hidden'} pb-6 text-base md:text-lg leading-relaxed text-neutral-600`}>
+                        {section.body}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>

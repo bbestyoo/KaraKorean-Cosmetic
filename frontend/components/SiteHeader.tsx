@@ -6,9 +6,10 @@ import { Menu, X, Heart, User } from "lucide-react";
 import { CartButton } from "@/components/CartButton";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { PromoBanner } from "./PromoBanner";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -27,6 +28,8 @@ export function SiteHeader() {
   const { wishlist: wishlistItems } = useWishlist();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const { isLoggedIn, user, logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -173,25 +176,48 @@ export function SiteHeader() {
               )}
             </Link>
             <CartButton />
-             <div className="hidden md:block mr-3" ref={userMenuRef}>
-            <button
-              onClick={() => setIsUserMenuOpen((v) => !v)}
-              className="p-2 rounded-full hover:bg-gray-100"
-              aria-label="User menu"
-            >
-              <User size={22} />
-            </button>
-            {isUserMenuOpen && (
-              <div className="absolute right-6 top-full mt-2 w-44 bg-white  z-50 py-1">
-                <Link href="/login" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Sign In
-                </Link>
-                <Link href="/signup" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Sign Up
-                </Link>
-              </div>
-            )}
-          </div>
+            <div className="hidden md:flex items-center mr-3 relative" ref={userMenuRef}>
+              <button
+                onClick={() => setIsUserMenuOpen((v) => !v)}
+                className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-2"
+                aria-label="User menu"
+              >
+                <User size={22} />
+                {isLoggedIn && (
+                  <span className="hidden lg:inline-block text-sm font-semibold">{user?.username || user?.name || 'Account'}</span>
+                )}
+              </button>
+              {isUserMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-44 bg-white z-50 py-1 shadow-md border">
+                  {isLoggedIn ? (
+                    <>
+                      <Link href="/account" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Profile
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsUserMenuOpen(false);
+                          router.push('/');
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Sign In
+                      </Link>
+                      <Link href="/signup" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -247,20 +273,44 @@ export function SiteHeader() {
               </Link>
               {/* Auth links (mobile) */}
               <div className="border-t border-neutral-100">
-                <Link
-                  href="/login"
-                  className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
-                  onClick={closeMenu}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
-                  onClick={closeMenu}
-                >
-                  Sign Up
-                </Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link
+                      href="/account"
+                      className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
+                      onClick={() => { closeMenu(); }}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        closeMenu();
+                        router.push('/');
+                      }}
+                      className="group block w-full text-left py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
+                      onClick={closeMenu}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
+                      onClick={closeMenu}
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

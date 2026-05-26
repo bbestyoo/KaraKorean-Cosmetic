@@ -82,9 +82,9 @@ export const ProductRecommendations = ({ productId }: { productId: string }) => 
 
     return (
       <Link href={`/products/${product.product_id}`}>
-        <div className="flex-shrink-0 w-56 group cursor-pointer">
+        <div className="flex-shrink-0 w-[300px] group cursor-pointer border-gra-y-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow p-2 ">
           {/* Image Container with overlay label */}
-          <div className="relative w-full h-64 bg-gray-100 rounded-2xl overflow-hidden mb-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="relative  w-full h-64 bg-gray-100 rounded-2xl overflow-hidden mb-4 shadow-sm hover:shadow-md transition-shadow">
             {product.images && product.images.length > 0 ? (
               <Image
                 src={product.images[0].image}
@@ -112,9 +112,9 @@ export const ProductRecommendations = ({ productId }: { productId: string }) => 
           </div>
 
           {/* Content */}
-          <div>
+          <div className='px-5 py-3'>
             {/* Product Name */}
-            <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-3 min-h-10">
+            <h3 className="text-md font-medium text-gray-900 line-clamp-2 mb-3 min-h-10">
               {product.name}
             </h3>
 
