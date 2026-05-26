@@ -12,49 +12,17 @@ import NewArrivalsCarousel from "@/components/NewArrivalsCarousel";
 export default function Home() {
   return (
     <main>
-      <div className="flex h-auto md:h-[90vh] md:min-h-[90vh] bg-[#f7f6f2] relative overflow-hidden">
-        <div className="flex xl:flex-row flex-1 relative  px-4 md:px-6 pt-5 sm:pt-12 pb-32 md:py-10 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full md:gap-0 ">
-          {/* Desktop Model — absolute positioned, highest z-index */}
-          {/* <Image
-            src="/images/newheromodel.png"
-            alt="Hero image"
-            width={600}
-            height={900}
-            className="hidden lg:block absolute z-20 select-none pointer-events-none"
-            priority
-          />
+      <div className="flex h-[83vh] sm:h-auto md:h-[90vh] md:min-h-[90vh] bg-[#f7f6f2] relative overflow-hidden">
+        <div className="flex xl:flex-row flex-1 relative  px-4 md:px-6 pt-10  sm:pt-12 pb-32 md:py-10 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full md:gap-0 ">
 
-          {/* Mobile Model — centered and scaled down */}
-          {/* <div className="block lg:hidden relative w-[350px] -mt-10  h-[500px] z-20 -ml-30 shrink-0 order-3">
-            <Image
-              src="/images/newheromodel.png"
-              alt="Hero image"
-              fill
-              sizes="180px"
-              className="object-contain select-none pointer-events-none"
-              priority
-            />
-          </div> */}
-
-          {/* <div
-            className="
-    relative z-20 shrink-0
-    w-[280px] h-[420px]
-    sm:w-[340px] sm:h-[500px]
-    md:w-[500px] md:h-[760px]
-    lg:w-[500px] lg:h-[760px]
-    xl:w-[600px] xl:h-[900px]
-    -mt-10 lg:mt-0
-  "
-          > */}
           <div
-  className="
-    relative z-20 shrink-0 min-[420px]:shrink 
-    h-[420px] sm:h-[500px] md:h-[760px] xl:h-[900px]
+            className="
+    relative  z-20 shrink-0 min-[420px]:shrink 
+    h-[480px] sm:h-[500px] md:h-[760px] xl:h-[900px]
     md:aspect-[2/3] /* Forces the container to scale proportionally to the height */
     -mt-10 lg:mt-0 order-2
   "
->
+          >
             <Image
               src="/images/newheromodel.png"
               alt="Hero image"
@@ -75,7 +43,7 @@ export default function Home() {
           <RevealOnScroll
             direction="left"
             delay={200}
-            className="relative top-12 md:absolute md:left-10 md:top-12 z-20 flex flex-col gap-0 md:items-start w-sm md:w-auto  md:mt-0 order-1 md:order-1"
+            className="relative top-32 md:absolute md:left-10 md:top-12 z-20 flex flex-col gap-0 md:items-start w-sm md:w-auto  md:mt-0 order-1 md:order-1"
           >
             {/* New arrivals badge */}
             {/* <span className=" border border-[#0f3b2b] text-[#0f3b2b] text-[0.5rem] md:text-mdz tracking-[0.25em] font-sans p-1 w-full rounded-full mb-2">

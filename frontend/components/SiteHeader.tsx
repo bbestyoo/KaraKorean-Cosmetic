@@ -73,7 +73,6 @@ export function SiteHeader() {
         <PromoBanner />
 
         <div className="h-16 sm:h-20 md:h-24 px-6 lg:px-8 flex items-center justify-between relative">
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 -ml-2 text-neutral-800 transition-transform duration-200 active:scale-90"
             onClick={isMobileMenuOpen ? closeMenu : openMenu}

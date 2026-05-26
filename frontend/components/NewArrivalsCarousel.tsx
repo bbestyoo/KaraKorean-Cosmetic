@@ -112,10 +112,10 @@ export default function NewArrivalsCarousel() {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Featured product card */}
-      <div className="bg-[#eeebd8]/70 flex flex-col md:flex-row gap-7 p-3 sm:gap-3 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90">
+      <div className="bg-[#eeebd8]/70  flex flex-col md:flex-row gap-3 p-1 sm:gap-3 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90">
 
         {/* Product Image Container */}
-        <div className=" sm:w-38 h-38 w-40 sm:h-64 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
+        <div className=" sm:w-38 h-28 w-32 sm:h-64 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
           <Image
             src={currentProduct.image}
             alt={currentProduct.name}
@@ -129,11 +129,11 @@ export default function NewArrivalsCarousel() {
 
         {/* Product Details */}
         <div
-          className={`flex flex-col justify-between py-1 flex-1 transition-opacity duration-300 ${fadeState === "in" ? "opacity-100" : "opacity-0"
+          className={`flex flex-col gap-3 sm:gap-0 justify-between py-1 flex-1 transition-opacity duration-300 ${fadeState === "in" ? "opacity-100" : "opacity-0"
             }`}
         >
           <div>
-            <p className="font-serif italic text-[#0f3b2b] text:lg sm:text-2xl leading-tight">
+            <p className="font-serif italic text-[#0f3b2b] text-sm sm:text-2xl leading-tight">
               {currentProduct.name}
             </p>
             <p className="font-sans text-xs text-[#6b766f] tracking-widest mt-1 normal-case">
@@ -141,7 +141,7 @@ export default function NewArrivalsCarousel() {
             </p>
           </div>
           <div>
-            <p className="font-sans text-[#0f3b2b] text-md sm:text-lg font-semibold normal-case">
+            <p className="font-sans text-[#0f3b2b] text-xs sm:text-lg font-semibold normal-case">
               {currentProduct.price}
             </p>
             <p className="hidden md:block font-sans line-through text-[#0f3b2b]/60 text-sm normal-case mt-0.5">
@@ -150,7 +150,7 @@ export default function NewArrivalsCarousel() {
           </div>
           <Link
             href={currentProduct.link}
-            className="bg-[#0f3b2b] text-[#f7f6f2] text-xs tracking-[0.2em] font-sans px-4 py-2 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm shadow-sm"
+            className="bg-[#0f3b2b] text-[#f7f6f2] text-[10px] sm:text-xs tracking-[0.2em] font-sans  p-1 px-2 sm:px-4 sm:py-2 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm shadow-sm"
           >
             ADD TO BAG
           </Link>
