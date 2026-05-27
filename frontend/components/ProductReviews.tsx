@@ -129,7 +129,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
   }
 
   return (
-    <section className="max-w-[1200px] mx-auto py-12">
+    <section className="max-w-[1800px] mx-auto py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left: Stats + Reviews */}
         <div className="lg:col-span-2 bg-white border border-gray-100 p-6 rounded">
@@ -208,7 +208,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
             <div>
               <button
                 onClick={() => setShowLogin(true)}
-                className="w-full px-4 py-3 bg-[#0f3b2b] text-white rounded font-semibold"
+                className="w-full px-4 py-3 bg-[#0f3b2b] text-white rounded font-semibold cursor-pointer hover:bg-white hover:text-black hover:border hover:border-[#0f3b2b] transition-colors" 
               >
                 Sign in to leave a review
               </button>

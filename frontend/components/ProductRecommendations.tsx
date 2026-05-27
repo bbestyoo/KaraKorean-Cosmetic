@@ -64,7 +64,7 @@ export const ProductRecommendations = ({ productId }: { productId: string }) => 
       fetchRecommendations();
     }
   }, [productId]);
-
+``
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star

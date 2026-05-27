@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Product {
@@ -105,17 +105,35 @@ export default function NewArrivalsCarousel() {
 
   const currentProduct = products[currentIndex];
 
+  const { addItem } = useCart();
+
+  const parsePrice = (priceStr: string) => {
+    const digits = priceStr.replace(/[^\d.]/g, '');
+    return Number(digits) || 0;
+  };
+
+  const handleAddToBag = (product: Product) => {
+    addItem({
+      product_id: String(product.id),
+      name: product.name,
+      price: parsePrice(product.price),
+      size: 'One Size',
+      quantity: 1,
+      image: product.image,
+    });
+  };
+
   return (
     <div
-      className="flex flex-col lg:w-[520px]"
+      className="flex flex-col lg:w-[480px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Featured product card */}
-      <div className="bg-[#eeebd8]/70  flex flex-col md:flex-row gap-3 p-1 sm:gap-3 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90">
+      <div className="bg-[#eeebd8]/70  flex flex-col md:flex-row  gap-3 p-1 sm:gap-10 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90 cursor-pointer">
 
         {/* Product Image Container */}
-        <div className=" sm:w-38 h-28 w-32 sm:h-64 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
+        <div className=" sm:w-38 md:w-42 h-28 w-32 sm:h-64 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
           <Image
             src={currentProduct.image}
             alt={currentProduct.name}
@@ -148,12 +166,14 @@ export default function NewArrivalsCarousel() {
               {currentProduct.oldPrice}
             </p>
           </div>
-          <Link
-            href={currentProduct.link}
-            className="bg-[#0f3b2b] text-[#f7f6f2] text-[10px] sm:text-xs tracking-[0.2em] font-sans  p-1 px-2 sm:px-4 sm:py-2 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm shadow-sm"
+          <button
+            type="button"
+            onClick={() => handleAddToBag(currentProduct)}
+            className="bg-[#0f3b2b] text-[#f7f6f2] text-[10px] sm:text-xs tracking-[0.2em] font-sans  p-1 px-2 sm:px-4 sm:py-2 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm shadow-sm curosr-pointer"
+            aria-label={`Add ${currentProduct.name} to bag`}
           >
             ADD TO BAG
-          </Link>
+          </button>
         </div>
       </div>
 

@@ -40,7 +40,7 @@ export function CartSidebar() {
           </h2>
           <button
             onClick={closeCart}
-            className="text-gray-900 hover:text-gray-600 transition-colors"
+            className="text-gray-900 cursor-pointer hover:text-gray-600 transition-colors"
             aria-label="Close cart"
           >
             <X size={24} strokeWidth={1.5} />
@@ -64,7 +64,7 @@ export function CartSidebar() {
             {displayItems.map((item) => (
               <div
                 key={`${item.product_id}-${item.size}`}
-                className="flex gap-6 relative"
+                className="flex cursor-pointer gap-6 relative"
               >
                 <div className="w-32 h-40 bg-gray-200 flex-shrink-0 relative">
                   {item.image && (
@@ -84,8 +84,8 @@ export function CartSidebar() {
                     </h3>
                     <button
                       onClick={() => removeItem(item.product_id, item.size)}
-                      className="text-gray-900 hover:text-gray-500 absolute right-0 top-0"
-                      aria-label="Remove item"
+                      className="text-gray-900 hover:text-gray-500 absolute right-0 top-0 cursor-pointer "
+                      aria-label="Remove item "
                     >
                       <X size={16} strokeWidth={1.5} />
                     </button>
@@ -105,7 +105,7 @@ export function CartSidebar() {
                             item.size,
                             Math.max(1, item.quantity - 1)
                           )}
-                          className="px-2 py-1.5 hover:bg-gray-100 transition-colors flex items-center justify-center border-r border-gray-900"
+                          className="px-2 py-1.5 cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-center border-r border-gray-900"
                         >
                           <Minus size={12} strokeWidth={1.5} />
                         </button>
@@ -118,7 +118,7 @@ export function CartSidebar() {
                             item.size,
                             item.quantity + 1
                           )}
-                          className="px-2 py-1.5 hover:bg-gray-100 transition-colors flex items-center justify-center border-l border-gray-900"
+                          className="px-2 py-1.5 cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-center border-l border-gray-900"
                         >
                           <Plus size={12} strokeWidth={1.5} />
                         </button>
@@ -151,8 +151,8 @@ export function CartSidebar() {
                   router.push('/checkout');
                   closeCart();
                 }}
-                className="w-full bg-[#1a1a1a] text-white py-3.5 text-xs tracking-widest hover:bg-black transition-colors"
-              >
+                className="w-full bg-[#0f3b2b] cursor-pointer text-white py-3.5 text-xs tracking-widest hover:bg-white hover:text-black hover:border hover:border-[#0f3b2b] transition-colors"
+              > 
                 Checkout
               </button>
               <button
@@ -160,7 +160,7 @@ export function CartSidebar() {
                   router.push('/cart');
                   closeCart();
                 }}
-                className="w-full border border-gray-900 bg-white text-gray-900 py-3.5 text-xs tracking-widest hover:bg-gray-50 transition-colors"
+                className="w-full border border-gray-900 bg-white text-gray-900 py-3.5 text-xs tracking-widest transition-colors hover:bg-[#0f3b2b] hover:text-white cursor-pointer"
               >
                 View cart
               </button>

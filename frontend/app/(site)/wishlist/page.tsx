@@ -196,7 +196,7 @@ function WishlistContent() {
         <div className="mt-6 md:mt-0 flex gap-4">
           <button
             onClick={handleShareWishlist}
-            className="flex items-center gap-2 px-6 py-3 border border-[#0f3b2b]/20 hover:border-[#0f3b2b] text-xs font-semibold tracking-widest text-[#0f3b2b] uppercase transition-all hover:bg-[#0f3b2b] hover:text-white"
+            className="flex cursor-pointer items-center gap-2 px-6 py-3 border border-[#0f3b2b]/20 hover:border-[#0f3b2b] text-xs font-semibold tracking-widest text-[#0f3b2b] uppercase transition-all hover:bg-[#0f3b2b] hover:text-white"
           >
             {isLoggedIn ? (
               <>
@@ -223,8 +223,8 @@ function WishlistContent() {
       </div>
 
       {/* Luxury Quick Links */}
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
-        <div className="bg-white/50 border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
+      <div className="max-w-[1620px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
+        <div className="bg-white/50 cursor-pointer hover:shadow-lg  border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
           <span className="text-[10px] tracking-[0.2em] text-[#6b766f] font-semibold uppercase">✦ EXPERIENCE</span>
           <h3 className="font-serif text-lg text-[#0f3b2b] mt-2 mb-4">Complimentary Consultation</h3>
           <p className="text-xs text-[#6b766f] leading-relaxed mb-6">
@@ -238,7 +238,7 @@ function WishlistContent() {
           </a>
         </div>
 
-        <div className="bg-white/50 border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
+        <div className="bg-white/50 cursor-pointer hover:shadow-lg  border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
           <span className="text-[10px] tracking-[0.2em] text-[#6b766f] font-semibold uppercase">✦ RITUAL</span>
           <h3 className="font-serif text-lg text-[#0f3b2b] mt-2 mb-4">Tailored Beauty Routine</h3>
           <p className="text-xs text-[#6b766f] leading-relaxed mb-6">
@@ -252,7 +252,7 @@ function WishlistContent() {
           </Link>
         </div>
 
-        <div className="bg-white/50 border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
+        <div className="bg-white/50  cursor-pointer hover:shadow-lg border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
           <span className="text-[10px] tracking-[0.2em] text-[#6b766f] font-semibold uppercase">✦ PACKAGING</span>
           <h3 className="font-serif text-lg text-[#0f3b2b] mt-2 mb-4">Shipped With Premium Care</h3>
           <p className="text-xs text-[#6b766f] leading-relaxed mb-6">

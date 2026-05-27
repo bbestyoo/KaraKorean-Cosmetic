@@ -70,7 +70,7 @@ export default function BlogPage() {
       : posts.filter((post) => post.category === activeFilter);
 
   return (
-    <section id="blog-page" className=" max-w-[1600px] mx-auto">
+    <section id="blog-page" className=" max-w-[1700px] mx-auto">
       {/* ── Hero ── */}
       <div className="blog-hero">
         <p className="blog-hero-eyebrow">✦ The Kara Journal</p>
@@ -131,7 +131,7 @@ export default function BlogPage() {
       </div>
 
       {/* ── Newsletter CTA ── */}
-      <div className="blog-newsletter">
+      <div className="blog-newsletter md:mb-20">
         <h2 className="blog-newsletter-title">Stay in the Glow</h2>
         <p className="blog-newsletter-desc">
           Get weekly K-beauty tips, exclusive deals, and new blog posts delivered

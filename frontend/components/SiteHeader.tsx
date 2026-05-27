@@ -179,7 +179,7 @@ export function SiteHeader() {
             <div className="hidden md:flex items-center mr-3 relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen((v) => !v)}
-                className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-2"
+                className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
                 aria-label="User menu"
               >
                 <User size={22} />
@@ -188,31 +188,93 @@ export function SiteHeader() {
                 )}
               </button>
               {isUserMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-44 bg-white z-50 py-1 shadow-md border">
+                <div
+                  className="absolute right-0 top-full mt-3 w-64 z-50 rounded-2xl overflow-hidden"
+                  style={{
+                    background: 'rgba(255,255,255,0.92)',
+                    backdropFilter: 'blur(20px) saturate(160%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+                    border: '1px solid rgba(201,164,107,0.2)',
+                    boxShadow: '0 8px 32px -8px rgba(0,0,0,0.18), 0 2px 8px -2px rgba(201,164,107,0.15)',
+                    animation: 'dropdownFadeIn 0.2s cubic-bezier(0.34,1.56,0.64,1) both',
+                  }}
+                >
+                  <style>{`
+                    @keyframes dropdownFadeIn {
+                      from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+                      to   { opacity: 1; transform: translateY(0) scale(1); }
+                    }
+                  `}</style>
+
                   {isLoggedIn ? (
                     <>
-                      <Link href="/account" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Profile
-                      </Link>
-                      <button
-                        onClick={() => {
-                          logout();
-                          setIsUserMenuOpen(false);
-                          router.push('/');
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Logout
-                      </button>
+                      {/* User info header */}
+                      <div className="px-4 pt-4 pb-3 border-b border-[#c9a46b]/15">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                            style={{ background: 'linear-gradient(135deg, #c9a46b, #5c8a72)' }}>
+                            {(user?.username || user?.name || 'U')[0].toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">{user?.username || user?.name || 'Account'}</p>
+                            <p className="text-xs text-gray-400 truncate">{user?.email || 'Signed in'}</p>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Menu items */}
+                      <div className="py-2 px-2">
+                        <Link
+                          href="/account"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-[#c9a46b]/10 hover:text-[#8a6e3a] transition-all duration-200 group"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 group-hover:text-[#c9a46b] transition-colors"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                          My Profile
+                        </Link>
+                        <button
+                          onClick={() => { logout(); setIsUserMenuOpen(false); router.push('/'); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group mt-0.5"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                          Sign Out
+                        </button>
+                      </div>
                     </>
                   ) : (
                     <>
-                      <Link href="/login" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Sign In
-                      </Link>
-                      <Link href="/signup" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Sign Up
-                      </Link>
+                      {/* Brand header */}
+                      <div className="px-5 pt-5 pb-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="w-2 h-2 rounded-full" style={{ background: 'linear-gradient(135deg, #c9a46b, #5c8a72)' }} />
+                          <span className="text-xs font-semibold tracking-widest uppercase text-gray-400">Kara Korean</span>
+                        </div>
+                        <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}>Welcome back ✨</p>
+                        <p className="text-xs text-gray-400 mt-0.5">Sign in to access your account</p>
+                      </div>
+
+                      {/* Buttons */}
+                      <div className="px-4 pb-5 flex flex-col gap-2.5">
+                        <Link
+                          href="/login"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold border-2 text-gray-800 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                          style={{ borderColor: 'rgba(92,110,105,0.35)', background: 'rgba(92,110,105,0.05)' }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#5c6e69'; (e.currentTarget as HTMLElement).style.background = 'rgba(92,110,105,0.1)'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(92,110,105,0.35)'; (e.currentTarget as HTMLElement).style.background = 'rgba(92,110,105,0.05)'; }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                          Sign In
+                        </Link>
+                        <Link
+                          href="/signup"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:opacity-90"
+                          style={{ background: 'linear-gradient(135deg, #c9a46b 0%, #a07840 100%)', boxShadow: '0 4px 14px -4px rgba(201,164,107,0.5)' }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                          Create Account
+                        </Link>
+                      </div>
                     </>
                   )}
                 </div>
@@ -294,22 +356,23 @@ export function SiteHeader() {
                     </button>
                   </>
                 ) : (
-                  <>
+                  <div className="flex gap-3 pt-3 pb-1">
                     <Link
                       href="/login"
-                      className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
                       onClick={closeMenu}
+                      className="flex-1 flex items-center justify-center py-2.5 px-4 rounded-xl text-sm font-semibold border-2 border-[#5c6e69]/40 text-[#5c6e69] hover:border-[#5c6e69] hover:bg-[#5c6e69]/10 transition-all duration-200 tracking-wide uppercase"
                     >
                       Sign In
                     </Link>
                     <Link
                       href="/signup"
-                      className="group block py-3.5 text-base font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:text-[#0f3b2b]"
                       onClick={closeMenu}
+                      className="flex-1 flex items-center justify-center py-2.5 px-4 rounded-xl text-sm font-semibold text-white uppercase tracking-wide transition-all duration-200 hover:opacity-90"
+                      style={{ background: 'linear-gradient(135deg, #c9a46b, #a07840)', boxShadow: '0 4px 12px -3px rgba(201,164,107,0.45)' }}
                     >
                       Sign Up
                     </Link>
-                  </>
+                  </div>
                 )}
               </div>
             </div>

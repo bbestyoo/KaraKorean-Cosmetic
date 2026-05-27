@@ -113,7 +113,7 @@ export function HomeHero({ children }: HomeHeroProps) {
               ))}
             </div>
 
-            <div className="w-full h-px bg-[#e0ddd5] mb-4" />
+            {/* <div className="w-full h-px bg-[#e0ddd5] mb-4" />
 
             <p className="font-sans text-[0.6rem] text-[#6b766f] normal-case tracking-wide mb-1">
               Not sure where to start?
@@ -124,7 +124,7 @@ export function HomeHero({ children }: HomeHeroProps) {
             >
               → Take the Skin Quiz
             </Link>
-          </div>
+          </div> */}
 
           {/* ELEGANCE / BEAUTY labels */}
           <div

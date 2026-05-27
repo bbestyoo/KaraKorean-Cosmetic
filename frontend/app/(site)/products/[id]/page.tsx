@@ -272,8 +272,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           ))}
         </section>
 
-        <aside className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto bg-white px-6 py-10 sm:px-12 sm:py-14 lg:p-20 scrollbar-hide">
-          <div className="max-w-[580px] space-y-12">
+        <aside className="w-full  lg:w-1/2 lg:sticky lg:top-0 bg-white px-6 py-10 sm:px-12 sm:py-14 lg:p-20">
+          <div className="max-w-[880px] space-y-12">
             {/* Header / Title */}
             <header className="space-y-6">
               <h1 className="text-3xl sm:text-4xl lg:text-[2.5rem] capitalize font-light tracking-wide text-neutral-900 leading-tight">
@@ -331,7 +331,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                           key={s}
                           type="button"
                           onClick={() => setSelectedSize(s)}
-                          className={`px-3 py-2 border rounded-md text-sm font-medium ${selectedSize === s ? 'bg-[#0f3b2b] text-white border-[#0f3b2b]' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-100'}`}
+                          className={`px-3 cursor-pointer py-2 border rounded-md text-sm font-medium ${selectedSize === s ? 'bg-[#0f3b2b] text-white border-[#0f3b2b]' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-100'}`}
                         >
                           {s}
                         </button>
@@ -349,7 +349,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     type="button"
                     onClick={handleDecrement}
                     aria-label="Decrease quantity"
-                    className="px-3 py-2 border border-neutral-300 rounded hover:bg-neutral-100"
+                    className="px-3 py-2 cursor-pointer border border-neutral-300 rounded hover:bg-neutral-100"
                   >
                     <Minus size={14} />
                   </button>
@@ -358,7 +358,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     type="button"
                     onClick={handleIncrement}
                     aria-label="Increase quantity"
-                    className="px-3 py-2 border border-neutral-300 rounded hover:bg-neutral-100"
+                    className="px-3 py-2 border cursor-pointer border-neutral-300 rounded hover:bg-neutral-100"
                   >
                     <Plus size={14} />
                   </button>
@@ -371,7 +371,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             </div>
 
             {/* Accordions */}
-            <div className="pt-8">
+            <div className="pt-8 1">
               <ul className="flex flex-col">
                 {POLICY_SECTIONS.map((section) => {
                   const isOpen = openPolicy === section.id;
@@ -397,13 +397,13 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         </aside>
       </div>
 
-      <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 py-12">
-        <ProductRecommendations productId={product.product_id} />
-      </div>
 
       {/* Product Reviews Section */}
-      <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 py-6">
+      <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8 py-6">
         <ProductReviews productId={product.product_id} />
+      </div>
+      <div className="mx-auto max-w-[1800px] px-4 sm:px-6 md:mb-10 lg:px-8 py-12">
+        <ProductRecommendations productId={product.product_id} />
       </div>
     </main>;
 }

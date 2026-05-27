@@ -6,6 +6,7 @@ import { Star, Heart, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import { cursorTo } from 'readline';
 
 interface ProductCardProps {
   product: {
@@ -83,7 +84,7 @@ export function ProductCard({ product }: ProductCardProps) {
             >
               <Heart
                 size={18}
-                className={isWishlisted ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}
+                className={isWishlisted ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900' }
               />
             </button>
             <button
@@ -103,7 +104,7 @@ export function ProductCard({ product }: ProductCardProps) {
             >
               <ShoppingBag
                 size={18}
-                className="text-neutral-900 hover:text-[#c9a46b] transition-colors"
+                className="text-neutral-900 hover:text-[#c9a46b] transition-colors "
               />
             </button>
           </div>

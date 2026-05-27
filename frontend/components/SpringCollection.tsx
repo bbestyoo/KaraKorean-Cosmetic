@@ -44,7 +44,7 @@ export default function SpringCollection() {
                 const category = toCategory("Spring Collection");
                 return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
               })()}
-              className="border border-[#1a1a1a] text-[#1a1a1a] px-10 py-3 text-sm font-semibold tracking-widest uppercase hover:bg-[#1a1a1a] hover:text-white transition-colors duration-300 inline-block text-center"
+              className="border border-[#1a1a1a] text-[#1a1a1a] px-10 py-3 text-sm font-semibold tracking-widest uppercase hover:bg-[#0f3b2b] hover:text-white transition-colors duration-300 inline-block text-center"
             >
               Shop Now
             </Link>

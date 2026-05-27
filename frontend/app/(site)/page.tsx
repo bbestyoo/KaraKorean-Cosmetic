@@ -88,7 +88,7 @@ export default function Home() {
             <div className="hidden md:block w-full h-px bg-[#e0ddd5] mb-4" />
 
             {/* Skin quiz */}
-            <p className="hidden md:block font-sans text-[0.6rem] text-[#6b766f] normal-case tracking-wide mb-1">
+            {/* <p className="hidden md:block font-sans text-[0.6rem] text-[#6b766f] normal-case tracking-wide mb-1">
               Not sure where to start?
             </p>
             <Link
@@ -96,7 +96,7 @@ export default function Home() {
               className="hidden md:block font-sans text-[0.65rem] text-[#0f3b2b] normal-case tracking-wide hover:underline underline-offset-4"
             >
               → Take the Skin Quiz
-            </Link>
+            </Link> */}
           </RevealOnScroll>
 
           {/* ELEGANCE / BEAUTY labels — hidden on mobile */}
@@ -131,25 +131,25 @@ export default function Home() {
           <RevealOnScroll
             direction="right"
             delay={400}
-            className="hidden xl:flex absolute right-10 bottom-40 z-20 flex-col items-start gap-5 text-left"
+            className="hidden xl:flex absolute right-10 bg-red-3001  bottom-40 z-20 flex-col items-end gap-5 text-left"
           >
             <p className="font-sans text-xs tracking-[0.2em] text-[#6b766f] leading-relaxed normal-case">
-              Rituals rooted in nature.
+              Not sure where to start ?
               <br />
-              Crafted for your skin&apos;s story.
+              
             </p>
             <Link
-              href="/skincare"
-              className="inline-block bg-[#0f3b2b] text-[#f7f6f2] text-[0.6rem] tracking-[0.35em] uppercase px-8 py-3 hover:bg-[#1a5c42] transition-colors duration-500 font-sans"
+              href="/quiz"
+              className="inline-block bg-[#0f3b2b] font-semibold text-[#f7f6f2] text-[0.6rem] tracking-[0.35em] uppercase px-8 py-3 hover:bg-[#1a5c42] transition-colors duration-500 font-sans"
             >
-              Explore the Ritual
+              Take the skin quiz
             </Link>
             <Link
               href="/journal"
               className="flex items-center gap-3 text-[#6b766f] text-[0.6rem] tracking-[0.25em] uppercase font-sans hover:text-[#0f3b2b] transition-colors duration-300 normal-case"
             >
               <span className="block w-8 h-px bg-current" />
-              Learn Our Story
+              Crafted for your skin&apos;s story.
             </Link>
           </RevealOnScroll>
 

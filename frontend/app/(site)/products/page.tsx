@@ -512,11 +512,11 @@ function ProductsContent() {
                           category_name: product.category_name,
                         });
                       }}
-                      className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
+                      className="p-2 rounded-full bg-white shadow-sm  cursor-pointer hover:scale-105 transition-all text-neutral-900"
                     >
                       <Heart
                         size={16}
-                        className={isInWishlist(product.product_id) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}
+                        className={`${isInWishlist(product.product_id) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}} hover:text-[#c9a46b] `}
                       />
                     </button>
                     <button
@@ -532,11 +532,11 @@ function ProductsContent() {
                           image: product.images[0]?.image || '/images/placeholder.png',
                         });
                       }}
-                      className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
+                      className="p-2 rounded-full bg-white  shadow-sm hover:scale-105 transition-all text-neutral-900 cursor-pointer"
                     >
                       <ShoppingBag
                         size={16}
-                        className="text-neutral-900 hover:text-[#c9a46b] transition-colors"
+                        className="text-neutral-900 hover:text-[#c9a46b] transition-colors "
                       />
                     </button>
                   </div>

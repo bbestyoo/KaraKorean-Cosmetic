@@ -72,7 +72,7 @@ export default function FeaturedProducts() {
           </RevealOnScroll>
         </div>
         <RevealOnScroll direction="left" delay={200}>
-          <button className="mt-2 md:mt-0 px-6 py-3 border border-neutral-300 text-xs font-bold tracking-widest text-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">
+          <button className="mt-2 md:mt-0 px-6 py-3 border border-neutral-300 text-xs font-bold tracking-widest text-neutral-800 hover:bg-[#0f3b2b] cursor-pointer hover:text-white transition-colors">
             VIEW ALL PRODUCTS
           </button>
         </RevealOnScroll>
@@ -126,7 +126,7 @@ export default function FeaturedProducts() {
                       className="text-white hover:text-red-500 transition-colors"
                     >
                       <Heart
-                        className={`w-6 cursor-pointer h-6 transition-colors ${isInWishlist(`featured-${index}`) ? 'fill-red-500 text-red-500' : 'fill-none text-white'
+                        className={`w-6 cursor-pointer h-6 transition-colors ${isInWishlist(`featured-${index}`) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'fill-none text-white hover:text-[#c9a46b]'}
                           }`}
                       />
                     </button>
@@ -162,7 +162,7 @@ export default function FeaturedProducts() {
                           </span>
                         )}
                       </div>
-                      <button className="bg-[#2D2B2A] text-white p-3 rounded-full hover:bg-black hover:scale-105 transition-all">
+                      <button className="bg-[#0f3b2b] text-white p-3 rounded-full hover:bg-black hover:scale-105 transition-all">
                         <ShoppingCart className="w-4 h-4" />
                       </button>
                     </div>

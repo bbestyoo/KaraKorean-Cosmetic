@@ -55,10 +55,10 @@ export default function BestSellers() {
 
               {/* Overlay text */}
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-black/10 group-hover:bg-black/0 transition-colors duration-500">
-                <h2 className="font-serif text-lg sm:text-3xl md:text-4xl lg:text-5xl text-[#E85D8A] uppercase tracking-widest mb-4 drop-shadow-md transition-transform duration-500 group-hover:-translate-y-2">
+                <h2 className="font-serif text-lg sm:text-3xl md:text-4xl lg:text-5xl text-white group-hover:text-[#0f3b2b] uppercase tracking-widest mb-4 drop-shadow-md transition-transform duration-500 group-hover:-translate-y-2">
                   {card.title}
                 </h2>
-                <p className="font-sans text-sm md:text-base text-[#E85D8A] tracking-[0.25em] uppercase font-semibold drop-shadow-md opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
+                <p className="font-sans text-sm md:text-base text-white group-hover:text-[#0f3b2b] tracking-[0.25em] uppercase font-semibold drop-shadow-md opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
                   {card.subtitle}
                 </p>
               </div>

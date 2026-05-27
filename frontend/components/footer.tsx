@@ -3,7 +3,7 @@ import { FiInstagram, FiLinkedin, FiTwitter, FiYoutube } from "react-icons/fi";
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-white pt-10 sm:pt-16 px-4 sm:px-6 lg:px-12 flex flex-col justify-between overflow-hidden border-t border-gray-100">
+    <footer className="w-full bg-[#0f3b2b] text-white pt-10 sm:pt-16 px-4 sm:px-6 lg:px-12 flex flex-col justify-between overflow-hidden border-t border-gray-100">
       {/* Top Grid Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 mb-10 lg:mb-5 w-full max-w-screen-2xl mx-auto">
 
@@ -13,7 +13,7 @@ export default function Footer() {
             <Link
               key={item}
               href="#"
-              className="text-3xl sm:text-4xl md:text-5xl text-[#555f59] hover:opacity-70 transition-opacity font-serif tracking-wide"
+              className="text-3xl sm:text-4xl md:text-5xl text-white hover:opacity-70 transition-opacity font-serif tracking-wide"
             >
               {item}
             </Link>
@@ -25,11 +25,11 @@ export default function Footer() {
           <div className="grid grid-cols-3 gap-4 sm:gap-8">
             {/* Column 1 */}
             <div className="flex flex-col gap-4">
-              <h3 className="text-xl text-[#555f59] font-sans mb-2">Company</h3>
+              <h3 className="text-xl text-white font-sans mb-2">Company</h3>
               <ul className="flex flex-col gap-3">
                 {["About Us", "Careers", "Partnerships"].map((item) => (
                   <li key={item}>
-                    <Link href="#" className="text-xs md:text-sm font-semibold tracking-widest uppercase text-[#555f59] hover:text-[#555f59] transition-colors">
+                    <Link href="#" className="text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
                       {item}
                     </Link>
                   </li>
@@ -39,11 +39,11 @@ export default function Footer() {
 
             {/* Column 2 */}
             <div className="flex flex-col gap-4">
-              <h3 className="text-xl text-[#555f59] font-sans mb-2">Support</h3>
+              <h3 className="text-xl text-white font-sans mb-2">Support</h3>
               <ul className="flex flex-col gap-3">
                 {["Contact Us", "Shipping", "Returns", "FAQ"].map((item) => (
                   <li key={item}>
-                    <Link href="#" className="text-xs md:text-sm font-semibold tracking-widest uppercase text-[#555f59] hover:text-[#555f59] transition-colors">
+                    <Link href="#" className="text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
                       {item}
                     </Link>
                   </li>
@@ -53,11 +53,11 @@ export default function Footer() {
 
             {/* Column 3 */}
             <div className="flex flex-col gap-4">
-              <h3 className="text-xl text-[#555f59] font-sans mb-2">Account</h3>
+              <h3 className="text-xl text-white font-sans mb-2">Account</h3>
               <ul className="flex flex-col gap-3">
                 {["Log In", "Order History"].map((item) => (
                   <li key={item}>
-                    <Link href="#" className="text-xs md:text-sm font-semibold tracking-widest uppercase text-[#555f59] hover:text-[#555f59] transition-colors">
+                    <Link href="#" className="text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
                       {item}
                     </Link>
                   </li>
@@ -69,24 +69,24 @@ export default function Footer() {
           {/* Social & Legal (below categories) */}
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 sm:gap-6 mt-8 sm:mt-16 pt-6 sm:pt-8 border-t border-[#E85D8A]/20">
             <div className="flex items-center gap-6">
-              <Link href="#" className="text-[#555f59] hover:scale-110 transition-transform">
+              <Link href="#" className="text-white hover:scale-110 transition-transform">
                 <FiLinkedin size={22} />
               </Link>
 
-              <Link href="#" className="text-[#555f59] hover:scale-110 transition-transform">
+              <Link href="#" className="text-white hover:scale-110 transition-transform">
                 <FiInstagram size={22} />
               </Link>
-              <Link href="#" className="text-[#555f59] hover:scale-110 transition-transform">
+              <Link href="#" className="text-white hover:scale-110 transition-transform">
                 <FiTwitter size={22} />
               </Link>
-              <Link href="#" className="text-[#555f59] hover:scale-110 transition-transform">
+              <Link href="#" className="text-white hover:scale-110 transition-transform">
                 <FiYoutube size={22} />
               </Link>
             </div>
 
             <div className="flex flex-wrap items-center gap-4 md:gap-6">
               {["Terms", "Privacy", "Cookies"].map((item) => (
-                <Link key={item} href="#" className="text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-[#555f59] hover:text-[#555f59] transition-colors">
+                <Link key={item} href="#" className="text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-white hover:text-[#555f59] transition-colors">
                   {item}
                 </Link>
               ))}
