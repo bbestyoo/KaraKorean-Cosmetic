@@ -65,7 +65,7 @@ export default function AboutPage() {
           poster="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=1600&auto=format&fit=crop"
         >
           <source
-            src="https://videos.pexels.com/video-files/6283930/6283930-hd_1920_1080_25fps.mp4"
+            src="/videos/about-hero.mp4"
             type="video/mp4"
           />
           {/* Fallback: poster image will show if video fails */}
