@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Comment, Repliess, ProductImage, Rating, ProductAttribute, Variant, Size
+from .models import Product, Comment, Repliess, ProductImage, Rating, ProductAttribute, Variant, Size, UseCase
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
@@ -87,11 +87,12 @@ class GetProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many = True, read_only = True)
     ratings = serializers.SerializerMethodField()
     category = serializers.StringRelatedField()
+    usecases = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
     variants = VariantSerializer(many=True, read_only=True)
     sizes = SizeSerializer(many=True, read_only=True)
     class Meta:
         model = Product
-        fields = ['product_id','name','category','price','old_price', 'before_deal_price','images','ratings','variants','sizes']
+        fields = ['product_id','name','category','usecases','price','old_price', 'before_deal_price','images','ratings','variants','sizes']
 
     def get_ratings(self,obj):
         request = self.context.get('request')
@@ -121,6 +122,7 @@ class ProductSerializer(serializers.ModelSerializer):
     ratings = serializers.SerializerMethodField()
     category_name = serializers.SerializerMethodField()
     sub_category_name = serializers.SerializerMethodField()
+    usecases = serializers.SlugRelatedField(many=True, slug_field='name', queryset=UseCase.objects.all(), required=False)
     # stock = serializers.SerializerMethodField()
     attributes = ProductAttributeSerializer(many=True, read_only=True)
     variants = VariantSerializer(many=True, read_only=True)

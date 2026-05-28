@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Product, Comment, Size, ProductImage, Category, Brand
+from .models import Product, Comment, Size, ProductImage, Category, Brand, UseCase
 from math import ceil
 from .serializers import ProductSerializer, CommentSerializer, ReplySerializer, RatingSerializer, GetProductSerializer, SizeSerializer, ProductImageSerializer
 from rest_framework.response import Response
@@ -46,6 +46,8 @@ class GetProduct(APIView):
         min_rating = request.query_params.get('min_rating')
         min_price = request.query_params.get('min_price')
         max_price = request.query_params.get('max_price')
+        usecase = request.query_params.get('usecase')
+        featured = request.query_params.get('featured')
         # Instead of a single 'ordering' value, expect multiple ordering parameters
         ordering_fields = request.query_params.getlist('ordering')
         brand = request.query_params.get('brand')
@@ -83,6 +85,15 @@ class GetProduct(APIView):
                 queryset = queryset.filter(category__name__icontains=category)
                 print(queryset)
             except (ValueError, TypeError,):
+                pass
+        # Filter by featured flag if provided (supports ?featured=true)
+        if featured and str(featured).lower() in ['true', '1', 'yes']:
+            queryset = queryset.filter(featured=True)
+        # Filter by usecase if provided (?usecase=antiaging)
+        if usecase:
+            try:
+                queryset = queryset.filter(usecases__name__icontains=usecase)
+            except (ValueError, TypeError):
                 pass
         # Apply ordering based on multiple parameters
         if ordering_fields:
@@ -220,6 +231,8 @@ class ApiSearch(generics.ListAPIView):
         min_price = request.query_params.get('min_price')
         max_price = request.query_params.get('max_price')
         brand = request.query_params.get('brand')
+        featured = request.query_params.get('featured')
+        usecase = request.query_params.get('usecase')
         ordering_fields = request.query_params.getlist('ordering')
         
         # Filter by minimum rating
@@ -254,6 +267,15 @@ class ApiSearch(generics.ListAPIView):
             if len(ordering_fields) == 1 and " " in ordering_fields[0]:
                 ordering_fields = ordering_fields[0].split()
             queryset = queryset.order_by(*ordering_fields)
+        # Filter by featured flag if provided (supports ?featured=true)
+        if featured and str(featured).lower() in ['true', '1', 'yes']:
+            queryset = queryset.filter(featured=True)
+        # Filter by usecase if provided (?usecase=antiaging)
+        if usecase:
+            try:
+                queryset = queryset.filter(usecases__name__icontains=usecase)
+            except (ValueError, TypeError):
+                pass
         
         return queryset
 
@@ -586,6 +608,20 @@ class BrandViewSet(viewsets.ModelViewSet):
                 model = Brand
                 fields = ['id', 'name']
         return BrandSerializer
+
+
+class UseCaseViewSet(viewsets.ModelViewSet):
+    queryset = UseCase.objects.all()
+    serializer_class = None
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        from rest_framework import serializers
+        class UseCaseSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = UseCase
+                fields = ['id', 'name']
+        return UseCaseSerializer
 
 
 class RecommendationsView(APIView):

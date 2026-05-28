@@ -30,6 +30,7 @@ class Product(models.Model):
     trending = models.BooleanField(default=False)
     best_seller = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
+    usecases = models.ManyToManyField('UseCase', blank=True, related_name='products')
 
     def __str__(self):
         return self.name
@@ -128,6 +129,17 @@ class Category(models.Model):
 class SubCategory(models.Model):
     name = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+    def __str__(self):
+        return self.name
+    
+
+class UseCase(models.Model):
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Use Case'
+        verbose_name_plural = 'Use Cases'
+
     def __str__(self):
         return self.name
     

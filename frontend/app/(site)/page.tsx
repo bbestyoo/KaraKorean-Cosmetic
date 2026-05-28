@@ -156,12 +156,13 @@ export default function Home() {
           <Brands />
         </div>
       </div>
-
       <BestSellers />
 
       {/* Collections Section */}
+<div className="sm:py-20 mt-10">
 
       <FeaturedProducts />
+</div>
       <Collections />
 
       <NewnessSection />

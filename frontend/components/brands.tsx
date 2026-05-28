@@ -1,4 +1,6 @@
-'use client';
+"use client";
+
+import Link from 'next/link';
 
 const brands = [
     { src: '/images/logos/anua.png', alt: 'Anua' },
@@ -10,6 +12,9 @@ const brands = [
     { src: '/images/logos/skin1004.png', alt: 'Skin1004' },
     { src: '/images/logos/somebymi.png', alt: 'Some By Mi' },
 ];
+
+// Note: use the brand display name directly in the query string so
+// the products page (which reads `brand`) can match it to product data.
 
 export default function Brands() {
     return (
@@ -28,29 +33,44 @@ export default function Brands() {
                 .marquee-track:hover {
                     animation-play-state: paused;
                 }
+                .brand-img {
+                    transition: transform 150ms ease-in-out;
+                    transform-origin: center;
+                }
+                .brand-img:hover {
+                    transform: scale(1.2);
+                }
             `}</style>
             <div className="relative overflow-hidden w-full">
                 <div className="marquee-track">
                     {/* First set */}
-                    {brands.map((brand, idx) => (
-                        <div key={`a-${idx}`} className="flex-shrink-0 px-6 flex items-center">
-                            <img
-                                src={brand.src}
-                                alt={brand.alt}
-                                className="h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                            />
-                        </div>
-                    ))}
+                    {brands.map((brand, idx) => {
+                        return (
+                            <div key={`a-${idx}`} className="flex-shrink-0 px-6 flex items-center">
+                                <Link href={`/products?brand=${encodeURIComponent(brand.alt)}`} aria-label={`View products for ${brand.alt}`}>
+                                    <img
+                                        src={brand.src}
+                                        alt={brand.alt}
+                                        className="brand-img cursor-pointer h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
+                                    />
+                                </Link>
+                            </div>
+                        );
+                    })}
                     {/* Second set */}
-                    {brands.map((brand, idx) => (
-                        <div key={`b-${idx}`} className="flex-shrink-0 px-5 sm:px-16 flex items-center">
-                            <img
-                                src={brand.src}
-                                alt={brand.alt}
-                                className="h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                            />
-                        </div>
-                    ))}
+                    {brands.map((brand, idx) => {
+                        return (
+                            <div key={`b-${idx}`} className="flex-shrink-0 px-5 sm:px-16 flex items-center">
+                                <Link href={`/products?brand=${encodeURIComponent(brand.alt)}`} aria-label={`View products for ${brand.alt}`}>
+                                    <img
+                                        src={brand.src}
+                                        alt={brand.alt}
+                                        className="brand-img cursor-pointer h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
+                                    />
+                                </Link>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>

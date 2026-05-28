@@ -12,6 +12,7 @@ router.register(r'size', views.SizeViewSet)
 router.register(r'product-image', views.ProductImageViewSet)
 router.register(r'category', views.CategoryViewSet)
 router.register(r'brand', views.BrandViewSet)
+router.register(r'usecase', views.UseCaseViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -33,15 +33,9 @@ export default function CartPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-4xl font-bold text-gray-900">Shopping Cart ({items.length} items)</h1>
-          <button
-            onClick={() => router.push('/products')}
-            className="text-sm font-semibold text-gray-900 hover:text-gray-600 transition-colors"
-          >
-            Continue Shopping
-          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -51,10 +45,10 @@ export default function CartPage() {
               {items.map((item) => (
                 <div
                   key={`${item.product_id}-${item.size}`}
-                  className="flex gap-4 p-6 border-b last:border-b-0"
+                  className="flex gap-4 px-6 py-3 border-b last:border-b-0"
                 >
                   {/* Product Image */}
-                  <div className="w-24 h-24 bg-gray-100 rounded-lg flex-shrink-0">
+                  <div className="w-28 h-32 bg-gray-100 rounded-lg flex-shrink-0">
                     {item.image && (
                       <Image
                         src={item.image}
@@ -68,7 +62,7 @@ export default function CartPage() {
 
                   {/* Product Details */}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                    <h3 className="font-semibold text-lg text-gray-900">{item.name}</h3>
                     <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
                       <select
                         value={item.size}
@@ -92,7 +86,7 @@ export default function CartPage() {
                             Math.max(1, item.quantity - 1)
                           )
                         }
-                        className="p-1 hover:text-gray-600"
+                        className="p-1 hover:text-gray-600 cursor-pointer"
                       >
                         <Minus size={16} />
                       </button>
@@ -107,16 +101,16 @@ export default function CartPage() {
                             item.quantity + 1
                           )
                         }
-                        className="p-1 hover:text-gray-600"
+                        className="p-1 hover:text-gray-600 cursor-pointer"
                       >
                         <Plus size={16} />
                       </button>
                     </div>
                     <button
                       onClick={() => removeItem(item.product_id, item.size)}
-                      className="text-red-500 hover:text-red-700 transition-colors"
+                      className="text-red-500 hover:text-red-700 transition-colors hover:scale-110 cursor-pointer"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={22} />
                     </button>
                   </div>
                 </div>
@@ -147,14 +141,14 @@ export default function CartPage() {
 
               <button
                 onClick={() => router.push('/checkout')}
-                className="w-full bg-purple-500 text-white py-3 rounded-lg font-semibold hover:bg-purple-600 transition-colors"
+                className="w-full bg-[#0f3b2b] text-white py-3 rounded-lg font-semibold hover:bg-white hover:text-[#0f3b2b] hover:border-[#0f3b2b] hover:border cursor-pointer transition-colors"
               >
                 Proceed to Checkout →
               </button>
 
               <button
                 onClick={() => router.push('/products')}
-                className="w-full border border-gray-300 text-gray-900 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                className="w-full border border-gray-300 cursor-pointer hover:bg-[#0f3b2b] hover:text-white text-gray-900 py-3 rounded-lg font-semibold transition-colors"
               >
                 Continue Shopping
               </button>

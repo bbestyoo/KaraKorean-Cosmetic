@@ -57,7 +57,7 @@ export default function FeaturedProducts() {
   const [emblaRef] = useEmblaCarousel({ align: "start", loop: true });
 
   return (
-    <section className="w-full bg-white pt-10 sm:py-20 px-6 md:px-12 lg:px-20 overflow-hidden">
+    <section className="w-full bg-white  px-6 md:px-12 lg:px-20 overflow-hidden">
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-5 sm:mb-12">
         <div>
           <RevealOnScroll direction="up">
