@@ -19,7 +19,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
   const { isLoggedIn, user, login } = useAuth();
 
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [stats, setStats] = useState({ total_ratings: 0, rating_dict: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, avg_rating: 0 });
+  const [stats, setStats] = useState<any>({ total_ratings: 0, rating_dict: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, avg_rating: 0 });
   const [loading, setLoading] = useState(true);
 
   // form state

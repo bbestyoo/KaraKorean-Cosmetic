@@ -194,6 +194,7 @@ export function HomeHero({ children }: HomeHeroProps) {
             <Brands />
           </div>
         </div>
+        </div>
       </section>
 
       {/* BestSellers + rest of page — slides up over the hero on scroll */}
