@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Comment, Repliess, ProductImage, Rating, ProductAttribute, Variant, Color, Size, SizeColorStock
+from .models import Product, Comment, Repliess, ProductImage, Rating, ProductAttribute, Variant, Size, UseCase
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
@@ -41,17 +41,9 @@ class CommentSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(f"/media/{obj.user.dp}")
     
 class ProductImageSerializer(serializers.ModelSerializer):
-    color_name = serializers.SerializerMethodField()
-    hex = serializers.SerializerMethodField()
     class Meta:
         model = ProductImage
-        fields = ['id', 'image', 'color', 'product', 'color_name', 'hex']
-
-    def get_color_name(self, obj):
-        return obj.color.name if obj.color else None
-
-    def get_hex(self, obj):
-        return obj.color.hex if obj.color else None
+        fields = ['id', 'image', 'product']
 
 class RatingSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only = True)
@@ -87,45 +79,20 @@ class VariantSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'additional_price']
 
 class SizeSerializer(serializers.ModelSerializer):
-    color_stocks = serializers.SerializerMethodField()
-    
     class Meta:
         model = Size
-        fields = ['id', 'name', 'price_adjustment', 'product', 'color_stocks']
-    
-    def get_color_stocks(self, obj):
-        color_stocks = obj.color_stocks.all()
-        return SizeColorStockSerializer(color_stocks, many=True).data
-
-class SizeColorStockSerializer(serializers.ModelSerializer):
-    color_id = serializers.SerializerMethodField()
-    color_name = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = SizeColorStock
-        fields = ['id', 'color_id', 'color_name', 'stock', 'product', 'size', 'color']
-    
-    def get_color_id(self, obj):
-        return obj.color.id if obj.color else None
-    
-    def get_color_name(self, obj):
-        return obj.color.name if obj.color else 'No Color'
-
-class ColorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Color
-        fields = ['id', 'name', 'hex', 'product']
+        fields = ['id', 'name', 'price_adjustment',  'product']
     
 class GetProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many = True, read_only = True)
     ratings = serializers.SerializerMethodField()
     category = serializers.StringRelatedField()
+    usecases = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
     variants = VariantSerializer(many=True, read_only=True)
     sizes = SizeSerializer(many=True, read_only=True)
-    colors = ColorSerializer(many=True, read_only=True)
     class Meta:
         model = Product
-        fields = ['product_id','name','category','price','old_price', 'before_deal_price','images','ratings','variants','sizes','colors']
+        fields = ['product_id','name','category','usecases','price','old_price', 'before_deal_price','images','ratings','variants','sizes']
 
     def get_ratings(self,obj):
         request = self.context.get('request')
@@ -155,11 +122,11 @@ class ProductSerializer(serializers.ModelSerializer):
     ratings = serializers.SerializerMethodField()
     category_name = serializers.SerializerMethodField()
     sub_category_name = serializers.SerializerMethodField()
-    stock = serializers.SerializerMethodField()
+    usecases = serializers.SlugRelatedField(many=True, slug_field='name', queryset=UseCase.objects.all(), required=False)
+    # stock = serializers.SerializerMethodField()
     attributes = ProductAttributeSerializer(many=True, read_only=True)
     variants = VariantSerializer(many=True, read_only=True)
     sizes = SizeSerializer(many=True, read_only=True)
-    colors = ColorSerializer(many=True, read_only=True)
     published_date = serializers.DateField(format='%Y-%m-%d', read_only=True)
     class Meta:
         model = Product
@@ -193,5 +160,5 @@ class ProductSerializer(serializers.ModelSerializer):
         return obj.sub_category.name if obj.sub_category else None
     
     def get_stock(self, obj):
-        total_stock = SizeColorStock.objects.filter(product_id=obj.product_id).aggregate(total=Sum('stock'))['total']
+        total_stock = Size.objects.filter(product_id=obj.product_id).aggregate(total=Sum('stock'))['total']
         return total_stock if total_stock is not None else 0

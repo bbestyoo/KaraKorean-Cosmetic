@@ -3,6 +3,7 @@ import { Heart, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { RevealOnScroll } from "./RevealOnScroll";
 import useEmblaCarousel from "embla-carousel-react";
+import { useWishlist } from "@/context/WishlistContext";
 
 const products = [
   {
@@ -52,11 +53,12 @@ const products = [
 ];
 
 export default function FeaturedProducts() {
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const [emblaRef] = useEmblaCarousel({ align: "start", loop: true });
 
   return (
-    <section className="w-full bg-white py-20 px-6 md:px-12 lg:px-20 overflow-hidden">
-      <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12">
+    <section className="w-full bg-white  px-6 md:px-12 lg:px-20 overflow-hidden">
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-5 sm:mb-12">
         <div>
           <RevealOnScroll direction="up">
             <p className="text-xs tracking-widest text-neutral-400 font-semibold mb-2">
@@ -64,13 +66,13 @@ export default function FeaturedProducts() {
             </p>
           </RevealOnScroll>
           <RevealOnScroll direction="up" delay={100}>
-            <h2 className="text-5xl md:text-6xl font-serif text-[#0f3b2b] tracking-tight">
+            <h2 className="text-3xl md:text-6xl font-serif text-[#0f3b2b] tracking-tight">
               Featured Products
             </h2>
           </RevealOnScroll>
         </div>
         <RevealOnScroll direction="left" delay={200}>
-          <button className="mt-6 md:mt-0 px-6 py-3 border border-neutral-300 text-xs font-bold tracking-widest text-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">
+          <button className="mt-2 md:mt-0 px-6 py-3 border border-neutral-300 text-xs font-bold tracking-widest text-neutral-800 hover:bg-[#0f3b2b] cursor-pointer hover:text-white transition-colors">
             VIEW ALL PRODUCTS
           </button>
         </RevealOnScroll>
@@ -81,15 +83,15 @@ export default function FeaturedProducts() {
           {products.map((product, index) => (
             <div
               key={index}
-              className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_25%] min-w-0 pl-6"
+              className="flex-[0_0_80%] sm:flex-[0_0_50%] lg:flex-[0_0_25%] min-w-0 pl-6"
             >
               <RevealOnScroll
                 direction="up"
                 delay={index * 150}
                 className="h-full"
               >
-                <div 
-                  className="relative bg-[#EBE7DD] rounded-t-lg pt-6 px-5 pb-8 h-full flex flex-col group"
+                <div
+                  className="relative bg-[#EBE7DD] rounded-t-lg pt-4 px-3 pb-5 sm:pt-6 sm:px-5 sm:pb-8 h-full flex flex-col group"
                   style={{
                     maskImage: "linear-gradient(to bottom, black calc(100% - 10px), transparent calc(100% - 10px)), radial-gradient(circle at 10px 100%, transparent 10px, black 10.5px)",
                     maskSize: "100% 100%, 20px 10px",
@@ -106,13 +108,32 @@ export default function FeaturedProducts() {
                     <span className="bg-[#E9F3A4] text-neutral-900 text-[0.65rem] font-bold tracking-widest px-2 py-1 rounded">
                       {product.badge}
                     </span>
-                    <button className="text-white hover:text-red-400 transition-colors">
-                      <Heart className="w-6 h-6 fill-current" />
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const pId = `featured-${index}`;
+                        const numericPrice = Number(product.price.replace('$', '')) || 0;
+                        const numericOldPrice = product.oldPrice ? Number(product.oldPrice.replace('$', '')) : undefined;
+                        toggleWishlist({
+                          product_id: pId,
+                          name: product.name,
+                          price: numericPrice,
+                          old_price: numericOldPrice,
+                          image: product.image,
+                          category_name: product.category,
+                        });
+                      }}
+                      className="text-white hover:text-red-500 transition-colors"
+                    >
+                      <Heart
+                        className={`w-6 cursor-pointer h-6 transition-colors ${isInWishlist(`featured-${index}`) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'fill-none text-white hover:text-[#c9a46b]'}
+                          }`}
+                      />
                     </button>
                   </div>
 
                   {/* Product Image */}
-                  <div className="relative w-full aspect-square mt-4 mb-6">
+                  <div className="relative w-full aspect-square mt-2 mb-3 sm:mt-4 sm:mb-6">
                     <Image
                       src={product.image}
                       alt={product.name}
@@ -124,15 +145,15 @@ export default function FeaturedProducts() {
 
                   {/* Product Info */}
                   <div className="mt-auto relative z-10">
-                    <h3 className="font-semibold text-lg text-neutral-900 mb-1 leading-tight">
+                    <h3 className="font-semibold text-sm sm:text-lg text-neutral-900 mb-1 leading-tight">
                       {product.name}
                     </h3>
-                    <p className="text-[0.65rem] font-bold tracking-widest text-neutral-500 uppercase mb-4 border-b border-neutral-300 border-dashed pb-4">
+                    <p className="text-[0.6rem] font-bold tracking-widest text-neutral-500 uppercase mb-2 sm:mb-4 border-b border-neutral-300 border-dashed pb-2 sm:pb-4">
                       {product.category}
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-xl font-medium text-neutral-900">
+                        <span className="text-base sm:text-xl font-medium text-neutral-900">
                           {product.price}
                         </span>
                         {product.oldPrice && (
@@ -141,7 +162,7 @@ export default function FeaturedProducts() {
                           </span>
                         )}
                       </div>
-                      <button className="bg-[#2D2B2A] text-white p-3 rounded-full hover:bg-black hover:scale-105 transition-all">
+                      <button className="bg-[#0f3b2b] text-white p-3 rounded-full hover:bg-black hover:scale-105 transition-all">
                         <ShoppingCart className="w-4 h-4" />
                       </button>
                     </div>

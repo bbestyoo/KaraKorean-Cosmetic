@@ -453,7 +453,7 @@ export default function EditProduct() {
     // Check if anything has changed
     if (!originalFormData || JSON.stringify(formData) === JSON.stringify(originalFormData)) {
       setSuccess('No changes to save.');
-      setStep('colors');
+      setStep('sizes');
       return;
     }
 
@@ -485,8 +485,8 @@ export default function EditProduct() {
         throw new Error(errorData.detail || 'Failed to update product');
       }
 
-      setSuccess('Product updated! Now update colors.');
-      setStep('colors');
+      setSuccess('Product updated! Now update sizes.');
+      setStep('sizes');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -647,8 +647,8 @@ export default function EditProduct() {
       }
 
       setCreatedSizeIds(sizeIds);
-      setSuccess('Sizes updated! Now configure stock.');
-      setStep('stock');
+      setSuccess('Product updated successfully!');
+      router.push('/admin/products');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -797,7 +797,7 @@ export default function EditProduct() {
             {/* Progress Indicator */}
             <div className="mb-8">
               <div className="flex items-center justify-between">
-                {(['product', 'colors', 'sizes', 'stock'] as const).map((s, idx) => (
+                {(['product', 'sizes'] as const).map((s, idx) => (
                   <div key={s} className="flex items-center flex-1">
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
@@ -811,7 +811,7 @@ export default function EditProduct() {
                       {idx + 1}
                     </div>
                     <div className={`flex-1 h-1 ${
-                      idx === (['product', 'colors', 'sizes', 'stock'] as const).length - 1
+                      idx === (['product', 'sizes'] as const).length - 1
                         ? 'hidden'
                         : ''
                     }`} />
@@ -964,7 +964,7 @@ export default function EditProduct() {
                     disabled={loading}
                     className="flex-1 px-6 py-3 bg-pink-500 text-white font-medium rounded-lg hover:bg-pink-600 disabled:opacity-50 transition-colors"
                   >
-                    {loading ? 'Saving...' : 'Next: Colors'}
+                    {loading ? 'Saving...' : 'Next: Sizes'}
                   </button>
                   <button
                     onClick={() => router.push('/admin/products')}
@@ -1074,7 +1074,7 @@ export default function EditProduct() {
                 <h2 className="text-2xl font-bold text-gray-900">Update Sizes</h2>
 
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
-                  <p className="text-sm">Add all sizes for this product. You&apos;ll configure stock quantities by size and color next.</p>
+                  <p className="text-sm">Add all sizes for this product. Saving here will finish the update.</p>
                 </div>
 
                 <div className="space-y-4">
@@ -1115,10 +1115,10 @@ export default function EditProduct() {
                     disabled={loading}
                     className="flex-1 px-6 py-3 bg-pink-500 text-white font-medium rounded-lg hover:bg-pink-600 disabled:opacity-50 transition-colors"
                   >
-                    {loading ? 'Saving...' : 'Next: Configure Stock'}
+                    {loading ? 'Saving...' : 'Save & Finish'}
                   </button>
                   <button
-                    onClick={() => setStep('colors')}
+                    onClick={() => setStep('product')}
                     className="flex-1 px-6 py-3 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300"
                   >
                     Back

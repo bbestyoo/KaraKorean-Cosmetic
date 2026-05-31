@@ -10,7 +10,6 @@ interface OrderItem {
   product_id: string;
   quantity: number;
   price: number;
-  color_name?: string;
   size_name?: string;
 }
 
@@ -108,8 +107,8 @@ export default function OrderConfirmationPage({ params }: PageProps) {
   });
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="min-h-screen bg-gray-30">
+      <div className="max-w-6xl border border-gray-200 mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Success Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
@@ -157,12 +156,6 @@ export default function OrderConfirmationPage({ params }: PageProps) {
                       <h3 className="font-semibold text-gray-900 text-lg">{item.product_name}</h3>
                       <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
                         <span>Qty: {item.quantity}</span>
-                        {item.color_name && (
-                          <>
-                            <span className="text-gray-300">•</span>
-                            <span>Color: {item.color_name}</span>
-                          </>
-                        )}
                         {item.size_name && (
                           <>
                             <span className="text-gray-300">•</span>

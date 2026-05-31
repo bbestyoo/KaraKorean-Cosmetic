@@ -30,6 +30,7 @@ class Product(models.Model):
     trending = models.BooleanField(default=False)
     best_seller = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
+    usecases = models.ManyToManyField('UseCase', blank=True, related_name='products')
 
     def __str__(self):
         return self.name
@@ -45,14 +46,6 @@ class Product(models.Model):
                 num += 1
         super().save(*args, **kwargs)
 
-class Color(models.Model):
-    name = models.CharField(max_length=50)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='colors')
-    hex = models.CharField(max_length=7, blank=True, null=True)  # e.g., #FFFFFF
-
-    def __str__(self):
-        return f"{self.product.name} - {self.name}"
-
 class Variant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
     name = models.CharField(max_length=100)
@@ -65,6 +58,7 @@ class Size(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sizes')
     name = models.CharField(max_length=50)  # e.g., XS, S, M, L, XL, XXL
     price_adjustment = models.FloatField(default=0)  # Additional cost for this size, if any
+    # stock = models.PositiveIntegerField(default=0)
 
     class Meta:
         unique_together = ['product', 'name']
@@ -72,26 +66,12 @@ class Size(models.Model):
     def __str__(self):
         return f"{self.product.name} - {self.name}"
 
-class SizeColorStock(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='size_color_stocks')
-    size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name='color_stocks')
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='size_stocks', null=True, blank=True)
-    stock = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        unique_together = ['product', 'size', 'color']
-
-    def __str__(self):
-        color_name = self.color.name if self.color else 'No Color'
-        return f"{self.product.name} - {self.size.name} - {color_name} ({self.stock})"
-
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to='shop/images', default='')
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='images', null=True, blank=True)
     
     def __str__(self):
-        return f"Image for {self.product.name} and color {self.color.name if self.color else 'N/A'}"
+        return f"Image for {self.product.name}"
     
 class ProductAttribute(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
@@ -149,6 +129,17 @@ class Category(models.Model):
 class SubCategory(models.Model):
     name = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+    def __str__(self):
+        return self.name
+    
+
+class UseCase(models.Model):
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Use Case'
+        verbose_name_plural = 'Use Cases'
+
     def __str__(self):
         return self.name
     

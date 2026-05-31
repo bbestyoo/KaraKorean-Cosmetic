@@ -23,6 +23,7 @@ VENV/
 
 # Static and media files (if collected)
 staticfiles/
+# static/
 media/
 
 # VS Code settings

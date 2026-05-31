@@ -254,8 +254,8 @@ export default function AddProduct() {
 
       const data = await response.json();
       setProductId(data.product_id);
-      setSuccess('Product created! Now add colors.');
-      setStep('colors');
+      setSuccess('Product created! Now add sizes.');
+      setStep('sizes');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -519,8 +519,8 @@ export default function AddProduct() {
       }
 
       setCreatedSizeIds(sizeIds);
-      setSuccess('Sizes created! Now configure stock.');
-      setStep('stock');
+      setSuccess('Sizes created! Now upload images.');
+      setStep('images');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -733,13 +733,13 @@ export default function AddProduct() {
           <div className="max-w-4xl mx-auto">
             {/* Progress Indicator */}
             <div className="mb-8 flex gap-2">
-              {(['product', 'colors', 'sizes', 'stock', 'images'] as const).map((s, idx) => (
+              {(['product', 'sizes', 'images'] as const).map((s, idx) => (
                 <div
                   key={s}
                   className={`flex-1 h-2 rounded-full transition-colors ${
                     step === s
                       ? 'bg-pink-500'
-                      : ['product', 'colors', 'sizes', 'stock', 'images'].indexOf(step) > idx
+                      : ['product', 'sizes', 'images'].indexOf(step) > idx
                       ? 'bg-green-500'
                       : 'bg-gray-300'
                   }`}
@@ -929,7 +929,7 @@ export default function AddProduct() {
                     disabled={loading}
                     className="flex-1 px-6 py-3 bg-pink-500 text-white font-medium rounded-lg hover:bg-pink-600 disabled:opacity-50 transition-colors"
                   >
-                    {loading ? 'Creating...' : 'Next: Add Colors'}
+                    {loading ? 'Creating...' : 'Next: Add Sizes'}
                   </button>
                   <Link href="/admin/products" className="flex-1">
                     <button
@@ -1036,10 +1036,7 @@ export default function AddProduct() {
                     {loading ? 'Saving...' : 'Next: Add Sizes'}
                   </button>
                   <button
-                    onClick={() => {
-                      setStep('product');
-                      setColors([]);
-                    }}
+                    onClick={() => setStep('product')}
                     className="flex-1 px-6 py-3 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300"
                   >
                     Back
@@ -1054,7 +1051,7 @@ export default function AddProduct() {
                 <h2 className="text-2xl font-bold text-gray-900">Add Sizes</h2>
 
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
-                  <p className="text-sm">Add all sizes for this product. You&apos;ll configure stock quantities by size and color next.</p>
+                  <p className="text-sm">Add all sizes for this product. Images come next.</p>
                 </div>
 
                 <div className="flex gap-3">
@@ -1097,76 +1094,10 @@ export default function AddProduct() {
                     disabled={loading || sizes.length === 0}
                     className="flex-1 px-6 py-3 bg-pink-500 text-white font-medium rounded-lg hover:bg-pink-600 disabled:opacity-50 transition-colors"
                   >
-                    {loading ? 'Saving...' : 'Next: Configure Stock'}
+                    {loading ? 'Saving...' : 'Next: Upload Images'}
                   </button>
                   <button
-                    onClick={() => setStep('colors')}
-                    className="flex-1 px-6 py-3 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300"
-                  >
-                    Back
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Stock Configuration */}
-            {step === 'stock' && productId && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-6">
-                <h2 className="text-2xl font-bold text-gray-900">Configure Stock</h2>
-
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
-                  <p className="text-sm">Set the quantity available for each size-color combination.</p>
-                </div>
-
-                <div className="space-y-4">
-                  {colors.map(color => (
-                    <div key={color.id} className="p-4 border border-gray-200 rounded-lg">
-                      <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <div className="w-6 h-6 rounded border border-gray-300" style={{ backgroundColor: color.hex }} />
-                        {color.name}
-                      </h3>
-                      <div className="space-y-2">
-                        {sizes.map(size => (
-                          <StockInputRow
-                            key={`${color.id}-${size.id}`}
-                            colorId={color.id}
-                            sizeName={size.name}
-                            sizeId={size.id}
-                            onAdd={handleAddStock}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {stocks.length > 0 && (
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-3">Stock Summary</h3>
-                    <div className="space-y-2">
-                      {stocks.map(stock => {
-                        const color = colors.find(c => c.id === stock.colorId);
-                        const size = sizes.find(s => s.id === stock.sizeId);
-                        return (
-                          <div key={stock.id} className="flex justify-between text-sm text-gray-700">
-                            <span>{color?.name} - {size?.name}</span>
-                            <span>{stock.quantity} units</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-4">
-                  <button
-                    onClick={handlePostStock}
-                    className="flex-1 px-6 py-3 bg-pink-500 text-white font-medium rounded-lg hover:bg-pink-600 disabled:opacity-50 transition-colors"
-                  >
-                    {loading ? 'Saving...' : 'Next: Complete'}
-                  </button>
-                  <button
-                    onClick={() => setStep('sizes')}
+                    onClick={() => setStep('product')}
                     className="flex-1 px-6 py-3 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300"
                   >
                     Back
@@ -1181,7 +1112,7 @@ export default function AddProduct() {
                 <h2 className="text-2xl font-bold text-gray-900">Product Complete!</h2>
 
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                  <p className="text-sm">Your product has been created with all colors, sizes, and stock configured. Click finish to complete and go to your product list.</p>
+                  <p className="text-sm">Your product has been created with sizes configured. Click finish to complete and go to your product list.</p>
                 </div>
 
                 <div className="flex gap-4">
@@ -1193,7 +1124,7 @@ export default function AddProduct() {
                     {loading ? 'Finishing...' : 'Finish'}
                   </button>
                   <button
-                    onClick={() => setStep('stock')}
+                    onClick={() => setStep('sizes')}
                     className="flex-1 px-6 py-3 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300"
                   >
                     Back

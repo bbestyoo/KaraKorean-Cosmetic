@@ -7,7 +7,6 @@ export interface CartItem {
   name: string;
   price: number;
   size: string;
-  color: string;
   quantity: number;
   image: string;
 }
@@ -15,8 +14,8 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string, size: string, color: string) => void;
-  updateQuantity: (productId: string, size: string, color: string, quantity: number) => void;
+  removeItem: (productId: string, size: string) => void;
+  updateQuantity: (productId: string, size: string, quantity: number) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   isOpen: boolean;
@@ -56,15 +55,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const existingItem = prevItems.find(
         (item) =>
           item.product_id === newItem.product_id &&
-          item.size === newItem.size &&
-          item.color === newItem.color
+          item.size === newItem.size
       );
 
       if (existingItem) {
         return prevItems.map((item) =>
           item.product_id === newItem.product_id &&
-          item.size === newItem.size &&
-          item.color === newItem.color
+          item.size === newItem.size
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         );
@@ -75,15 +72,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsOpen(true);
   };
 
-  const removeItem = (productId: string, size: string, color: string) => {
+  const removeItem = (productId: string, size: string) => {
     setItems((prevItems) =>
       prevItems.filter(
         (item) =>
-          !(
-            item.product_id === productId &&
-            item.size === size &&
-            item.color === color
-          )
+          !(item.product_id === productId && item.size === size)
       )
     );
   };
@@ -91,19 +84,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const updateQuantity = (
     productId: string,
     size: string,
-    color: string,
     quantity: number
   ) => {
     if (quantity <= 0) {
-      removeItem(productId, size, color);
+      removeItem(productId, size);
       return;
     }
 
     setItems((prevItems) =>
       prevItems.map((item) =>
         item.product_id === productId &&
-        item.size === size &&
-        item.color === color
+        item.size === size
           ? { ...item, quantity }
           : item
       )

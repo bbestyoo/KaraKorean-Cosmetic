@@ -1,54 +1,47 @@
 version: '3.8'
 
 services:
-  db:
-    container_name: postgres
-    image: postgres:17-alpine
-    restart: always
-    volumes:
-      - ./volumes/postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - default
-    environment:
-      - POSTGRES_DB=${POSTGRES_DATABASE}
-      - POSTGRES_USER=${POSTGRES_USERNAME}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  web:
+  kara-web:
+    container_name: kara-web
     build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Proxy & SSL Settings
+      - VIRTUAL_HOST=api.aamakonana.com
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=api.aamakonana.com
+      - LETSENCRYPT_EMAIL=bibhab.dev@gmail.com
+
+      # Shared Database Connection
+      # Points to the 'global-db' container on the 'web_gateway' network
+      - DB_HOST=${POSTGRES_HOST}
+      - DB_PORT=5432
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASS=${POSTGRES_PASSWORD}
+
+    ports:
+      - 8000:8000
+    
     volumes:
       - .:/app
-      - ./volumes/static_volume:/app/static
-      - ./volumes/media_volume:/app/media
-    ports:
-      - "8000:8000"
+    
     networks:
-      - default
+      - web_gateway
 
-    environment:
-      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
-      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASS=${EMAIL_PASS}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    depends_on:
-      db:
-        condition: service_healthy
+    command: >
+      gunicorn backend.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 3
+      --worker-class gevent
+      --worker-connections 1000
+      --timeout 120
+      --access-logfile -
+      --error-logfile -
 
 networks:
-  default:
-    # external:
-      name: shared-network
+  web_gateway:
+    external: true
+
+

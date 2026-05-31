@@ -1,6 +1,6 @@
 import { CartSidebar } from "@/components/CartSidebar";
+import Footer from "@/components/footer";
 import { SiteHeader } from "@/components/SiteHeader";
-import { PromoBanner } from "@/components/PromoBanner";
 
 export default function SiteLayout({
   children,
@@ -9,11 +9,11 @@ export default function SiteLayout({
 }>) {
   return (
     <>
-      <PromoBanner />
       <SiteHeader />
 
       <main id="main">{children}</main>
       <CartSidebar />
+      <Footer/>
     </>
   );
 }

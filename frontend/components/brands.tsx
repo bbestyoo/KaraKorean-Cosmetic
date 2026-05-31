@@ -1,4 +1,6 @@
-'use client';
+"use client";
+
+import Link from 'next/link';
 
 const brands = [
     { src: '/images/logos/anua.png', alt: 'Anua' },
@@ -11,9 +13,12 @@ const brands = [
     { src: '/images/logos/somebymi.png', alt: 'Some By Mi' },
 ];
 
+// Note: use the brand display name directly in the query string so
+// the products page (which reads `brand`) can match it to product data.
+
 export default function Brands() {
     return (
-        <div className="w-full absolute bottom-0 overflow-hidden py-6">
+        <div className="w-full absolute bottom-13 sm:bottom-10 md:bottom-0 overflow-hidden py-0 sm:py-5 lg:py-10 bg-white/5  z-10 border-t border-white/10">
             <style>{`
                 @keyframes marquee {
                     0%   { transform: translateX(0); }
@@ -22,35 +27,50 @@ export default function Brands() {
                 .marquee-track {
                     display: flex;
                     width: max-content;
-                    animation: marquee 20s linear infinite;
+                    animation: marquee 25s linear infinite;
                     will-change: transform;
                 }
                 .marquee-track:hover {
                     animation-play-state: paused;
                 }
+                .brand-img {
+                    transition: transform 150ms ease-in-out;
+                    transform-origin: center;
+                }
+                .brand-img:hover {
+                    transform: scale(1.2);
+                }
             `}</style>
             <div className="relative overflow-hidden w-full">
                 <div className="marquee-track">
-                    {/* Original set */}
-                    {brands.map((brand, idx) => (
-                        <div key={`a-${idx}`} className="flex-shrink-0 px-10 flex items-center">
-                            <img
-                                src={brand.src}
-                                alt={brand.alt}
-                                className="h-10 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                            />
-                        </div>
-                    ))}
-                    {/* Exact duplicate — makes -50% land back at start */}
-                    {brands.map((brand, idx) => (
-                        <div key={`b-${idx}`} className="flex-shrink-0 px-10 flex items-center">
-                            <img
-                                src={brand.src}
-                                alt={brand.alt}
-                                className="h-10 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                            />
-                        </div>
-                    ))}
+                    {/* First set */}
+                    {brands.map((brand, idx) => {
+                        return (
+                            <div key={`a-${idx}`} className="flex-shrink-0 px-6 flex items-center">
+                                <Link href={`/products?brand=${encodeURIComponent(brand.alt)}`} aria-label={`View products for ${brand.alt}`}>
+                                    <img
+                                        src={brand.src}
+                                        alt={brand.alt}
+                                        className="brand-img cursor-pointer h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
+                                    />
+                                </Link>
+                            </div>
+                        );
+                    })}
+                    {/* Second set */}
+                    {brands.map((brand, idx) => {
+                        return (
+                            <div key={`b-${idx}`} className="flex-shrink-0 px-5 sm:px-16 flex items-center">
+                                <Link href={`/products?brand=${encodeURIComponent(brand.alt)}`} aria-label={`View products for ${brand.alt}`}>
+                                    <img
+                                        src={brand.src}
+                                        alt={brand.alt}
+                                        className="brand-img cursor-pointer h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
+                                    />
+                                </Link>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>
