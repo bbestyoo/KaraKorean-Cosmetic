@@ -48,6 +48,8 @@ class GetProduct(APIView):
         max_price = request.query_params.get('max_price')
         usecase = request.query_params.get('usecase')
         featured = request.query_params.get('featured')
+        trending = request.query_params.get('trending')
+        best_seller = request.query_params.get('best_seller')
         # Instead of a single 'ordering' value, expect multiple ordering parameters
         ordering_fields = request.query_params.getlist('ordering')
         brand = request.query_params.get('brand')
@@ -89,6 +91,13 @@ class GetProduct(APIView):
         # Filter by featured flag if provided (supports ?featured=true)
         if featured and str(featured).lower() in ['true', '1', 'yes']:
             queryset = queryset.filter(featured=True)
+
+        if trending and str(trending).lower() in ['true', '1', 'yes']:
+            queryset = queryset.filter(trending=True)
+        
+        if best_seller and str(best_seller).lower() in ['true', '1', 'yes']:
+            queryset = queryset.filter(best_seller=True)
+
         # Filter by usecase if provided (?usecase=antiaging)
         if usecase:
             try:
