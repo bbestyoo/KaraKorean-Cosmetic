@@ -16,7 +16,7 @@ const NAV_LINKS = [
   { label: "Products", href: "/products" },
   { label: "Blog", href: "/blog" },
   { label: "Quiz", href: "/quiz" },
-  { label: "About", href: "/about" },
+  { label: "About Us", href: "/about" },
 ];
 
 export function SiteHeader() {
@@ -163,7 +163,7 @@ export function SiteHeader() {
               <Heart
                 size={22}
                 className={cn(
-                  "transition-colors",
+                  "transition-colors hover:text-[#c9a46b]",
                   pathname === "/wishlist"
                     ? "fill-[#c9a46b] text-[#c9a46b]"
                     : "text-gray-900"
@@ -182,7 +182,7 @@ export function SiteHeader() {
                 className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
                 aria-label="User menu"
               >
-                <User size={22} />
+                <User size={22} className="hover:text-[#c9a46b]" />
                 {isLoggedIn && (
                   <span className="hidden lg:inline-block text-sm font-semibold">{user?.username || user?.name || 'Account'}</span>
                 )}

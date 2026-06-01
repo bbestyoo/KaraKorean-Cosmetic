@@ -248,57 +248,43 @@ export default function AboutPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════ */}
-      {/* THE TEAM                                                   */}
+      {/* STORE LOCATION                                             */}
       {/* ══════════════════════════════════════════════════════════ */}
-      <section className="bg-[#111] text-white py-24 px-6 lg:px-12">
-        <div className="max-w-7xl mx-auto">
-          <Reveal>
-            <p className="text-[11px] tracking-[0.35em] uppercase text-neutral-400 mb-4">The People Behind Kara</p>
-            <h2
-              className="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-16"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
-              Meet the Team
-            </h2>
-          </Reveal>
+      <section className="max-w-[1700px] mx-auto px-6 lg:px-12 py-24">
+        <Reveal>
+          <p className="text-[11px] tracking-[0.35em] uppercase text-neutral-400 mb-4">Visit Us</p>
+          <h2
+            className="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-6"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            Our Store Location
+          </h2>
+        </Reveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {[
-              {
-                name: 'Sujata Rana',
-                role: 'Co-Founder & Curator',
-                img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&auto=format&fit=crop',
-                bio: 'Skincare obsessive and K-drama enthusiast. Sujata sources every product with the same care she puts into her own 10-step routine.',
-              },
-              {
-                name: 'Priya Shrestha',
-                role: 'Co-Founder & Brand Director',
-                img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&auto=format&fit=crop',
-                bio: 'With a background in cosmetic chemistry and a passion for sustainability, Priya ensures every brand we carry meets our strict quality standards.',
-              },
-              {
-                name: 'Asha Tamang',
-                role: 'Community & Education Lead',
-                img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop',
-                bio: 'Asha creates the guides, tutorials, and quiz flows that help our community find the right routine — from beginner to full K-beauty devotee.',
-              },
-            ].map(({ name, role, img, bio }, i) => (
-              <Reveal key={name} delay={i * 100}>
-                <div className="group">
-                  <div className="relative aspect-[3/4] overflow-hidden mb-6">
-                    <Image
-                      src={img}
-                      alt={name}
-                      fill
-                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <p className="text-[11px] tracking-[0.25em] uppercase text-neutral-400 mb-1">{role}</p>
-                  <h3 className="text-xl font-black uppercase tracking-tight mb-3">{name}</h3>
-                  <p className="text-sm text-neutral-400 leading-relaxed">{bio}</p>
-                </div>
-              </Reveal>
-            ))}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-10 items-center">
+          <div className="relative w-full col-span-2 aspect-[16/9] overflow-hidden rounded-lg shadow">
+            <iframe
+              src="https://www.google.com/maps?q=27.7376772,85.3348645&z=18&output=embed"
+              className="absolute inset-0 w-full h-full border-0"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Kara Korean Beauty Store location"
+            />
+          </div>
+
+          <div className="flex flex-col justify-center">
+            <p className="text-base text-neutral-600 mb-4">Visit our store at:</p>
+            <address className="not-italic text-neutral-900 font-semibold mb-4">Kara Korean Beauty Store<br />Kathmandu, Nepal</address>
+            <p className="text-sm text-neutral-600 mb-4">Open daily 10:00 — 20:00. Call ahead for availability.</p>
+            <a
+              href="https://www.google.com/maps/place/Kara+Korean+Beauty+Store/@27.737714,85.3347341,20.39z/data=!4m6!3m5!1s0x39eb19005b6234c9:0x240b20f661c49f26!8m2!3d27.7376772!4d85.3348645!16s%2Fg%2F11xl9w0yvf?entry=ttu&g_ep=EgoyMDI2MDUyNy4wIKXMDSoASAFQAw%3D%3D"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] font-black tracking-[0.22em] uppercase border-b border-[#111] pb-0.5 hover:opacity-60 transition-opacity"
+            >
+              Open in Google Maps →
+            </a>
           </div>
         </div>
       </section>

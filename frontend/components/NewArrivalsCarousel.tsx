@@ -169,7 +169,7 @@ export default function NewArrivalsCarousel() {
           <button
             type="button"
             onClick={() => handleAddToBag(currentProduct)}
-            className="bg-[#0f3b2b] text-[#f7f6f2] text-[10px] sm:text-xs tracking-[0.2em] font-sans  p-1 px-2 sm:px-4 sm:py-2 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm shadow-sm curosr-pointer"
+            className="bg-[#0f3b2b] cursor-pointer text-[#f7f6f2] text-[10px] sm:text-xs tracking-[0.2em] font-sans  p-1 px-2 sm:px-4 sm:py-2 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm shadow-sm curosr-pointer"
             aria-label={`Add ${currentProduct.name} to bag`}
           >
             ADD TO BAG

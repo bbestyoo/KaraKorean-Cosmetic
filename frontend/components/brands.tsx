@@ -13,8 +13,11 @@ const brands = [
     { src: '/images/logos/somebymi.png', alt: 'Some By Mi' },
 ];
 
-// Note: use the brand display name directly in the query string so
-// the products page (which reads `brand`) can match it to product data.
+const slugify = (str: string) =>
+    str
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
 
 export default function Brands() {
     return (
@@ -38,16 +41,17 @@ export default function Brands() {
                     transform-origin: center;
                 }
                 .brand-img:hover {
-                    transform: scale(1.2);
+                    transform: scale(1.05);
                 }
             `}</style>
             <div className="relative overflow-hidden w-full">
                 <div className="marquee-track">
                     {/* First set */}
                     {brands.map((brand, idx) => {
+                        const slug = slugify(brand.alt);
                         return (
                             <div key={`a-${idx}`} className="flex-shrink-0 px-6 flex items-center">
-                                <Link href={`/products?brand=${encodeURIComponent(brand.alt)}`} aria-label={`View products for ${brand.alt}`}>
+                                <Link href={`/products?brands=${slug}`} aria-label={`View products for ${brand.alt}`}>
                                     <img
                                         src={brand.src}
                                         alt={brand.alt}
@@ -59,9 +63,10 @@ export default function Brands() {
                     })}
                     {/* Second set */}
                     {brands.map((brand, idx) => {
+                        const slug = slugify(brand.alt);
                         return (
                             <div key={`b-${idx}`} className="flex-shrink-0 px-5 sm:px-16 flex items-center">
-                                <Link href={`/products?brand=${encodeURIComponent(brand.alt)}`} aria-label={`View products for ${brand.alt}`}>
+                                <Link href={`/products?brands=${slug}`} aria-label={`View products for ${brand.alt}`}>
                                     <img
                                         src={brand.src}
                                         alt={brand.alt}

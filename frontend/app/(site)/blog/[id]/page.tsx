@@ -88,74 +88,6 @@ function htmlToParagraphs(html = '') {
   return flat ? [flat] : [];
 }
 
-const relatedPostsData = [
-  {
-    id: 101,
-    title: "MY REVOLUTIONARY BULLSHTS About \"ATOMIC HABIT\"",
-    excerpt: "We identify and approach prospects with your B2B value propositions and help them make buying decisions",
-    category: "Technology",
-    image: "https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=600&auto=format&fit=crop",
-    views: "2983",
-    readTime: "4 min",
-    date: "Jan 11.2023",
-    arrowColor: "black"
-  },
-  {
-    id: 102,
-    title: "MY REVOLUTIONARY BULLSHTS About \"ATOMIC HABIT\"",
-    excerpt: "We identify and approach prospects with your B2B value propositions and help them make buying decisions",
-    category: "Technology",
-    image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=600&auto=format&fit=crop",
-    views: "2983",
-    readTime: "4 min",
-    date: "Jan 11.2023",
-    arrowColor: "orange"
-  },
-  {
-    id: 103,
-    title: "MY REVOLUTIONARY BULLSHTS About \"ATOMIC HABIT\"",
-    excerpt: "We identify and approach prospects with your B2B value propositions and help them make buying decisions",
-    category: "Technology",
-    image: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=600&auto=format&fit=crop",
-    views: "2983",
-    readTime: "4 min",
-    date: "Jan 11.2023",
-    arrowColor: "black"
-  },
-  {
-    id: 104,
-    title: "Understanding Skincare Routine Layering",
-    excerpt: "Master the art of layering hydration to achieve smooth and plump skin without clog risk.",
-    category: "Entertainment",
-    image: "https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=600&auto=format&fit=crop",
-    views: "1892",
-    readTime: "5 min",
-    date: "Feb 14.2025",
-    arrowColor: "black"
-  },
-  {
-    id: 105,
-    title: "The Ultimate Sunscreen Science Breakdowns",
-    excerpt: "Diving deep into physical versus chemical filters to protect your skin barrier all summer.",
-    category: "Social Media",
-    image: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?q=80&w=600&auto=format&fit=crop",
-    views: "3411",
-    readTime: "6 min",
-    date: "Mar 20.2025",
-    arrowColor: "black"
-  },
-  {
-    id: 106,
-    title: "Double Cleansing: A Gentle Revolution",
-    excerpt: "Why oil attracts oil, and how a double cleanse eliminates sebum and daily pollutants completely.",
-    category: "Other",
-    image: "https://images.unsplash.com/photo-1601612628452-9e99ced43524?q=80&w=600&auto=format&fit=crop",
-    views: "2201",
-    readTime: "3 min",
-    date: "Apr 05.2025",
-    arrowColor: "black"
-  }
-];
 
 export default function SingleBlogPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -225,12 +157,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
     if (post) window.scrollTo({ top: 0, behavior: 'instant' });
   }, [post]);
 
-  const filteredRelated = relatedPostsData.filter(p => {
-    const matchesCategory = activeFilter === "All" || p.category === activeFilter;
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          p.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
 
   if (loading || !post) {
     return (
@@ -500,7 +426,6 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
 
         </div>
       </main>
-      <Footer />
     </>
   );
 }

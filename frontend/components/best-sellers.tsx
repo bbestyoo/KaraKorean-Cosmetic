@@ -3,20 +3,21 @@ import Link from "next/link";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 
 const cards = [
+  
   {
-    title: "DESTINATION DRESSING",
+    title: "AntiAging",
     subtitle: "THE VACATION SHOP",
     image: "/images/model1.png",
     link: "/shop/toner",
   },
   {
-    title: "SUMMER NIGHT LOUNGE & LINGERIE",
+    title: "Pigmentation",
     subtitle: "NEW LINGERIE",
     image: "/images/model2.png",
     link: "/shop/ampoule",
   },
   {
-    title: "STEP INTO SUMMER",
+    title: "Acne Control",
     subtitle: "NEW SHOES",
     image: "/images/model3.png",
     link: "/shop/essence",

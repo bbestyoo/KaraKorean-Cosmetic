@@ -86,7 +86,7 @@ export function HomeHero({ children }: HomeHeroProps) {
                 </div>
                 <Link
                   href="/skincare"
-                  className="bg-[#0f3b2b] text-[#f7f6f2] tracking-[0.2em] font-sans px-3 py-1.5 hover:bg-[#1a5c42] transition-colors duration-300 self-start"
+                  className="bg-[#0f3b2b] text-[#f7f6f2]  tracking-[0.2em] font-sans px-3 py-1.5 hover:bg-[#1a5c42] transition-colors duration-300 self-start"
                 >
                   ADD TO BAG
                 </Link>
