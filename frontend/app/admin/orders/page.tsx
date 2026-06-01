@@ -10,7 +10,14 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:8000';
+
+const API_BASE_URL1 = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL1) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
+const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
 
 interface OrderItem {
   id: string;

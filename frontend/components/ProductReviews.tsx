@@ -15,6 +15,16 @@ interface Review {
   approved: boolean;
 }
 
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
+
+
 export default function ProductReviews({ productId }: { productId: string }) {
   const { isLoggedIn, user, login } = useAuth();
 
@@ -105,8 +115,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
     e.preventDefault();
     setLoginError('');
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
-      const response = await fetch(`${API_BASE_URL}/userauth/api/login/`, {
+      const response = await fetch(`${API_ORIGIN}/userauth/api/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: loginEmail, password: loginPassword }),

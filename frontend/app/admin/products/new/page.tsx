@@ -15,7 +15,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/shop', '') || 'http://localhost:8000';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
 interface ProductFormData {
   name: string;
@@ -129,7 +136,7 @@ export default function AddProduct() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_BASE_URL}/shop/category/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/category/`, {
         headers: { 'Authorization': `Token ${token}` },
       });
       if (response.ok) {
@@ -144,7 +151,7 @@ export default function AddProduct() {
   const fetchBrands = async () => {
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_BASE_URL}/shop/brand/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/brand/`, {
         headers: { 'Authorization': `Token ${token}` },
       });
       if (response.ok) {
@@ -164,7 +171,7 @@ export default function AddProduct() {
 
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_BASE_URL}/shop/category/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/category/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -193,7 +200,7 @@ export default function AddProduct() {
 
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_BASE_URL}/shop/brand/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/brand/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -222,7 +229,7 @@ export default function AddProduct() {
 
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_BASE_URL}/shop/api/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/api/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -325,7 +332,7 @@ export default function AddProduct() {
       
       // Only delete from API if it has a numeric ID (was created)
       if (!isNaN(Number(imageId))) {
-        await fetch(`${API_BASE_URL}/shop/product-image/${imageId}/`, {
+        await fetch(`${API_ORIGIN}/shop/product-image/${imageId}/`, {
           method: 'DELETE',
           headers: { 'Authorization': `Token ${token}` },
         });
@@ -363,7 +370,7 @@ export default function AddProduct() {
       
       // Only delete from API if it was created (has numeric ID from API)
       if (!isNaN(Number(apiColorId))) {
-        await fetch(`${API_BASE_URL}/shop/color/${apiColorId}/`, {
+        await fetch(`${API_ORIGIN}/shop/color/${apiColorId}/`, {
           method: 'DELETE',
           headers: { 'Authorization': `Token ${token}` },
         });
@@ -397,7 +404,7 @@ export default function AddProduct() {
       const colorIds: Record<string, string> = {};
 
       for (const color of colors) {
-        const response = await fetch(`${API_BASE_URL}/shop/color/`, {
+        const response = await fetch(`${API_ORIGIN}/shop/color/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -462,7 +469,7 @@ export default function AddProduct() {
       
       // Only delete from API if it was created (has numeric ID from API)
       if (!isNaN(Number(apiSizeId))) {
-        await fetch(`${API_BASE_URL}/shop/size/${apiSizeId}/`, {
+        await fetch(`${API_ORIGIN}/shop/size/${apiSizeId}/`, {
           method: 'DELETE',
           headers: { 'Authorization': `Token ${token}` },
         });
@@ -496,7 +503,7 @@ export default function AddProduct() {
       const sizeIds: Record<string, string> = {};
 
       for (const size of sizes) {
-        const response = await fetch(`${API_BASE_URL}/shop/size/`, {
+        const response = await fetch(`${API_ORIGIN}/shop/size/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -554,7 +561,7 @@ export default function AddProduct() {
       const token = localStorage.getItem('auth_token');
 
       for (const stock of stocks) {
-        const response = await fetch(`${API_BASE_URL}/shop/size-color-stock/`, {
+        const response = await fetch(`${API_ORIGIN}/shop/size-color-stock/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -600,7 +607,7 @@ export default function AddProduct() {
           formDataObj.append('product', productId || '');
           formDataObj.append('color', colorId);
 
-          const response = await fetch(`${API_BASE_URL}/shop/product-image/`, {
+          const response = await fetch(`${API_ORIGIN}/shop/product-image/`, {
             method: 'POST',
             headers: {
               'Authorization': `Token ${token}`,

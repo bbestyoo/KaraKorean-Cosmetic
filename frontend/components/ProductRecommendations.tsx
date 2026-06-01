@@ -33,7 +33,14 @@ interface RecommendationsData {
   trending: Product[];
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
 export const ProductRecommendations = ({ productId }: { productId: string }) => {
   const [recommendations, setRecommendations] = useState<RecommendationsData>({
@@ -47,7 +54,7 @@ export const ProductRecommendations = ({ productId }: { productId: string }) => 
     const fetchRecommendations = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/recommendations/?product_id=${productId}`
+          `${API_ORIGIN}/api/recommendations/?product_id=${productId}`
         );
         if (response.ok) {
           const data = await response.json();

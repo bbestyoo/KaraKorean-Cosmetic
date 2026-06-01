@@ -15,7 +15,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const API_BASE_URL = 'http://localhost:8000';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
 interface ProductFormData {
   name: string;
@@ -187,7 +194,7 @@ export default function EditProduct() {
   const fetchProductData = async () => {
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_BASE_URL}/shop/api/${productId}/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/api/${productId}/`, {
         headers: { 'Authorization': `Token ${token}` },
       });
       
@@ -217,7 +224,7 @@ export default function EditProduct() {
           if (product.colors && product.colors.length > 0) {
             const loadedColors = await Promise.all(
               product.colors.map(async (color: APIColor) => {
-                const imageResponse = await fetch(`${API_BASE_URL}/shop/product-image/?color=${color.id}`, {
+                const imageResponse = await fetch(`${API_ORIGIN}/shop/product-image/?color=${color.id}`, {
                   headers: { 'Authorization': `Token ${token}` },
                 });
                 const imageData = await imageResponse.json();
@@ -589,7 +596,7 @@ export default function EditProduct() {
       
       // Only delete from API if it was created (has numeric ID from API)
       if (!isNaN(Number(apiSizeId))) {
-        await fetch(`${API_BASE_URL}/shop/size/${apiSizeId}/`, {
+        await fetch(`${API_ORIGIN}/shop/size/${apiSizeId}/`, {
           method: 'DELETE',
           headers: { 'Authorization': `Token ${token}` },
         });
@@ -624,7 +631,7 @@ export default function EditProduct() {
 
       for (const size of sizes) {
         if (isNaN(Number(size.id))) {
-          const response = await fetch(`${API_BASE_URL}/shop/size/`, {
+          const response = await fetch(`${API_ORIGIN}/shop/size/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -696,7 +703,7 @@ export default function EditProduct() {
         };
 
         if (isNaN(Number(stock.id))) {
-          await fetch(`${API_BASE_URL}/shop/size-color-stock/`, {
+          await fetch(`${API_ORIGIN}/shop/size-color-stock/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -705,7 +712,7 @@ export default function EditProduct() {
             body: JSON.stringify(payload),
           });
         } else {
-          await fetch(`${API_BASE_URL}/shop/size-color-stock/${stock.id}/`, {
+          await fetch(`${API_ORIGIN}/shop/size-color-stock/${stock.id}/`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',

@@ -6,6 +6,6 @@
   "installCommand": "npm install",
   "buildCommand": "npm run build",
   "env": {
-    "NEXT_PUBLIC_API_BASE_URL": "http://localhost:8000/shop"
+    "NEXT_PUBLIC_API_BASE_URL": "https://api.karakoreanbeauty.com/shop"
   }
 }

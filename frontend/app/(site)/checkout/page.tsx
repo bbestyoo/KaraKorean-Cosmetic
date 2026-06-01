@@ -44,6 +44,15 @@ export default function CheckoutPage() {
   const shippingCost = subtotal > 5000 ? 0 : 120;
   const total = subtotal + shippingCost;
 
+
+const API_BASE_URL1 = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL1) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
+const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
@@ -93,7 +102,7 @@ export default function CheckoutPage() {
     // Submit order to backend
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/cart/api/checkout/', {
+      const response = await fetch(`${API_BASE_URL}/cart/api/checkout/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

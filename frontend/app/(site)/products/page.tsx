@@ -8,7 +8,12 @@ import { ChevronDown, ChevronLeft, ChevronRight, X, Heart, ShoppingBag } from 'l
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
 const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
 const PRICE_RANGES = [

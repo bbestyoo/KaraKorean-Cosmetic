@@ -9,21 +9,6 @@ import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 
-// Local resolution dictionary for mock products
-const PRODUCT_CATALOG: Record<string, { name: string; price: number; old_price?: number; image: string; category_name: string }> = {
-  '1': { name: 'COSRX Snail Mucin 96% Power Repairing Essence', price: 2800, old_price: 3200, category_name: 'Essence', image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop' },
-  '2': { name: 'Anua Heartleaf 77% Soothing Toner', price: 3100, category_name: 'Toner', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop' },
-  '3': { name: 'Some By Mi AHA BHA PHA 30 Days Miracle Toner', price: 1950, old_price: 2400, category_name: 'Toner', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop' },
-  '4': { name: 'Isntree Hyaluronic Acid Toner', price: 2200, category_name: 'Toner', image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop' },
-  '5': { name: 'Skin1004 Madagascar Centella Ampoule', price: 3500, old_price: 4000, category_name: 'Ampoule', image: 'https://images.unsplash.com/photo-1617897903246-719242758050?w=600&auto=format&fit=crop' },
-  '6': { name: 'Medicube Age R Booster Shot', price: 5200, category_name: 'Serum', image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&auto=format&fit=crop' },
-  '7': { name: 'Roundlab 1025 Dokdo Cleanser', price: 1800, old_price: 2000, category_name: 'Cleanser', image: 'https://images.unsplash.com/photo-1601612628452-9e99ced43524?w=600&auto=format&fit=crop' },
-  '8': { name: 'BOJ Ceramide Repair Cream', price: 4100, category_name: 'Moisturizer', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&auto=format&fit=crop' },
-  '9': { name: 'COSRX Advanced Snail 92 All in one Cream', price: 3300, old_price: 3800, category_name: 'Moisturizer', image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop' },
-  '10': { name: 'Anua Heartleaf Pore Control Cleansing Oil', price: 2700, category_name: 'Cleanser', image: 'https://images.unsplash.com/photo-1614159102043-d3b56a98b8bc?w=600&auto=format&fit=crop' },
-  '11': { name: 'Skin1004 Centella Hyalu-Cica Water-Fit Sun Serum', price: 2900, old_price: 3500, category_name: 'Sunscreen', image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&auto=format&fit=crop' },
-  '12': { name: 'Isntree C-Niacin Toning Ampoule', price: 3800, category_name: 'Ampoule', image: 'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=600&auto=format&fit=crop' },
-};
 
 function WishlistContent() {
   const { wishlist, addToWishlist, removeFromWishlist, clearWishlist } = useWishlist();
@@ -43,38 +28,7 @@ function WishlistContent() {
   // Shared items parsed from URL query parameter
   const [sharedItems, setSharedItems] = useState<WishlistItem[]>([]);
 
-  useEffect(() => {
-    setIsHydrated(true);
 
-    const sharedIds = searchParams.get('shared');
-    if (sharedIds) {
-      const ids = sharedIds.split(',');
-      const parsedItems: WishlistItem[] = [];
-      ids.forEach((id) => {
-        const item = PRODUCT_CATALOG[id];
-        if (item) {
-          parsedItems.push({
-            product_id: id,
-            name: item.name,
-            price: item.price,
-            old_price: item.old_price,
-            image: item.image,
-            category_name: item.category_name,
-          });
-        } else if (id.startsWith('featured-')) {
-          // Fallback parsing for featured items in FeaturedProducts
-          parsedItems.push({
-            product_id: id,
-            name: 'Featured RADIANCE Renewal Serum',
-            price: 89,
-            image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=600&auto=format&fit=crop',
-            category_name: 'Serum',
-          });
-        }
-      });
-      setSharedItems(parsedItems);
-    }
-  }, [searchParams]);
 
   if (!isHydrated) {
     return (
@@ -89,9 +43,16 @@ function WishlistContent() {
     setLoginError('');
     setIsLoading(true);
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
+const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
+
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
-      const response = await fetch(`${API_BASE_URL}/userauth/api/login/`, {
+      const response = await fetch(`${API_ORIGIN}/userauth/api/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: email, password }),

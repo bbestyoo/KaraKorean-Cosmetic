@@ -45,12 +45,20 @@ export default function OrderConfirmationPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [orderId, setOrderId] = useState<string>('');
 
+const API_BASE_URL1 = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL1) {
+  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+}
+
+const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
         const resolvedParams = await params;
         setOrderId(resolvedParams.id);
-        const response = await fetch(`http://localhost:8000/cart/api/${resolvedParams.id}/`, {
+        const response = await fetch(`${API_BASE_URL}/cart/api/${resolvedParams.id}/`, {
           headers: {
             'Content-Type': 'application/json',
           },
