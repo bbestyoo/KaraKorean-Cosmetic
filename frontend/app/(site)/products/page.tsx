@@ -116,7 +116,7 @@ function FilterDropdown({
             <button
               key={option}
               onClick={() => { onChange(option); setOpen(false); }}
-              className={`w-full text-left px-5 py-3 text-[12px] tracking-wide transition-colors border-b border-gray-50 last:border-b-0 ${value === option ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50'
+              className={`w-full text-left cursor-pointer px-5 py-3 text-[12px] tracking-wide transition-colors border-b border-gray-50 last:border-b-0 ${value === option ? 'bg-[#0f3b2b] text-white' : ' hover:bg-[#f0f0f0] hover:text-black'
                 }`}
             >
               {option}
@@ -214,7 +214,15 @@ function ProductsContent() {
         setLoading(true);
         setError('');
 
-        const firstResponse = await fetch(`${API_BASE_URL}/api/?page=1&page_size=100`);
+        const sp = new URLSearchParams(searchParamsString);
+        const usecaseParam = sp.get('usecase');
+        const featuredParam = sp.get('featured');
+
+        const firstQuery = new URLSearchParams({ page: '1', page_size: '100' });
+        if (usecaseParam) firstQuery.set('usecase', usecaseParam);
+        if (featuredParam) firstQuery.set('featured', featuredParam);
+
+        const firstResponse = await fetch(`${API_BASE_URL}/api/?${firstQuery.toString()}`);
         if (!firstResponse.ok) {
           throw new Error('Failed to fetch products');
         }
@@ -226,7 +234,10 @@ function ProductsContent() {
         const additionalPages = await Promise.all(
           Array.from({ length: Math.max(0, totalPages - 1) }, async (_, index) => {
             const page = index + 2;
-            const response = await fetch(`${API_BASE_URL}/api/?page=${page}&page_size=100`);
+            const q = new URLSearchParams({ page: String(page), page_size: '100' });
+            if (usecaseParam) q.set('usecase', usecaseParam);
+            if (featuredParam) q.set('featured', featuredParam);
+            const response = await fetch(`${API_BASE_URL}/api/?${q.toString()}`);
             if (!response.ok) return [];
             const data = await response.json();
             return Array.isArray(data?.results) ? data.results : [];
@@ -253,7 +264,7 @@ function ProductsContent() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [searchParamsString]);
 
   const categories = useMemo(
     () => ['All', ...Array.from(new Set(products.map((product) => product.category_name).filter(Boolean)))],

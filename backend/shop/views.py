@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Product, Comment, Size, ProductImage, Category, Brand, UseCase
 from math import ceil
-from .serializers import ProductSerializer, CommentSerializer, ReplySerializer, RatingSerializer, GetProductSerializer, SizeSerializer, ProductImageSerializer
+from .serializers import ProductSerializer, CommentSerializer, ReplySerializer, RatingSerializer, GetProductSerializer, SizeSerializer, ProductImageSerializer, UseCaseSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import filters, viewsets
@@ -621,16 +621,7 @@ class BrandViewSet(viewsets.ModelViewSet):
 
 class UseCaseViewSet(viewsets.ModelViewSet):
     queryset = UseCase.objects.all()
-    serializer_class = None
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_class(self):
-        from rest_framework import serializers
-        class UseCaseSerializer(serializers.ModelSerializer):
-            class Meta:
-                model = UseCase
-                fields = ['id', 'name']
-        return UseCaseSerializer
+    serializer_class = UseCaseSerializer
 
 
 class RecommendationsView(APIView):

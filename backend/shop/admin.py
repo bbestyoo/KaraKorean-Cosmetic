@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute, Variant, Size
+from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute, Variant, Size, UseCase
 from import_export.admin import ImportExportModelAdmin
 from .resources import ProductResource, ProductAttributeResource, ProductImageResource, BrandResource, SeriesResource, CategoryResource, SubCategoryResource
 # Register your models here.
@@ -50,6 +50,10 @@ class SubCategoryAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     model = SubCategory
     resource_class = ProductAttributeResource
 
+class UseCaseAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    model = UseCase
+    resource_class = ProductAttributeResource
+
 class ProductAttributeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     model = ProductAttribute
     resource_class = ProductAttributeResource
@@ -64,6 +68,7 @@ class ProductsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 admin.site.register(Product,ProductsAdmin)
+admin.site.register(UseCase,UseCaseAdmin)
 admin.site.register(Comment)
 admin.site.register(Repliess)
 admin.site.register(Brand, BrandAdmin)

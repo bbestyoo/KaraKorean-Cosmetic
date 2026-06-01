@@ -5,6 +5,7 @@ import Link from "next/link";
 import { RevealOnScroll } from "./RevealOnScroll";
 import useEmblaCarousel from "embla-carousel-react";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 import { useState, useEffect } from "react";
 import { useProductAPI } from "@/hooks/useProductAPI";
 
@@ -40,6 +41,7 @@ function normalizeProduct(product: any) {
 
 export default function FeaturedProducts() {
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addItem } = useCart();
   const [emblaRef] = useEmblaCarousel({ align: "start", loop: true });
   const { getProducts } = useProductAPI();
   const [products, setProducts] = useState<any[]>([]);
@@ -71,7 +73,7 @@ export default function FeaturedProducts() {
           </RevealOnScroll>
         </div>
         <RevealOnScroll direction="left" delay={200}>
-          <button className="mt-2 md:mt-0 px-6 py-3 border border-neutral-300 text-xs font-bold tracking-widest text-neutral-800 hover:bg-[#0f3b2b] cursor-pointer hover:text-white transition-colors">VIEW ALL PRODUCTS</button>
+          <Link href="/products?featured=true" className="mt-2 md:mt-0 px-6 py-3 border border-neutral-300 text-xs font-bold tracking-widest text-neutral-800 hover:bg-[#0f3b2b] cursor-pointer hover:text-white transition-colors inline-block text-center">VIEW ALL PRODUCTS</Link>
         </RevealOnScroll>
       </div>
 
@@ -130,7 +132,7 @@ export default function FeaturedProducts() {
                     </div>
 
                     <div className="mt-auto relative z-10">
-                      <h3 className="font-semibold text-sm sm:text-lg text-neutral-900 mb-1 leading-tight">{product.name}</h3>
+                      <h3 className="font-semibold text-sm sm:text-lg truncate text-neutral-900 mb-1 leading-tight">{product.name}</h3>
                       <p className="text-[0.6rem] font-bold tracking-widest text-neutral-500 uppercase mb-2 sm:mb-4 border-b border-neutral-300 border-dashed pb-2 sm:pb-4">{product.category}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-baseline gap-2">
@@ -139,8 +141,23 @@ export default function FeaturedProducts() {
                             <span className="text-xs text-neutral-400 line-through">Rs. {Number(product.old_price).toLocaleString()}</span>
                           )}
                         </div>
-                        <button className="bg-[#0f3b2b] text-white p-3 rounded-full hover:bg-black hover:scale-105 transition-all">
-                          <ShoppingCart className="w-4 h-4" />
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            addItem({
+                              product_id: product.product_id || `featured-${index}`,
+                              name: product.name,
+                              price: Number(product.price) || 0,
+                              size: 'Standard',
+                              quantity: 1,
+                              image: product.images?.[0]?.image || '/images/placeholder.png',
+                            });
+                          }}
+                          className="bg-[#0f3b2b] text-white p-3 rounded-full hover:bg-black hover:scale-105 transition-all"
+                          aria-label={`Add ${product.name} to cart`}
+                        >
+                          <ShoppingCart className="w-4 h-4 cursor-pointer" />
                         </button>
                       </div>
                     </div>

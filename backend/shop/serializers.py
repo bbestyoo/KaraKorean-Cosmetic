@@ -162,3 +162,9 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_stock(self, obj):
         total_stock = Size.objects.filter(product_id=obj.product_id).aggregate(total=Sum('stock'))['total']
         return total_stock if total_stock is not None else 0
+
+class UseCaseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UseCase
+        fields = '__all__'

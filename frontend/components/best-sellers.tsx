@@ -38,9 +38,8 @@ export default function BestSellers() {
             
             <Link
               href={(() => {
-                const parts = (card.link || '').split('/').filter(Boolean);
-                const category = parts.length ? parts[parts.length - 1] : '';
-                return `/products${category ? `?category=${encodeURIComponent(category)}` : ''}`;
+                const slug = (card.title || '').toString().replace(/\s+/g, '').toLowerCase();
+                return `/products?usecase=${encodeURIComponent(slug)}`;
               })()}
               className="group relative w-full h-full overflow-hidden block"
             >

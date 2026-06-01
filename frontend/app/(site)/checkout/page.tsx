@@ -157,13 +157,13 @@ export default function CheckoutPage() {
           <div className="lg:col-span-2">
             <div className="space-y-6">
               {/* Sign In Prompt */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="bg-[#0f3b2b]/10 border border-blue-200 rounded-lg p-6">
                 <div className="flex gap-3 items-start">
-                  <Mail size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                  <Mail size={20} className="text-[#0f3b2b] mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Already have an account?</h3>
                     <p className="text-sm text-gray-600 mb-4">Sign in to use saved addresses and track your orders.</p>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition-colors">
+                    <button className="px-4 py-2  text-white rounded font-semibold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b] border border-black transition-colors">
                       Sign In
                     </button>
                   </div>
@@ -372,7 +372,7 @@ export default function CheckoutPage() {
               <button
                 onClick={handleContinueToPayment}
                 disabled={isLoading}
-                className="w-full bg-red-500 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full  text-white py-4 rounded-lg font-bold text-lg bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b] border border-black  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Processing...' : `Place Order - NPR ${total.toLocaleString()}`}
               </button>
@@ -418,7 +418,7 @@ export default function CheckoutPage() {
                     placeholder="Enter promo code"
                     className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
-                  <button className="px-4 py-2 bg-purple-500 text-white rounded font-semibold hover:bg-purple-600 transition-colors">
+                  <button className="px-4 py-2  text-white rounded border border-black font-semibold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b]">
                     Apply
                   </button>
                 </div>
@@ -450,7 +450,7 @@ export default function CheckoutPage() {
 
               {/* Place Order Button */}
               <button
-                className="w-full bg-purple-500 text-white py-3 rounded-lg font-bold hover:bg-purple-600 transition-colors"
+                className="w-full  text-white py-3 rounded-lg font-bold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b] border border-black  transition-colors"
               >
                 Place Order - NPR {total.toLocaleString()}
               </button>

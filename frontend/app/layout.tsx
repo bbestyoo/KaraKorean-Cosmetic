@@ -24,39 +24,46 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Kara Korean Store(Coming Soon)",
+  title: "Kara — Korean Beauty Store",
   description:
-    "Aama Ko Nana – आमाको न्यानोपनको अनुभूति | Countdown to a new crafted experience blending design, narrative & commerce.",
+    "Kara brings authentic Korean skincare and beauty products to Kathmandu and across Nepal. Shop curated K‑beauty brands, discover routines, and enjoy local delivery.",
   keywords: [
-    "Aama Ko Nana",
-    "coming soon",
-    "design",
-    "portfolio",
-    "commerce",
+    "Kara",
+    "Korean beauty",
+    "K-beauty",
+    "skincare",
+    "Kathmandu",
     "Nepal",
+    "COSRX",
+    "Isntree",
   ],
   openGraph: {
-    title: "Aama Ko Nana — Coming Soon",
-    description: "आमाको न्यानोपनको अनुभूति. A bold creative & commerce destination in the making.",
-    url: "https://example.com",
-    siteName: "Aama Ko Nana",
+    title: "Kara — Korean Beauty Store",
+    description: "Kara brings authentic Korean skincare and beauty products to Kathmandu and across Nepal.",
+    url: "https://kara.example.com",
+    siteName: "Kara",
     images: [
       {
-        url: "/og-image.png",
+        url: "/images/logos/karalogo.jpg",
         width: 1200,
         height: 630,
-        alt: "Aama Ko Nana Coming Soon",
+        alt: "Kara Korean Beauty Store",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Aama Ko Nana — Coming Soon",
-    description: "आमाको न्यानोपनको अनुभूति.",
-    images: ["/og-image.png"],
+    title: "Kara — Korean Beauty Store",
+    description: "Kara brings authentic Korean skincare and beauty products to Kathmandu and across Nepal.",
+    images: ["/images/logos/karalogo.jpg"],
   },
-  robots: { index: false, follow: true },
+  robots: { index: true, follow: true },
+  icons: {
+    icon: '/images/logos/karalogo.jpg',
+    shortcut: '/images/logos/karalogo.jpg',
+    apple: '/images/logos/karalogo.jpg',
+  },
 };
 
 export default function RootLayout({
@@ -67,6 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/images/logos/karalogo.jpg" />
         {/* Google Analytics */}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-X327RLYMX5" />
         <Script id="google-analytics">
