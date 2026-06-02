@@ -23,7 +23,7 @@ class Product(models.Model):
     old_price = models.FloatField(null=True,blank=True)
     before_deal_price = models.FloatField(null=True,blank=True)
     price = models.IntegerField(default=0)
-    description= RichTextField()
+    description= RichTextField(null=True, blank=True)
     meta_description = models.TextField(blank=True)
     meta_keywords = models.TextField(blank=True)
     published_date = models.DateField(default=date.today)
