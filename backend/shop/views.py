@@ -576,12 +576,10 @@ class TaggedProductsView(APIView):
 class SizeViewSet(viewsets.ModelViewSet):
     queryset = Size.objects.all()
     serializer_class = SizeSerializer
-    permission_classes = [IsAuthenticated]
 
 class ProductImageViewSet(viewsets.ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = ProductImage.objects.all()
@@ -595,7 +593,6 @@ class ProductImageViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = None
-    permission_classes = [IsAuthenticated]
     
     def get_serializer_class(self):
         from rest_framework import serializers
@@ -608,7 +605,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class BrandViewSet(viewsets.ModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = None
-    permission_classes = [IsAuthenticated]
     
     def get_serializer_class(self):
         from rest_framework import serializers
