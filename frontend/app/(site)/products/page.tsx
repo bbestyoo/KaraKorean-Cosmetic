@@ -97,6 +97,7 @@ function FilterDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -105,6 +106,29 @@ function FilterDropdown({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // When the dropdown is open, stop propagation of wheel/touch events
+  // from the dropdown panel so global smooth-scrollers (Lenis) don't
+  // intercept them and prevent two-finger scrolling inside the panel.
+  useEffect(() => {
+    if (!open) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const stopProp = (e: Event) => {
+      e.stopPropagation();
+    };
+
+    el.addEventListener('wheel', stopProp as EventListener, { passive: false, capture: true });
+    el.addEventListener('touchstart', stopProp as EventListener, { passive: false, capture: true });
+    el.addEventListener('touchmove', stopProp as EventListener, { passive: false, capture: true });
+
+    return () => {
+      el.removeEventListener('wheel', stopProp as EventListener, { capture: true } as EventListenerOptions);
+      el.removeEventListener('touchstart', stopProp as EventListener, { capture: true } as EventListenerOptions);
+      el.removeEventListener('touchmove', stopProp as EventListener, { capture: true } as EventListenerOptions);
+    };
+  }, [open]);
 
   return (
     <div ref={ref} className="relative">
@@ -116,7 +140,7 @@ function FilterDropdown({
         <ChevronDown size={12} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-0 w-52 h-64 overflow-y-auto bg-white border border-gray-200 shadow-lg z-30">
+        <div ref={scrollRef} className="absolute top-full left-0 mt-0 w-52 h-64 overflow-y-auto bg-white border border-gray-200 shadow-lg z-30">
           {options.map((option) => (
             <button
               key={option}
