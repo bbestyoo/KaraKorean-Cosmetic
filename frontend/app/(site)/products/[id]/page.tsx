@@ -258,19 +258,17 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   return <main className="min-h-screen bg-white text-neutral-900">
       <div className="flex flex-col lg:flex-row lg:items-start">
         <section
-          className="w-full lg:w-1/2 flex flex-col"
+          className="w-full lg:w-1/2 flex flex-col "
           aria-label="Product gallery"
         >
           {(product.images.length > 0 ? product.images : [{ image: '/images/placeholder.png' }]).map((img, idx) => (
-            <div
-              key={`${img.image}-${idx}`}
-              className="relative w-full aspect-[3/4] bg-neutral-100"
-            >
+            <div key={`${img.image}-${idx}`} className="w-full bg-neutral-100 overflow-hidden">
               <Image
                 src={img.image}
                 alt={`${product.name} — view ${idx + 1}`}
-                fill
-                className="object-cover"
+                width={1200}
+                height={1600}
+                className="w-full h-auto object-contain"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority={idx === 0}
               />

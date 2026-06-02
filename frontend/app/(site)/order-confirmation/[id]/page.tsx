@@ -296,13 +296,13 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
           <button
             onClick={() => router.push('/products')}
-            className="bg-red-500 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-600 transition-colors"
+            className="bg-[#0f3b2b] cursor-pointer text-white py-4 rounded-lg  border font-bold text-lg hover:bg-white hover:text-[#0f3b2b] hover:border hover:border-[#0f3b2b] transition-colors"
           >
             Continue Shopping
           </button>
           <button
             onClick={() => router.push('/')}
-            className="border-2 border-gray-300 text-gray-900 py-4 rounded-lg font-bold text-lg hover:border-gray-400 transition-colors"
+            className="border-2 border-gray-300 hover:bg-[#0f3b2b] hover:text-white  cursor-pointer text-gray-900 py-4 rounded-lg font-bold text-lg hover:border-gray-400 transition-colors"
           >
             Back to Home
           </button>

@@ -494,7 +494,7 @@ function ProductsContent() {
               {paginatedProducts.map((product) => (
                 <div
                   key={product.product_id}
-                  className="group relative"
+                  className="group relative "
                 >
                   <Link href={`/products/${product.product_id}`} className="block">
                     {/* Image */}
@@ -531,7 +531,7 @@ function ProductsContent() {
                       className="p-2 rounded-full bg-white shadow-sm  cursor-pointer hover:scale-105 transition-all text-neutral-900"
                     >
                       <Heart
-                        size={16}
+                        size={20}
                         className={`${isInWishlist(product.product_id) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}} hover:text-[#c9a46b] `}
                       />
                     </button>
@@ -551,7 +551,7 @@ function ProductsContent() {
                       className="p-2 rounded-full bg-white  shadow-sm hover:scale-105 transition-all text-neutral-900 cursor-pointer"
                     >
                       <ShoppingBag
-                        size={16}
+                        size={20}
                         className="text-neutral-900 hover:text-[#c9a46b] transition-colors "
                       />
                     </button>
@@ -559,15 +559,15 @@ function ProductsContent() {
 
                   {/* Details */}
                   <Link href={`/products/${product.product_id}`} className="block">
-                    <p className="text-[12px] text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black transition-colors">
+                    <p className="text-[12px] md:text-lg text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black group-hover:font-medium transition-colors">
                       {product.name}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px] text-gray-800">
+                      <span className="text-[13px] md:text-lg font-medium text-gray-800">
                         Rs.&nbsp;{product.price.toLocaleString()}
                       </span>
                       {product.old_price && (
-                        <span className="text-[12px] text-gray-400 line-through">
+                        <span className="text-[12px] md:text-md  text-gray-400 line-through">
                           Rs.&nbsp;{product.old_price.toLocaleString()}
                         </span>
                       )}
