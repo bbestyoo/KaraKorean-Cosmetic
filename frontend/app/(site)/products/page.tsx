@@ -116,7 +116,7 @@ function FilterDropdown({
         <ChevronDown size={12} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-0 w-52 bg-white border border-gray-200 shadow-lg z-30">
+        <div className="absolute top-full left-0 mt-0 w-52 h-64 overflow-y-auto bg-white border border-gray-200 shadow-lg z-30">
           {options.map((option) => (
             <button
               key={option}
@@ -271,14 +271,45 @@ function ProductsContent() {
     };
   }, [searchParamsString]);
 
-  const categories = useMemo(
-    () => ['All', ...Array.from(new Set(products.map((product) => product.category_name).filter(Boolean)))],
-    [products]
-  );
-  const brands = useMemo(
-    () => ['All', ...Array.from(new Set(products.map((product) => product.brand).filter(Boolean)))],
-    [products]
-  );
+  const [categories, setCategories] = useState<string[]>(['All']);
+  const [brands, setBrands] = useState<string[]>(['All']);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const [catRes, brandRes] = await Promise.all([
+          fetch(`${API_ORIGIN}/shop/category/`),
+          fetch(`${API_ORIGIN}/shop/brand/`),
+        ]);
+
+        const catData = await (catRes.ok ? catRes.json() : Promise.resolve([]));
+        const brandData = await (brandRes.ok ? brandRes.json() : Promise.resolve([]));
+
+        const parseList = (arr: any): string[] => {
+          if (!Array.isArray(arr)) return [];
+          return arr
+            .map((it) => {
+              if (typeof it === 'string') return it;
+              return it?.name ?? it?.category_name ?? it?.title ?? it?.label ?? '';
+            })
+            .filter(Boolean);
+        };
+
+        const catList = parseList(catData);
+        const brandList = parseList(brandData);
+
+        if (mounted) {
+          setCategories(['All', ...Array.from(new Set(catList))]);
+          setBrands(['All', ...Array.from(new Set(brandList))]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch categories or brands', err);
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, []);
 
   // Normalize selectedCategory/Brand to match actual option casing after products load
   useEffect(() => {

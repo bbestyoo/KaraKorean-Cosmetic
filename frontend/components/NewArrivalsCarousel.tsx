@@ -4,64 +4,29 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useProductAPI } from "@/hooks/useProductAPI";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   brand: string;
   price: string;
-  oldPrice: string;
+  oldPrice?: string;
   image: string;
-  link: string;
+  link?: string;
 }
-
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Glow Ampoule",
-    brand: "COSRX · 30ml",
-    price: "Rs. 2,800",
-    oldPrice: "Rs. 3,800",
-    image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=600&auto=format&fit=crop",
-    link: "/skincare",
-  },
-  {
-    id: 2,
-    name: "Relief Sun",
-    brand: "Beauty of Joseon · 50ml",
-    price: "Rs. 2,900",
-    oldPrice: "Rs. 3,900",
-    image: "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=600&auto=format&fit=crop",
-    link: "/skincare",
-  },
-  {
-    id: 3,
-    name: "Snail Mucin",
-    brand: "COSRX · 100ml",
-    price: "Rs. 3,200",
-    oldPrice: "Rs. 4,200",
-    image: "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=600&auto=format&fit=crop",
-    link: "/skincare",
-  },
-  {
-    id: 4,
-    name: "Heartleaf Toner",
-    brand: "Anua · 250ml",
-    price: "Rs. 3,500",
-    oldPrice: "Rs. 4,500",
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=600&auto=format&fit=crop",
-    link: "/skincare",
-  },
-];
 
 export default function NewArrivalsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [fadeState, setFadeState] = useState<"in" | "out">("in");
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { getProducts, loading, error } = useProductAPI();
+  const [products, setProducts] = useState<Product[]>([]);
 
   const startTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
+    if (!products || products.length <= 1) return;
     timerRef.current = setInterval(() => {
       handleNext();
     }, 4000);
@@ -76,9 +41,57 @@ export default function NewArrivalsCarousel() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [currentIndex, isPaused]);
+  }, [currentIndex, isPaused, products.length]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await getProducts(1, { trending: true, page_size: 6 });
+        const items = Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [];
+        if (!mounted) return;
+        const mapped = items.map((item: any, index: number) => {
+          const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+          const API_ORIGIN = API_BASE_URL ? API_BASE_URL.replace(/\/shop\/?$/, '') : '';
+          const resolveImageUrl = (image?: string | null) => {
+            if (!image) return '/images/placeholder.png';
+            if (image.startsWith('http://') || image.startsWith('https://')) return image;
+            const normalizedPath = image.startsWith('/') ? image : `/${image}`;
+            return new URL(normalizedPath, API_ORIGIN).toString();
+          };
+
+          const images = Array.isArray(item.images)
+            ? item.images
+            : item.images
+              ? [item.images]
+              : item.image
+                ? [item.image]
+                : [];
+
+          const image = images.length ? resolveImageUrl(images[0].image ?? images[0]) : '/images/placeholder.png';
+
+          return {
+            id: item.product_id ?? String(item.id ?? item.pk ?? index),
+            name: item.name ?? item.title ?? item.product_name ?? 'Product',
+            brand: item.brand ?? item.brand_name ?? item.category_name ?? '',
+            price: `Rs. ${Number(item.price ?? 0).toLocaleString()}`,
+            oldPrice: item.old_price !== undefined ? `Rs. ${Number(item.old_price).toLocaleString()}` : undefined,
+            image,
+            link: `/products/${item.product_id ?? item.id ?? ''}`,
+          } as Product;
+        });
+        setProducts(mapped);
+        setCurrentIndex(0);
+      } catch (err) {
+        console.error('Failed to load new arrivals', err);
+        if (mounted) setProducts([]);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [getProducts]);
 
   const handleNext = () => {
+    if (!products || products.length <= 1) return;
     setFadeState("out");
     setTimeout(() => {
       setCurrentIndex((prev) => (prev + 1) % products.length);
@@ -87,6 +100,7 @@ export default function NewArrivalsCarousel() {
   };
 
   const handlePrev = () => {
+    if (!products || products.length <= 1) return;
     setFadeState("out");
     setTimeout(() => {
       setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
@@ -95,6 +109,7 @@ export default function NewArrivalsCarousel() {
   };
 
   const handleDotClick = (index: number) => {
+    if (!products || products.length <= 1) return;
     if (index === currentIndex) return;
     setFadeState("out");
     setTimeout(() => {
@@ -103,7 +118,7 @@ export default function NewArrivalsCarousel() {
     }, 300);
   };
 
-  const currentProduct = products[currentIndex];
+  const currentProduct = products[currentIndex] ?? products[0];
 
   const { addItem } = useCart();
 
@@ -122,6 +137,28 @@ export default function NewArrivalsCarousel() {
       image: product.image,
     });
   };
+
+  if (products.length === 0) {
+    if (loading) {
+      return (
+        <div className="flex flex-col lg:w-[480px] items-center justify-center p-4">
+          <div className="text-sm text-neutral-500">Loading new arrivals…</div>
+        </div>
+      );
+    }
+    if (error) {
+      return (
+        <div className="flex flex-col lg:w-[480px] items-center justify-center p-4">
+          <div className="text-sm text-red-500">Failed to load new arrivals</div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col lg:w-[480px] items-center justify-center p-4">
+        <div className="text-sm text-neutral-500">No new arrivals</div>
+      </div>
+    );
+  }
 
   return (
     <div

@@ -6,6 +6,7 @@ import { ChevronDown, Minus, Plus } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { ProductRecommendations } from '@/components/ProductRecommendations';
 import ProductReviews from '@/components/ProductReviews';
+import DOMPurify from "dompurify";
 
 interface ProductImage {
   image: string;
@@ -36,6 +37,7 @@ interface Size {
 interface Product {
   product_id: string;
   name: string;
+  description?: string | null;
   category: string;
   price: number;
   old_price: number | null;
@@ -67,6 +69,7 @@ const emptyRatingDict = (): Record<number, number> => ({
 interface ApiProduct extends Omit<Product, 'category' | 'images'> {
   category?: string | null;
   images?: ProductImage[];
+  description?: string | null;
 }
 
 function resolveImageUrl(image?: string | null) {
@@ -268,7 +271,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 alt={`${product.name} — view ${idx + 1}`}
                 width={1200}
                 height={1600}
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain  select-none pointer-events-none"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority={idx === 0}
               />
@@ -277,7 +280,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         </section>
 
         <aside className="w-full  lg:w-1/2 lg:sticky lg:top-0 bg-white px-6 py-10 sm:px-12 sm:py-14 lg:p-20">
-          <div className="max-w-[880px] space-y-12">
+          <div className="max-w-[880px] space-y-3">
             {/* Header / Title */}
             <header className="space-y-6">
               <h1 className="text-3xl sm:text-4xl lg:text-[2.5rem] capitalize font-light tracking-wide text-neutral-900 leading-tight">
@@ -372,6 +375,17 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               {showValidationErrors && !selectedSize && (
                 <p className="text-sm text-red-600 mt-2">Please select a size.</p>
               )}
+
+              {/* Description */}
+              <div className="grid grid-cols-[100px_1fr] items-center gap-6">
+                <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Description:</span>
+               <div
+  className="text-md text-neutral-700 "
+  dangerouslySetInnerHTML={{
+    __html: DOMPurify.sanitize(product.description ?? "No description available."),
+  }}
+/>
+              </div>
             </div>
 
             {/* Accordions */}
