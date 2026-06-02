@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Kara — Korean Beauty Store",
     description: "Kara brings authentic Korean skincare and beauty products to Kathmandu and across Nepal.",
-    url: "https://kara.example.com",
+    url: "https://karakoreanbeauty.com",
     siteName: "Kara",
     images: [
       {
@@ -74,7 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/images/logos/karalogo.jpg" />
+        <link rel="icon" href="/images/logos/karalogo.png" />
         {/* Google Analytics */}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-X327RLYMX5" />
         <Script id="google-analytics">

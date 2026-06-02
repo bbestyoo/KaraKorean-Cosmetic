@@ -67,12 +67,7 @@ const generatePost = (id: string): BlogPost => {
   };
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-if (!API_BASE_URL) {
-  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');1
-}
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
 const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
 function resolveImageUrl(image?: string | null) {
@@ -93,6 +88,8 @@ function htmlToParagraphs(html = '') {
   return flat ? [flat] : [];
 }
 
+// Related posts will be fetched from the backend and filtered client-side.
+// The old hard-coded sample data was removed to use live blog posts instead.
 
 export default function SingleBlogPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -162,6 +159,50 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
     if (post) window.scrollTo({ top: 0, behavior: 'instant' });
   }, [post]);
 
+  const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
+  const [relatedLoading, setRelatedLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchRelated = async () => {
+      try {
+        setRelatedLoading(true);
+        const res = await fetch(`${API_ORIGIN}/blog/api/`);
+        if (!res.ok) throw new Error('Failed to fetch related posts');
+        const data = await res.json();
+        const normalized = (Array.isArray(data) ? data : []).map((p: any) => {
+          const contentText = stripHtml(p.content || '');
+          const wordCount = contentText.split(/\s+/).filter(Boolean).length || 0;
+          return {
+            id: p.id,
+            title: p.title,
+            excerpt: contentText.slice(0, 180) + (contentText.length > 180 ? '...' : ''),
+            category: p.category || 'Other',
+            date: p.date ? new Date(p.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+            image: resolveImageUrl(p.image),
+            readTime: `${Math.max(1, Math.ceil(wordCount / 200))} min read`,
+            views: p.views || ''
+          };
+        });
+
+        if (mounted) setRelatedPosts(normalized);
+      } catch (err) {
+        console.error('Error fetching related posts:', err);
+      } finally {
+        if (mounted) setRelatedLoading(false);
+      }
+    };
+
+    fetchRelated();
+    return () => { mounted = false; };
+  }, [blogId]);
+
+  const filteredRelated = relatedPosts.filter(p => {
+    const matchesCategory = activeFilter === "All" || p.category === activeFilter;
+    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch && String(p.id) !== String(post?.id);
+  });
 
   if (loading || !post) {
     return (
@@ -305,7 +346,7 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
             <h3>Add a Review</h3>
             <div className="single-blog-add-review-subtitle">
               <div className="single-blog-add-review-subtitle-text">
-                Be the first to review <span>Spectacular views of Queenstown</span>
+                Be the first to review <span>{post.title}</span>
               </div>
 
               <div className="single-blog-review-stars">
@@ -431,6 +472,7 @@ export default function SingleBlogPage({ params }: { params: Promise<{ id: strin
 
         </div>
       </main>
+      <Footer />
     </>
   );
 }

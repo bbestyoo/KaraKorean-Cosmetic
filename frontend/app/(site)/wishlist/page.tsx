@@ -8,7 +8,7 @@ import { Heart, Share2, LogIn, X, Clipboard, Check, ShoppingBag, Plus } from 'lu
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-
+import { useProductAPI } from '@/hooks/useProductAPI';
 
 function WishlistContent() {
   const { wishlist, addToWishlist, removeFromWishlist, clearWishlist } = useWishlist();
@@ -27,8 +27,60 @@ function WishlistContent() {
 
   // Shared items parsed from URL query parameter
   const [sharedItems, setSharedItems] = useState<WishlistItem[]>([]);
+  const { getProduct } = useProductAPI();
+  useEffect(() => {
+    setIsHydrated(true);
 
+    const sharedIds = searchParams.get('shared');
+    if (!sharedIds) return;
 
+    const ids = sharedIds.split(',');
+
+    const fetchShared = async () => {
+      const parsedItems: WishlistItem[] = [];
+
+      for (const id of ids) {
+        if (id.startsWith('featured-')) {
+          parsedItems.push({
+            product_id: id,
+            name: 'Featured RADIANCE Renewal Serum',
+            price: 89,
+            image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=600&auto=format&fit=crop',
+            category_name: 'Serum',
+          });
+          continue;
+        }
+
+        try {
+          const data: any = await getProduct(id);
+          if (data) {
+            parsedItems.push({
+              product_id: String(data.id || id),
+              name: data.title || data.name || data.product_name || 'Product',
+              price: data.price || data.selling_price || data.sale_price || 0,
+              old_price: data.old_price || data.list_price || undefined,
+              image: data.image || (data.images && data.images[0]) || 'https://via.placeholder.com/400',
+              category_name: data.category?.name || data.category_name || data.category || '',
+            });
+            continue;
+          }
+        } catch (e) {
+          // ignore and fallback to placeholder
+        }
+
+        parsedItems.push({
+          product_id: id,
+          name: 'Unknown Product',
+          price: 0,
+          image: 'https://via.placeholder.com/400',
+        });
+      }
+
+      setSharedItems(parsedItems);
+    };
+
+    fetchShared();
+  }, [searchParams, getProduct]);
 
   if (!isHydrated) {
     return (
@@ -43,16 +95,9 @@ function WishlistContent() {
     setLoginError('');
     setIsLoading(true);
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-if (!API_BASE_URL) {
-  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
-}
-
-const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
-
     try {
-      const response = await fetch(`${API_ORIGIN}/userauth/api/login/`, {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
+      const response = await fetch(`${API_BASE_URL}/userauth/api/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: email, password }),
