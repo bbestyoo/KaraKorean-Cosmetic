@@ -23,9 +23,9 @@ from rest_framework.permissions import IsAuthenticated
 #function based view ma image ko right path janna only relative path like / media/shop/images bata janxa so class based use grya
 
 class CustomPagination(PageNumberPagination):
-    page_size = 100
+    page_size = 16
     page_size_query_param = 'page_size'
-    max_page_size = 100
+    max_page_size = 16
     
     def get_paginated_response(self, data):
         return Response({
