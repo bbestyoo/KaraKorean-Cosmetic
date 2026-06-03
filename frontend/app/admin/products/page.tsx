@@ -76,14 +76,14 @@ export default function AdminProducts() {
     try {
       setLoading(true);
       const token = localStorage.getItem('auth_token');
-      
+
       // Build query parameters
       const params = new URLSearchParams();
       params.append('page', page.toString());
       if (search.trim()) {
         params.append('search', search);
       }
-      
+
       const response = await fetch(`${API_BASE_URL}/shop/api/admin/search/?${params}`, {
         headers: { 'Authorization': `Token ${token}` },
       });
@@ -105,7 +105,7 @@ export default function AdminProducts() {
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setCurrentPage(1);
-    
+
     // Client-side filtering
     if (value.trim()) {
       const filtered = allProducts.filter((p) =>
@@ -278,11 +278,10 @@ export default function AdminProducts() {
                           </td>
                           <td className="py-3 px-4 text-sm text-gray-600">
                             <span
-                              className={`px-2 py-1 rounded text-xs font-medium ${
-                                (product.stock || 0) > 0
+                              className={`px-2 py-1 rounded text-xs font-medium ${(product.stock || 0) > 0
                                   ? 'bg-green-100 text-green-800'
                                   : 'bg-red-100 text-red-800'
-                              }`}
+                                }`}
                             >
                               {product.stock || 0} units
                             </span>

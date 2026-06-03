@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Lenis from 'lenis';
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const lenisRef = useRef<Lenis | null>(null);
 
   // Disable Lenis for admin routes
   const isAdminRoute = pathname.startsWith('/admin');
@@ -18,6 +19,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
       smoothWheel: true,
     });
+    lenisRef.current = lenis;
 
     let frameId = 0;
     let resizeFrameId = 0;
@@ -57,8 +59,24 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener("resize", scheduleResize);
       window.removeEventListener("load", scheduleResize);
       lenis.destroy();
+      lenisRef.current = null;
     };
-  }, [isAdminRoute, pathname]);
+  }, [isAdminRoute]);
+
+  // Handle route transitions
+  useEffect(() => {
+    if (!lenisRef.current) return;
+
+    // Immediately scroll to top on route change
+    lenisRef.current.scrollTo(0, { immediate: true });
+
+    // Resize Lenis after DOM updates
+    const timer = setTimeout(() => {
+      lenisRef.current?.resize();
+    }, 80);
+
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   return <>{children}</>;
 }

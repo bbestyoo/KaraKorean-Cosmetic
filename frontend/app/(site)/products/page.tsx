@@ -373,267 +373,72 @@ function ProductsContent() {
 
   return (
     <>
-    <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-white">
 
-      {/* ── TOP FILTER BAR ── */}
-      <div className="border-b border-gray-200 bg-white">
-        <div className="max-w-[1600px] mx-auto flex items-stretch divide-x divide-gray-200">
-          <FilterDropdown
-            label="Category"
-            options={categories}
-            value={selectedCategory}
-            onChange={(v) => {
-              setSelectedCategory(v);
-              resetPage();
-              updateUrl({ category: v, page: 1 });
-            }}
-          />
-          <FilterDropdown
-            label="Brand"
-            options={brands}
-            value={selectedBrand}
-            onChange={(v) => {
-              setSelectedBrand(v);
-              resetPage();
-              updateUrl({ brand: v, page: 1 });
-            }}
-          />
-          <FilterDropdown
-            label="Price"
-            options={PRICE_RANGES.map(r => r.label)}
-            value={selectedPriceRange}
-            onChange={(v) => {
-              setSelectedPriceRange(v);
-              resetPage();
-              updateUrl({ price: v, page: 1 });
-            }}
-          />
-        </div>
-      </div>
-
-      <div className="max-w-[1700px] mx-auto px-4 sm:px-5">
-
-        {/* ── SORT BAR + PAGINATION ── */}
-        <div className="flex items-center justify-between py-4 border-b border-gray-100">
-          {/* Sort by */}
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-gray-500 tracking-wider">Sort by</span>
-            <div className="relative">
-              <select
-                value={selectedSort}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setSelectedSort(val);
-                  resetPage();
-                  updateUrl({ sort: val, page: 1 });
-                }}
-                className="appearance-none text-[12px] font-medium text-gray-800 pr-5 cursor-pointer bg-transparent outline-none border-b border-gray-300 pb-0.5 hover:border-gray-800 transition-colors"
-              >
-                {SORT_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              <ChevronDown size={11} className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" />
-            </div>
-          </div>
-
-          {/* Pagination controls */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setCurrentPage(p => {
-                const newP = Math.max(1, p - 1);
-                updateUrl({ page: newP });
-                return newP;
-              })}
-              disabled={currentPage === 1}
-              className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors"
-            >
-              <ChevronLeft size={14} />
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => {
-                  setCurrentPage(page);
-                  updateUrl({ page });
-                }}
-                className={`w-7 h-7 text-[12px] flex items-center justify-center transition-colors ${currentPage === page
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-600 hover:text-black'
-                  }`}
-              >
-                {page}
-              </button>
-            ))}
-            <button
-              onClick={() => setCurrentPage(p => {
-                const newP = Math.min(totalPages, p + 1);
-                updateUrl({ page: newP });
-                return newP;
-              })}
-              disabled={currentPage === totalPages}
-              className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors"
-            >
-              <ChevronRight size={14} />
-            </button>
+        {/* ── TOP FILTER BAR ── */}
+        <div className="border-b border-gray-200 bg-white">
+          <div className="max-w-[1600px] mx-auto flex items-stretch divide-x divide-gray-200">
+            <FilterDropdown
+              label="Category"
+              options={categories}
+              value={selectedCategory}
+              onChange={(v) => {
+                setSelectedCategory(v);
+                resetPage();
+                updateUrl({ category: v, page: 1 });
+              }}
+            />
+            <FilterDropdown
+              label="Brand"
+              options={brands}
+              value={selectedBrand}
+              onChange={(v) => {
+                setSelectedBrand(v);
+                resetPage();
+                updateUrl({ brand: v, page: 1 });
+              }}
+            />
+            <FilterDropdown
+              label="Price"
+              options={PRICE_RANGES.map(r => r.label)}
+              value={selectedPriceRange}
+              onChange={(v) => {
+                setSelectedPriceRange(v);
+                resetPage();
+                updateUrl({ price: v, page: 1 });
+              }}
+            />
           </div>
         </div>
 
-        {/* ── PAGE TITLE ── */}
-        <h1 className="text-3xl font-serif text-gray-800 mt-8 mb-8 font-normal">
-          Korean Beauty Shop
-        </h1>
+        <div className="max-w-[1700px] mx-auto px-4 sm:px-5">
 
-        {loading && products.length === 0 && (
-          <div className="py-24 text-center text-sm text-gray-500">
-            Loading products...
-          </div>
-        )}
-
-        {!loading && error && products.length === 0 && (
-          <div className="py-24 text-center">
-            <p className="text-gray-500 text-sm mb-4">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
-        {/* ── ACTIVE FILTERS ── */}
-        {(selectedCategory !== 'All' || selectedBrand !== 'All' || selectedPriceRange !== 'All Prices') && (
-          <div className="flex items-center gap-2 mb-6 flex-wrap">
-            <span className="text-[11px] text-gray-400 uppercase tracking-wider">Active filters:</span>
-            {selectedCategory !== 'All' && (
-              <button
-                onClick={() => { setSelectedCategory('All'); resetPage(); updateUrl({ category: 'All', page: 1 }); }}
-                className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
-              >
-                {selectedCategory}
-                <X size={10} />
-              </button>
-            )}
-            {selectedBrand !== 'All' && (
-              <button
-                onClick={() => { setSelectedBrand('All'); resetPage(); updateUrl({ brand: 'All', page: 1 }); }}
-                className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
-              >
-                {selectedBrand}
-                <X size={10} />
-              </button>
-            )}
-            {selectedPriceRange !== 'All Prices' && (
-              <button
-                onClick={() => { setSelectedPriceRange('All Prices'); resetPage(); updateUrl({ price: 'All Prices', page: 1 }); }}
-                className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
-              >
-                {selectedPriceRange}
-                <X size={10} />
-              </button>
-            )}
-            <button
-              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); resetPage(); updateUrl({ category: 'All', brand: 'All', price: 'All Prices', page: 1 }); }}
-              className="text-[11px] text-gray-400 underline hover:text-gray-800 ml-2"
-            >
-              Clear all
-            </button>
-          </div>
-        )}
-
-        {/* ── PRODUCT GRID ── */}
-        {paginatedProducts.length > 0 ? (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12 mb-20">
-              {paginatedProducts.map((product) => (
-                <div
-                  key={product.product_id}
-                  className="group relative "
+          {/* ── SORT BAR + PAGINATION ── */}
+          <div className="flex items-center justify-between py-4 border-b border-gray-100">
+            {/* Sort by */}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-gray-500 tracking-wider">Sort by</span>
+              <div className="relative">
+                <select
+                  value={selectedSort}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedSort(val);
+                    resetPage();
+                    updateUrl({ sort: val, page: 1 });
+                  }}
+                  className="appearance-none text-[12px] font-medium text-gray-800 pr-5 cursor-pointer bg-transparent outline-none border-b border-gray-300 pb-0.5 hover:border-gray-800 transition-colors"
                 >
-                  <Link href={`/products/${product.product_id}`} className="block">
-                    {/* Image */}
-                    <div className="aspect-square bg-[#f2f2f2] overflow-hidden relative mb-3">
-                      <Image
-                        src={product.images[0]?.image || '/images/placeholder.png'}
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      {product.old_price && (
-                        <div className="absolute top-3 left-3 bg-gray-900 text-white text-[9px] uppercase tracking-widest px-2 py-1">
-                          Sale
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-
-                  {/* Actions Overlay */}
-                  <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleWishlist({
-                          product_id: product.product_id,
-                          name: product.name,
-                          price: product.price,
-                          old_price: product.old_price || undefined,
-                          image: product.images[0]?.image || '/images/placeholder.png',
-                          category_name: product.category_name,
-                        });
-                      }}
-                      className="p-2 rounded-full bg-white shadow-sm  cursor-pointer hover:scale-105 transition-all text-neutral-900"
-                    >
-                      <Heart
-                        size={20}
-                        className={`${isInWishlist(product.product_id) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}} hover:text-[#c9a46b] `}
-                      />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        addItem({
-                          product_id: product.product_id,
-                          name: product.name,
-                          price: product.price,
-                          size: 'Standard',
-                          quantity: 1,
-                          image: product.images[0]?.image || '/images/placeholder.png',
-                        });
-                      }}
-                      className="p-2 rounded-full bg-white  shadow-sm hover:scale-105 transition-all text-neutral-900 cursor-pointer"
-                    >
-                      <ShoppingBag
-                        size={20}
-                        className="text-neutral-900 hover:text-[#c9a46b] transition-colors "
-                      />
-                    </button>
-                  </div>
-
-                  {/* Details */}
-                  <Link href={`/products/${product.product_id}`} className="block">
-                    <p className="text-[12px] md:text-lg text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black group-hover:font-medium transition-colors">
-                      {product.name}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[13px] md:text-lg font-medium text-gray-800">
-                        Rs.&nbsp;{product.price.toLocaleString()}
-                      </span>
-                      {product.old_price && (
-                        <span className="text-[12px] md:text-md  text-gray-400 line-through">
-                          Rs.&nbsp;{product.old_price.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                </div>
-              ))}
+                  {SORT_OPTIONS.map(o => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                <ChevronDown size={11} className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" />
+              </div>
             </div>
 
-            {/* ── BOTTOM PAGINATION ── */}
-            <div className="flex items-center justify-center gap-1 pb-20">
+            {/* Pagination controls */}
+            <div className="flex items-center gap-1">
               <button
                 onClick={() => setCurrentPage(p => {
                   const newP = Math.max(1, p - 1);
@@ -641,20 +446,25 @@ function ProductsContent() {
                   return newP;
                 })}
                 disabled={currentPage === 1}
-                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors border border-gray-200"
+                className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors"
               >
                 <ChevronLeft size={14} />
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              {(() => {
+                let start = Math.max(1, currentPage - 1);
+                let end = Math.min(totalPages, start + 2);
+                start = Math.max(1, end - 2);
+                return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+              })().map((page) => (
                 <button
                   key={page}
                   onClick={() => {
                     setCurrentPage(page);
                     updateUrl({ page });
                   }}
-                  className={`w-8 h-8 text-[12px] flex items-center justify-center transition-colors border ${currentPage === page
-                    ? 'bg-gray-900 text-white border-gray-900'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-800 hover:text-black'
+                  className={`w-7 h-7 text-[12px] flex items-center justify-center transition-colors ${currentPage === page
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-600 hover:text-black'
                     }`}
                 >
                   {page}
@@ -667,25 +477,225 @@ function ProductsContent() {
                   return newP;
                 })}
                 disabled={currentPage === totalPages}
-                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors border border-gray-200"
+                className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors"
               >
                 <ChevronRight size={14} />
               </button>
             </div>
-          </>
-        ) : (
-          <div className="py-32 text-center">
-            <p className="text-gray-400 text-sm mb-4">No products found.</p>
-            <button
-              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); }}
-              className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
-            >
-              Clear Filters
-            </button>
           </div>
-        )}
-      </div>
-    </main>
+
+          {/* ── PAGE TITLE ── */}
+          <h1 className="text-3xl font-serif text-gray-800 mt-8 mb-8 font-normal">
+            Korean Beauty Shop
+          </h1>
+
+          {loading && products.length === 0 && (
+            <div className="py-24 text-center text-sm text-gray-500">
+              Loading products...
+            </div>
+          )}
+
+          {!loading && error && products.length === 0 && (
+            <div className="py-24 text-center">
+              <p className="text-gray-500 text-sm mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* ── ACTIVE FILTERS ── */}
+          {(selectedCategory !== 'All' || selectedBrand !== 'All' || selectedPriceRange !== 'All Prices') && (
+            <div className="flex items-center gap-2 mb-6 flex-wrap">
+              <span className="text-[11px] text-gray-400 uppercase tracking-wider">Active filters:</span>
+              {selectedCategory !== 'All' && (
+                <button
+                  onClick={() => { setSelectedCategory('All'); resetPage(); updateUrl({ category: 'All', page: 1 }); }}
+                  className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
+                >
+                  {selectedCategory}
+                  <X size={10} />
+                </button>
+              )}
+              {selectedBrand !== 'All' && (
+                <button
+                  onClick={() => { setSelectedBrand('All'); resetPage(); updateUrl({ brand: 'All', page: 1 }); }}
+                  className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
+                >
+                  {selectedBrand}
+                  <X size={10} />
+                </button>
+              )}
+              {selectedPriceRange !== 'All Prices' && (
+                <button
+                  onClick={() => { setSelectedPriceRange('All Prices'); resetPage(); updateUrl({ price: 'All Prices', page: 1 }); }}
+                  className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
+                >
+                  {selectedPriceRange}
+                  <X size={10} />
+                </button>
+              )}
+              <button
+                onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); resetPage(); updateUrl({ category: 'All', brand: 'All', price: 'All Prices', page: 1 }); }}
+                className="text-[11px] text-gray-400 underline hover:text-gray-800 ml-2"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+
+          {/* ── PRODUCT GRID ── */}
+          {paginatedProducts.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12 mb-20">
+                {paginatedProducts.map((product) => (
+                  <div
+                    key={product.product_id}
+                    className="group relative "
+                  >
+                    <Link href={`/products/${product.product_id}`} className="block">
+                      {/* Image */}
+                      <div className="aspect-square bg-[#f2f2f2] overflow-hidden relative mb-3">
+                        <Image
+                          src={product.images[0]?.image || '/images/placeholder.png'}
+                          alt={product.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {product.old_price && (
+                          <div className="absolute top-3 left-3 bg-gray-900 text-white text-[9px] uppercase tracking-widest px-2 py-1">
+                            Sale
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+
+                    {/* Actions Overlay */}
+                    <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleWishlist({
+                            product_id: product.product_id,
+                            name: product.name,
+                            price: product.price,
+                            old_price: product.old_price || undefined,
+                            image: product.images[0]?.image || '/images/placeholder.png',
+                            category_name: product.category_name,
+                          });
+                        }}
+                        className="p-2 rounded-full bg-white shadow-sm  cursor-pointer hover:scale-105 transition-all text-neutral-900"
+                      >
+                        <Heart
+                          size={20}
+                          className={`${isInWishlist(product.product_id) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}} hover:text-[#c9a46b] `}
+                        />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addItem({
+                            product_id: product.product_id,
+                            name: product.name,
+                            price: product.price,
+                            size: 'Standard',
+                            quantity: 1,
+                            image: product.images[0]?.image || '/images/placeholder.png',
+                          });
+                        }}
+                        className="p-2 rounded-full bg-white  shadow-sm hover:scale-105 transition-all text-neutral-900 cursor-pointer"
+                      >
+                        <ShoppingBag
+                          size={20}
+                          className="text-neutral-900 hover:text-[#c9a46b] transition-colors "
+                        />
+                      </button>
+                    </div>
+
+                    {/* Details */}
+                    <Link href={`/products/${product.product_id}`} className="block">
+                      <p className="text-[12px] md:text-lg text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black group-hover:font-medium transition-colors">
+                        {product.name}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13px] md:text-lg font-medium text-gray-800">
+                          Rs.&nbsp;{product.price.toLocaleString()}
+                        </span>
+                        {product.old_price && (
+                          <span className="text-[12px] md:text-md  text-gray-400 line-through">
+                            Rs.&nbsp;{product.old_price.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── BOTTOM PAGINATION ── */}
+              <div className="flex items-center justify-center gap-1 pb-20">
+                <button
+                  onClick={() => setCurrentPage(p => {
+                    const newP = Math.max(1, p - 1);
+                    updateUrl({ page: newP });
+                    return newP;
+                  })}
+                  disabled={currentPage === 1}
+                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors border border-gray-200"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                {(() => {
+                  let start = Math.max(1, currentPage - 1);
+                  let end = Math.min(totalPages, start + 2);
+                  start = Math.max(1, end - 2);
+                  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+                })().map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => {
+                      setCurrentPage(page);
+                      updateUrl({ page });
+                    }}
+                    className={`w-8 h-8 text-[12px] flex items-center justify-center transition-colors border ${currentPage === page
+                      ? 'bg-gray-900 text-white border-gray-900'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-800 hover:text-black'
+                      }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage(p => {
+                    const newP = Math.min(totalPages, p + 1);
+                    updateUrl({ page: newP });
+                    return newP;
+                  })}
+                  disabled={currentPage === totalPages}
+                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black disabled:opacity-30 transition-colors border border-gray-200"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="py-32 text-center">
+              <p className="text-gray-400 text-sm mb-4">No products found.</p>
+              <button
+                onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); }}
+                className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
+        </div>
+      </main>
     </>
   );
 }
