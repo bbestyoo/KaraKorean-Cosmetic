@@ -18,7 +18,7 @@ class DeliverySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Delivery
-        fields = ['id', 'order', 'phone_number', 'first_name', 'last_name', 'email', 
+        fields = ['id', 'order', 'phone_number', 'full_name', 'email', 
                   'shipping_address', 'payment_method', 'shipping_cost', 'subtotal', 
                   'discount', 'payment_amount', 'payment_status', 'order_items', 'created_at']
         read_only_fields = ['order']
