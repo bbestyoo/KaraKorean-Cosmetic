@@ -19,9 +19,9 @@ export default function AccountPage() {
   const [active, setActive] = useState<"profile" | "addresses" | "settings">("profile");
   const [profile, setProfile] = useState({ name: "Jane Doe", email: "jane@example.com", phone: "" });
   const [addresses, setAddresses] = useState<Address[]>([
-    { id: "", label: "", line1: "", city: "", country: "" },
+    { id: "", line1: "", city: "", country: "" },
   ]);
-  const [newAddress, setNewAddress] = useState<Address>({ id: "", label: "", line1: "", city: "", state: "", zip: "", country: "" });
+  const [newAddress, setNewAddress] = useState<Address>({ id: "", line1: "", city: "", country: "" });
   const [status, setStatus] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
@@ -173,7 +173,6 @@ export default function AccountPage() {
                 {addresses.length > 1 && addresses.map((addr) => (
                   <div key={addr.id} className="flex items-start justify-between p-4 border rounded-md">
                     <div>
-                      <div className="font-semibold">{addr.label || "Address"}</div>
                       <div className="text-sm text-neutral-600">{addr.line1}</div>
                       <div className="text-sm text-neutral-600">{addr.city}, </div>
                       <div className="text-sm text-neutral-600">{addr.country}</div>
