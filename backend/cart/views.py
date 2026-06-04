@@ -150,8 +150,7 @@ class CheckoutAPIView(APIView):
             
             delivery_data = {
                 'phone_number': data.get('phoneNumber'),
-                'first_name': data.get('firstName'),
-                'last_name': data.get('lastName'),
+                'full_name': data.get('fullName'),
                 'email': data.get('email', ''),
                 'shipping_address': data.get('shippingAddress'),
                 'payment_method': 'COD',
@@ -238,8 +237,7 @@ class OrderAPIView(APIView):
         # Filter by search query if provided
         if search_query:
             orders = orders.filter(
-                Q(delivery__first_name__icontains=search_query) |
-                Q(delivery__last_name__icontains=search_query) |
+                Q(delivery__full_name__icontains=search_query) |
                 Q(delivery__email__icontains=search_query) |
                 Q(id__icontains=search_query)
             )
@@ -300,8 +298,7 @@ class DeliveryView(APIView):
                 """
             
             # Extract relevant fields from serializer.data
-            first_name = serializer.data.get('first_name', 'N/A')
-            last_name = serializer.data.get('last_name', 'N/A')
+            full_name = serializer.data.get('full_name', 'N/A')
             phone_number = serializer.data.get('phone_number', 'N/A')
             shipping_address = serializer.data.get('shipping_address', 'N/A')
             city = serializer.data.get('city', 'N/A')
@@ -381,7 +378,7 @@ class DeliveryView(APIView):
                    <table>
                     <tr>
                       <th>Name</th>
-                      <td>{first_name} {last_name}</td>
+                      <td>{full_name}</td>
                     </tr>
                     <tr>
                       <th>Phone Number</th>
