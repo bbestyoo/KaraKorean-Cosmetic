@@ -310,7 +310,7 @@ export default function CheckoutPage() {
                         type="text"
                         name="fullName"
                         placeholder="Enter full name"
-                        value={formData.fullName}
+                        value={formData?.fullName}
                         onChange={(e) => {
                           handleInputChange(e);
                           setErrors(prev => ({ ...prev, fullName: '' }));
@@ -333,7 +333,7 @@ export default function CheckoutPage() {
                         type="tel"
                         name="phoneNumber"
                         placeholder="Enter phone number"
-                        value={formData.phoneNumber}
+                        value={formData?.phoneNumber}
                         onChange={(e) => {
                           handleInputChange(e);
                           setErrors(prev => ({ ...prev, phoneNumber: '' }));
@@ -351,7 +351,7 @@ export default function CheckoutPage() {
                         type="email"
                         name="email"
                         placeholder="Enter email (optional)"
-                        value={formData.email}
+                        value={formData?.email}
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
@@ -377,7 +377,7 @@ export default function CheckoutPage() {
                       type="text"
                       name="shippingAddress"
                       placeholder="Enter street address"
-                      value={formData.shippingAddress}
+                      value={formData?.shippingAddress}
                       onChange={(e) => {
                         handleInputChange(e);
                         setErrors(prev => ({ ...prev, shippingAddress: '' }));
@@ -396,7 +396,7 @@ export default function CheckoutPage() {
                         type="text"
                         name="city"
                         placeholder="Enter city"
-                        value={formData.city}
+                        value={formData?.city}
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
@@ -408,7 +408,7 @@ export default function CheckoutPage() {
                         type="text"
                         name="country"
                         placeholder="Enter country"
-                        value={formData.country}
+                        value={formData?.country}
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
@@ -535,7 +535,7 @@ export default function CheckoutPage() {
                       type="checkbox"
                       id="createAccount"
                       name="createAccount"
-                      checked={formData.createAccount}
+                      checked={formData?.createAccount}
                       onChange={handleInputChange}
                       className="w-4 h-4 rounded border-gray-300 cursor-pointer"
                     />
@@ -553,7 +553,7 @@ export default function CheckoutPage() {
                         type="password"
                         name="password"
                         placeholder="Create a password"
-                        value={formData.password}
+                        value={formData?.password}
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />

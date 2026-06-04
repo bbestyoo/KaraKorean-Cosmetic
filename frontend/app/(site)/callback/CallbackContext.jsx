@@ -24,19 +24,19 @@ export default function CallbackPage() {
         const fetchUser = async () => {
             try {
                 // Fetch user profile using the access token
-                const res = await fetch(`${API_ORIGIN}/userauth/api/profile/`, {
+                const res = await fetch(`${API_ORIGIN}/userauth/api/info/`, {
                     headers: { Authorization: `Bearer ${access}` },
                 });
 
                 if (!res.ok) throw new Error('Failed to fetch user');
 
                 const user = await res.json();
-                login({ access, refresh }, user);  // match your AuthContext login signature
+                login(access, user);  // match your AuthContext login signature
                 router.replace('/');
             } catch (err) {
                 console.error(err);
                 // Even if profile fetch fails, still log in with tokens
-                login({ access, refresh }, null);
+                login(access, null);
                 router.replace('/');
             }
         };

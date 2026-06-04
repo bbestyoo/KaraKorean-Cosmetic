@@ -191,9 +191,6 @@ export default function NewArrivalsCarousel() {
             <p className="font-serif italic text-[#0f3b2b] text-sm sm:text-2xl leading-tight">
               {currentProduct.name}
             </p>
-            <p className="font-sans text-xs text-[#6b766f] tracking-widest mt-1 normal-case">
-              {currentProduct.brand}
-            </p>
           </div>
           <div>
             <p className="font-sans text-[#0f3b2b] text-xs sm:text-lg font-semibold normal-case">
