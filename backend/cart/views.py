@@ -592,7 +592,7 @@ class MergeCartView(APIView):
 
 
 class CouponView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self,request):
         code = request.GET.get('code')
