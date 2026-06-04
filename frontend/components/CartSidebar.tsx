@@ -21,17 +21,15 @@ export function CartSidebar() {
 
       {/* Backdrop overlay with smooth transition */}
       <div
-        className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ease-in-out ${
-          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
+        className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ease-in-out ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
         onClick={closeCart}
       />
 
       {/* Sidebar Panel with smooth slide-in/out transition */}
       <div
-        className={`fixed right-0 top-0 h-full w-full max-w-[500px] bg-[#f7f7f7] shadow-2xl z-50 flex flex-col font-mono transition-transform duration-500 ease-out transform ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`fixed right-0 top-0 h-full w-full max-w-[500px] bg-[#f7f7f7] shadow-2xl z-50 flex flex-col font-mono transition-transform duration-500 ease-out transform ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6">
@@ -54,7 +52,7 @@ export function CartSidebar() {
             <p className="text-gray-500">Your cart is empty</p>
             <button
               onClick={() => { router.push('/products'); closeCart(); }}
-              className="mt-2 bg-[#1a1a1a] text-white py-3 px-6 text-xs tracking-widest hover:bg-black transition-colors"
+              className="mt-2 bg-[#0f3b2b] cursor-pointer text-white py-3 px-6 text-xs tracking-widest hover:bg-white hover:text-black hover:border hover:border-[#0f3b2b] transition-colors"
             >
               Shop now
             </button>
@@ -152,7 +150,7 @@ export function CartSidebar() {
                   closeCart();
                 }}
                 className="w-full bg-[#0f3b2b] cursor-pointer text-white py-3.5 text-xs tracking-widest hover:bg-white hover:text-black hover:border hover:border-[#0f3b2b] transition-colors"
-              > 
+              >
                 Checkout
               </button>
               <button

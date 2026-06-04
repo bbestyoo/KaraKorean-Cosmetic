@@ -380,7 +380,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             <div className="grid grid-cols-[100px_1fr] items-start gap-6">
               <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Description:</span>
               <div
-                className="text-md text-neutral-700 mt-2"
+                className="text-md text-neutral-700 mt-[10px]"
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(product.description ?? "No description available."),
                 }}

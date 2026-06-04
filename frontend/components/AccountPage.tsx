@@ -1,230 +1,430 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { User, MapPin, Settings } from "lucide-react";
+import { User, Settings, RefreshCw } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-type Address = {
-  id: string;
-  label?: string;
-  line1: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
+interface ProfileData {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+}
+
+const DEFAULT_PROFILE: ProfileData = {
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  city: "",
 };
 
 export default function AccountPage() {
-  const { user, isLoggedIn } = useAuth();
-  const [active, setActive] = useState<"profile" | "addresses" | "settings">("profile");
-  const [profile, setProfile] = useState({ name: "Jane Doe", email: "jane@example.com", phone: "" });
-  const [addresses, setAddresses] = useState<Address[]>([
-    { id: "", label: "", line1: "", city: "", country: "" },
-  ]);
-  const [newAddress, setNewAddress] = useState<Address>({ id: "", label: "", line1: "", city: "", state: "", zip: "", country: "" });
-  const [status, setStatus] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
+  const { user, isLoggedIn, token } = useAuth();
+  const [active, setActive] = useState<"profile" | "settings">("profile");
+
+  const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
+  const [originalProfile, setOriginalProfile] = useState<ProfileData>(DEFAULT_PROFILE);
+  const [loadingProfile, setLoadingProfile] = useState(false);
+
+  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
+
   const [changingPassword, setChangingPassword] = useState(false);
-  const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [passwords, setPasswords] = useState({
+    oldpassword: "",
+    password: "",
+    password2: "",
+  });
+  const [passwordStatus, setPasswordStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  async function handleProfileSave(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
+  // Derive API base URL (same pattern as checkout page)
+  const API_BASE_URL = (() => {
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    return base.replace(/\/shop\/?$/, "");
+  })();
+
+  const getAuthHeader = useCallback(() => {
+    if (!token) return null;
+    return token.includes(".") ? `Bearer ${token}` : `Token ${token}`;
+  }, [token]);
+
+  // ─── 1. Fetch user info ───────────────────────────────────────────────────
+  const fetchUserInfo = useCallback(async () => {
+    const authHeader = getAuthHeader();
+    if (!authHeader) return;
+
+    setLoadingProfile(true);
     try {
-      const res = await fetch("/api/account/update", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ...profile, addresses }),
+      const res = await fetch(`${API_BASE_URL}/userauth/api/info/`, {
+        headers: { Authorization: authHeader },
       });
-      const json = await res.json();
-      if (res.ok) setStatus({ type: "success", message: "Profile updated" });
-      else setStatus({ type: "error", message: json?.error || "Update failed" });
-    } catch (err) {
-      setStatus({ type: "error", message: "Network error" });
-    } finally {
-      setSaving(false);
-      setTimeout(() => setStatus(null), 3000);
-    }
-  }
-
-  async function handleAddAddress(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newAddress.line1) {
-      setStatus({ type: "error", message: "Address line required" });
-      setTimeout(() => setStatus(null), 2000);
-      return;
-    }
-    const addr = { ...newAddress, id: String(Date.now()) };
-    const updated = [...addresses, addr];
-    setAddresses(updated);
-    setNewAddress({ id: "", label: "", line1: "", city: "", state: "", zip: "", country: "" });
-    try {
-      await fetch("/api/account/update", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...profile, addresses: updated }) });
-    } catch (_) {
-      /* ignore */
-    }
-    setStatus({ type: "success", message: "Address added" });
-    setTimeout(() => setStatus(null), 2000);
-  }
-
-  async function handleDeleteAddress(id: string) {
-    const updated = addresses.filter((a) => a.id !== id);
-    setAddresses(updated);
-    try {
-      await fetch("/api/account/update", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...profile, addresses: updated }) });
-    } catch (_) {
-      /* ignore */
-    }
-    setStatus({ type: "success", message: "Address removed" });
-    setTimeout(() => setStatus(null), 2000);
-  }
-
-  async function handlePasswordChange(e: React.FormEvent) {
-    e.preventDefault();
-    setChangingPassword(true);
-    try {
-      const res = await fetch("/api/account/password", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(passwords) });
-      const json = await res.json();
       if (res.ok) {
-        setStatus({ type: "success", message: "Password changed" });
-        setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        const data = await res.json();
+        const fetched: ProfileData = {
+          name: data.name || data.username || "",
+          email: data.email || "",
+          phone: data.phone || data.phone_number || "",
+          address: data.address || data.shipping_address || "",
+          city: data.city || "",
+        };
+        setProfile(fetched);
+        setOriginalProfile(fetched);
       } else {
-        setStatus({ type: "error", message: json?.error || "Change failed" });
+        console.error("Failed to fetch user info:", res.status);
       }
     } catch (err) {
-      setStatus({ type: "error", message: "Network error" });
+      console.error("Error fetching user info:", err);
     } finally {
-      setChangingPassword(false);
-      setTimeout(() => setStatus(null), 3000);
+      setLoadingProfile(false);
+    }
+  }, [API_BASE_URL, getAuthHeader]);
+
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      fetchUserInfo();
+    }
+  }, [isLoggedIn, token, fetchUserInfo]);
+
+  // ─── 2. Update user info (PATCH) ─────────────────────────────────────────
+  async function handleProfileSave(e: React.FormEvent) {
+    e.preventDefault();
+    const authHeader = getAuthHeader();
+    if (!authHeader) {
+      setStatus({ type: "error", message: "You are not authenticated." });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/userauth/api/info/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify({
+          name: profile.name,
+          email: profile.email,
+          phone: profile.phone,
+          address: profile.address,
+          city: profile.city,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const updated: ProfileData = {
+          name: data.name || data.username || profile.name,
+          email: data.email || profile.email,
+          phone: data.phone || data.phone_number || profile.phone,
+          address: data.address || data.shipping_address || profile.address,
+          city: data.city || profile.city,
+        };
+        setProfile(updated);
+        setOriginalProfile(updated);
+        setStatus({ type: "success", message: "Profile updated successfully!" });
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        const message =
+          typeof errData === "object"
+            ? Object.values(errData).flat().join(" ")
+            : "Update failed. Please try again.";
+        setStatus({ type: "error", message });
+      }
+    } catch (err) {
+      setStatus({ type: "error", message: "Network error. Please try again." });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setStatus(null), 4000);
     }
   }
 
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      setProfile((p) => ({
-        name: (user.username || user.name) ?? p.name,
-        email: user.email ?? p.email,
-        phone: user.phone ?? p.phone,
-      }));
+  // ─── Reset form to last fetched data ────────────────────────────────────
+  function handleReset() {
+    setProfile(originalProfile);
+    setStatus({ type: "success", message: "Changes reverted to saved data." });
+    setTimeout(() => setStatus(null), 2500);
+  }
+
+  // ─── 3. Change password ──────────────────────────────────────────────────
+  async function handlePasswordChange(e: React.FormEvent) {
+    e.preventDefault();
+    const authHeader = getAuthHeader();
+    if (!authHeader) {
+      setPasswordStatus({ type: "error", message: "You are not authenticated." });
+      return;
     }
-  }, [isLoggedIn, user]);
+
+    if (!passwords.oldpassword || !passwords.password || !passwords.password2) {
+      setPasswordStatus({ type: "error", message: "All password fields are required." });
+      return;
+    }
+
+    if (passwords.password !== passwords.password2) {
+      setPasswordStatus({ type: "error", message: "New passwords do not match." });
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/userauth/api/change-password/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify({
+          oldpassword: passwords.oldpassword,
+          password: passwords.password,
+          password2: passwords.password2,
+        }),
+      });
+
+      if (res.ok) {
+        setPasswordStatus({ type: "success", message: "Password changed successfully!" });
+        setPasswords({ oldpassword: "", password: "", password2: "" });
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        const message =
+          typeof errData === "object"
+            ? Object.values(errData).flat().join(" ")
+            : "Failed to change password.";
+        setPasswordStatus({ type: "error", message });
+      }
+    } catch (err) {
+      setPasswordStatus({ type: "error", message: "Network error. Please try again." });
+    } finally {
+      setChangingPassword(false);
+      setTimeout(() => setPasswordStatus(null), 4000);
+    }
+  }
 
   return (
     <div className="max-w-[1200px] mx-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* ── Sidebar ── */}
         <aside className="md:col-span-1 bg-white border rounded-lg p-6 shadow-sm">
           <div className="flex flex-col items-center">
             <div className="relative w-28 h-28 rounded-full overflow-hidden bg-gray-100">
               <Image src="/images/model1.png" alt="User avatar" fill className="object-cover" />
             </div>
-            <h3 className="mt-4 text-lg font-semibold">{profile.name}</h3>
-            <p className="text-sm text-neutral-500">{profile.email}</p>
+            <h3 className="mt-4 text-lg font-semibold text-center">
+              {loadingProfile ? (
+                <span className="inline-block w-24 h-5 bg-gray-200 rounded animate-pulse" />
+              ) : (
+                profile.name || user?.username || "—"
+              )}
+            </h3>
+            <p className="text-sm text-neutral-500 text-center mt-1">
+              {loadingProfile ? (
+                <span className="inline-block w-32 h-4 bg-gray-200 rounded animate-pulse" />
+              ) : (
+                profile.email || user?.email || ""
+              )}
+            </p>
           </div>
 
           <nav className="mt-6 space-y-2">
-            <button onClick={() => setActive("profile")} className={`w-full text-left px-3 py-2 rounded-md ${active === "profile" ? "bg-[#0f3b2b] text-white" : "text-neutral-700 hover:bg-neutral-100"}`}>
-              <User className="inline mr-2" /> Profile
+            <button
+              onClick={() => setActive("profile")}
+              className={`w-full text-left px-3 py-2 rounded-md flex items-center gap-2 transition-colors ${active === "profile"
+                ? "bg-[#0f3b2b] text-white"
+                : "text-neutral-700 hover:bg-neutral-100"
+                }`}
+            >
+              <User size={16} /> Profile
             </button>
-            <button onClick={() => setActive("addresses")} className={`w-full text-left px-3 py-2 rounded-md ${active === "addresses" ? "bg-[#0f3b2b] text-white" : "text-neutral-700 hover:bg-neutral-100"}`}>
-              <MapPin className="inline mr-2" /> Addresses
-            </button>
-            <button onClick={() => setActive("settings")} className={`w-full text-left px-3 py-2 rounded-md ${active === "settings" ? "bg-[#0f3b2b] text-white" : "text-neutral-700 hover:bg-neutral-100"}`}>
-              <Settings className="inline mr-2" /> Settings
+            <button
+              onClick={() => setActive("settings")}
+              className={`w-full text-left px-3 py-2 rounded-md flex items-center gap-2 transition-colors ${active === "settings"
+                ? "bg-[#0f3b2b] text-white"
+                : "text-neutral-700 hover:bg-neutral-100"
+                }`}
+            >
+              <Settings size={16} /> Settings
             </button>
           </nav>
         </aside>
 
+        {/* ── Main content ── */}
         <section className="md:col-span-3 bg-white border rounded-lg p-6 shadow-sm">
-          {status && <div className={`mb-4 p-3 rounded ${status.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}>{status.message}</div>}
-
+          {/* ── Profile Tab ── */}
           {active === "profile" && (
-            <form onSubmit={handleProfileSave} className="space-y-4">
-              <h2 className="text-xl font-semibold">Profile</h2>
+            <form onSubmit={handleProfileSave} className="space-y-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Profile</h2>
+                {loadingProfile && (
+                  <span className="text-xs text-neutral-400 flex items-center gap-1">
+                    <RefreshCw size={12} className="animate-spin" /> Loading…
+                  </span>
+                )}
+              </div>
+
+              {status && (
+                <div
+                  className={`p-3 rounded text-sm ${status.type === "success"
+                    ? "bg-green-50 text-green-800 border border-green-200"
+                    : "bg-red-50 text-red-800 border border-red-200"
+                    }`}
+                >
+                  {status.message}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="flex flex-col">
-                  <span className="text-sm font-medium text-neutral-600">Full name</span>
-                  <input value={profile.name} onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))} className="mt-1 p-3 border rounded-md" />
+                  <span className="text-sm font-medium text-neutral-600 mb-1">Full name</span>
+                  <input
+                    value={profile.name}
+                    onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
+                    placeholder="Your full name"
+                    className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/30"
+                    disabled={loadingProfile}
+                  />
                 </label>
+
                 <label className="flex flex-col">
-                  <span className="text-sm font-medium text-neutral-600">Email</span>
-                  <input value={profile.email} onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))} className="mt-1 p-3 border rounded-md" />
+                  <span className="text-sm font-medium text-neutral-600 mb-1">Email</span>
+                  <input
+                    type="email"
+                    value={profile.email}
+                    onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
+                    placeholder="Your email"
+                    className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/30"
+                    disabled={loadingProfile}
+                  />
                 </label>
+
+                <label className="flex flex-col">
+                  <span className="text-sm font-medium text-neutral-600 mb-1">Phone</span>
+                  <input
+                    type="tel"
+                    value={profile.phone}
+                    onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
+                    placeholder="Your phone number"
+                    className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/30"
+                    disabled={loadingProfile}
+                  />
+                </label>
+
+                <label className="flex flex-col">
+                  <span className="text-sm font-medium text-neutral-600 mb-1">City</span>
+                  <input
+                    value={profile.city}
+                    onChange={(e) => setProfile((p) => ({ ...p, city: e.target.value }))}
+                    placeholder="Your city"
+                    className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/30"
+                    disabled={loadingProfile}
+                  />
+                </label>
+
                 <label className="flex flex-col md:col-span-2">
-                  <span className="text-sm font-medium text-neutral-600">Phone</span>
-                  <input value={profile.phone} onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))} className="mt-1 p-3 border rounded-md" />
+                  <span className="text-sm font-medium text-neutral-600 mb-1">Address</span>
+                  <input
+                    value={profile.address}
+                    onChange={(e) => setProfile((p) => ({ ...p, address: e.target.value }))}
+                    placeholder="Your street address"
+                    className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/30"
+                    disabled={loadingProfile}
+                  />
                 </label>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button type="submit" disabled={saving} className="px-6 py-3 cursor-pointer bg-[#0f3b2b] text-white rounded-md font-semibold hover:opacity-95">
-                  {saving ? "Saving..." : "Save changes"}
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="submit"
+                  disabled={saving || loadingProfile}
+                  className="px-6 py-3 cursor-pointer bg-[#0f3b2b] text-white rounded-md font-semibold hover:opacity-90 disabled:opacity-60 transition-opacity"
+                >
+                  {saving ? "Saving…" : "Save changes"}
                 </button>
-                <button type="button" onClick={() => { setProfile({ name: "Jane Doe", email: "jane@example.com", phone: "+1 (555) 123-4567" }); setStatus({ type: "info", message: "Changes reverted" }); setTimeout(() => setStatus(null), 2000); }} className="px-4 py-3 cursor-pointer border rounded-md">
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  disabled={saving || loadingProfile}
+                  className="px-4 py-3 cursor-pointer border rounded-md text-neutral-700 hover:bg-neutral-50 disabled:opacity-60 transition-colors"
+                >
                   Reset
                 </button>
               </div>
             </form>
           )}
 
-          {active === "addresses" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Addresses</h2>
-              <div className="space-y-4">
-                {addresses.length > 1 && addresses.map((addr) => (
-                  <div key={addr.id} className="flex items-start justify-between p-4 border rounded-md">
-                    <div>
-                      <div className="font-semibold">{addr.label || "Address"}</div>
-                      <div className="text-sm text-neutral-600">{addr.line1}</div>
-                      <div className="text-sm text-neutral-600">{addr.city}, </div>
-                      <div className="text-sm text-neutral-600">{addr.country}</div>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <button onClick={() => { navigator.clipboard?.writeText(`${addr.line1}, ${addr.city}`); setStatus({ type: "success", message: "Address copied" }); setTimeout(() => setStatus(null), 2000); }} className="text-sm text-neutral-600 hover:text-black">
-                        Copy
-                      </button>
-                      <div className="flex gap-2">
-                        <button onClick={() => handleDeleteAddress(addr.id)} className="text-sm text-red-600">
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <form onSubmit={handleAddAddress} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input placeholder="Label (Home, Work)" value={newAddress.label} onChange={(e) => setNewAddress((p) => ({ ...p, label: e.target.value }))} className="p-3 border rounded-md" />
-                <input placeholder="Address line" value={newAddress.line1} onChange={(e) => setNewAddress((p) => ({ ...p, line1: e.target.value }))} className="p-3 border rounded-md md:col-span-2" />
-                <input placeholder="City" value={newAddress.city} onChange={(e) => setNewAddress((p) => ({ ...p, city: e.target.value }))} className="p-3 border rounded-md" />
-                <input placeholder="Country" value={newAddress.country} onChange={(e) => setNewAddress((p) => ({ ...p, country: e.target.value }))} className="p-3 border rounded-md" />
-                <div className="md:col-span-2 flex items-center gap-3">
-                  <button type="submit" className="px-5 py-3 bg-[#0f3b2b] hover:border-[#0f3b2bb3] hover:border hover:bg-white hover:text-[#0f3b2b]  border  cursor-pointer text-white rounded-md">Add address</button>
-                </div>
-              </form>
-            </div>
-          )}
-
+          {/* ── Settings / Change Password Tab ── */}
           {active === "settings" && (
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <h2 className="text-xl font-semibold">Account Settings</h2>
+            <form onSubmit={handlePasswordChange} className="space-y-5">
+              <h2 className="text-xl font-semibold">Change Password</h2>
+
+              {passwordStatus && (
+                <div
+                  className={`p-3 rounded text-sm ${passwordStatus.type === "success"
+                    ? "bg-green-50 text-green-800 border border-green-200"
+                    : "bg-red-50 text-red-800 border border-red-200"
+                    }`}
+                >
+                  {passwordStatus.message}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <label className="flex flex-col">
-                  <span className="text-sm font-medium text-neutral-600">Current password</span>
-                  <input type="password" value={passwords.currentPassword} onChange={(e) => setPasswords((p) => ({ ...p, currentPassword: e.target.value }))} className="mt-1 p-3 border rounded-md" />
-                </label>
-                <label className="flex flex-col">
-                  <span className="text-sm font-medium text-neutral-600">New password</span>
-                  <input type="password" value={passwords.newPassword} onChange={(e) => setPasswords((p) => ({ ...p, newPassword: e.target.value }))} className="mt-1 p-3 border rounded-md" />
-                </label>
                 <label className="flex flex-col md:col-span-2">
-                  <span className="text-sm font-medium text-neutral-600">Confirm new password</span>
-                  <input type="password" value={passwords.confirmPassword} onChange={(e) => setPasswords((p) => ({ ...p, confirmPassword: e.target.value }))} className="mt-1 p-3 border rounded-md" />
+                  <span className="text-sm font-medium text-neutral-600 mb-1">Current password</span>
+                  <input
+                    type="password"
+                    value={passwords.oldpassword}
+                    onChange={(e) =>
+                      setPasswords((p) => ({ ...p, oldpassword: e.target.value }))
+                    }
+                    placeholder="Enter current password"
+                    className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/30"
+                  />
+                </label>
+
+                <label className="flex flex-col">
+                  <span className="text-sm font-medium text-neutral-600 mb-1">New password</span>
+                  <input
+                    type="password"
+                    value={passwords.password}
+                    onChange={(e) =>
+                      setPasswords((p) => ({ ...p, password: e.target.value }))
+                    }
+                    placeholder="Enter new password"
+                    className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/30"
+                  />
+                </label>
+
+                <label className="flex flex-col">
+                  <span className="text-sm font-medium text-neutral-600 mb-1">Confirm new password</span>
+                  <input
+                    type="password"
+                    value={passwords.password2}
+                    onChange={(e) =>
+                      setPasswords((p) => ({ ...p, password2: e.target.value }))
+                    }
+                    placeholder="Confirm new password"
+                    className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/30"
+                  />
                 </label>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button type="submit" disabled={changingPassword} className="px-6 py-3 bg-[#0f3b2b] text-white rounded-md font-semibold">
-                  {changingPassword ? "Updating..." : "Change password"}
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="px-6 py-3 cursor-pointer bg-[#0f3b2b] text-white rounded-md font-semibold hover:opacity-90 disabled:opacity-60 transition-opacity"
+                >
+                  {changingPassword ? "Updating…" : "Change password"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPasswords({ oldpassword: "", password: "", password2: "" })
+                  }
+                  className="px-4 py-3 cursor-pointer border rounded-md text-neutral-700 hover:bg-neutral-50 transition-colors"
+                >
+                  Clear
                 </button>
               </div>
             </form>

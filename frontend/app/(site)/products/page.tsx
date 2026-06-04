@@ -574,7 +574,7 @@ function ProductsContent() {
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {product.old_price && (
-                          <div className="absolute top-3 left-3 bg-gray-900 text-white text-[9px] uppercase tracking-widest px-2 py-1">
+                          <div className="absolute top-3 left-3 bg-[#0f3b2b] text-white text-[9px] uppercase tracking-widest px-2 py-1">
                             Sale
                           </div>
                         )}
