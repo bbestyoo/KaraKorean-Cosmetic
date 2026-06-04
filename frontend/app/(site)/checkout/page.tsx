@@ -207,7 +207,7 @@ export default function CheckoutPage() {
         phoneNumber: formData.phoneNumber,
         email: formData.email,
         shippingAddress: formData.shippingAddress,
-        subtotal,
+        subtotal: subtotal - discountAmount,
         shippingCost,
         discountAmount,
         total,
@@ -308,7 +308,7 @@ export default function CheckoutPage() {
                       </label>
                       <input
                         type="text"
-                        name="FullName"
+                        name="fullName"
                         placeholder="Enter full name"
                         value={formData.fullName}
                         onChange={(e) => {

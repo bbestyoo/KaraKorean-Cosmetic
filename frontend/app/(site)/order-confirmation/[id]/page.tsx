@@ -114,6 +114,9 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
     day: 'numeric',
   });
 
+  const computedSubtotal = order.order_items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const computedDiscount = Math.max(0, computedSubtotal - (delivery.subtotal || 0));
+
   return (
     <main className="min-h-screen bg-gray-30">
       <div className="max-w-6xl border border-gray-200 mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -221,12 +224,12 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
               <div className="space-y-3 mb-6 pb-6 border-b">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-semibold text-gray-900">NPR {delivery.subtotal?.toLocaleString()}</span>
+                  <span className="font-semibold text-gray-900">NPR {computedSubtotal.toLocaleString()}</span>
                 </div>
-                {delivery.discount > 0 && (
+                {computedDiscount > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Discount</span>
-                    <span className="font-semibold text-green-600">-NPR {delivery.discount.toLocaleString()}</span>
+                    <span className="font-semibold text-green-600">-NPR {computedDiscount.toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
