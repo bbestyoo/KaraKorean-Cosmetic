@@ -163,8 +163,17 @@ class GoogleAuthView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        redirect_uri = f"{settings.BASE_URL}/api/auth/google/callback/" # Important!
-        authorization_url = f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={settings.GOOGLE_CLIENT_ID}&redirect_uri={redirect_uri}&scope=openid profile email"
+        redirect_uri = f"{settings.BASE_URL}/userauth/api/google/callback/" # Important!
+        print("La hai",redirect_uri)
+        authorization_url = (
+            f"https://accounts.google.com/o/oauth2/v2/auth"
+            f"?response_type=code"
+            f"&client_id={settings.GOOGLE_CLIENT_ID}"
+            f"&redirect_uri={redirect_uri}"
+            f"&scope=openid%20profile%20email"
+            f"&access_type=offline"
+            f"&prompt=consent"
+)
         return Response({"authorization_url": authorization_url})
     
 
@@ -175,6 +184,7 @@ class GoogleCallbackView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
+        print("CALLBACK HIT, ALL PARAMS:", request.GET) 
         code = request.GET.get('code')
         if not code:
             return Response({"error": "Missing authorization code"}, status=400)
@@ -184,11 +194,11 @@ class GoogleCallbackView(APIView):
             "code": code,
             "client_id": settings.GOOGLE_CLIENT_ID,
             "client_secret": settings.GOOGLE_CLIENT_SECRET,
-            "redirect_uri": f"{settings.BASE_URL}/api/auth/google/callback/", # Must match the one in Google Console
+            "redirect_uri": f"{settings.BASE_URL}/userauth/api/google/callback/", # Must match the one in Google Console
             "grant_type": "authorization_code"
         }
         response = requests.post(token_url, data=data).json()
-        
+        print("TOKEN EXCHANGE RESPONSE:", response)  # ← add this        
         if 'id_token' not in response:
             return Response({'error': 'Failed to obtain ID token'}, status=400)
 
@@ -216,6 +226,8 @@ class GoogleCallbackView(APIView):
 
             except User.DoesNotExist:
                 # 3. If no user is found, create a new one
+                if not email:
+                    return Response({'error': 'Could not get email from Google'}, status=400)
                 user = User.objects.create(google_id=google_id, email=email, name=name)
                 if picture_url:
                   try:
@@ -234,7 +246,7 @@ class GoogleCallbackView(APIView):
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token  # Access token is obtained from the refresh token
 
-            redirect_url = f"{settings.FRONTEND_URL}auth/callback?access={access}&refresh={refresh}"
+            redirect_url = f"{settings.FRONTEND_URL}callback?access={access}&refresh={refresh}"
             return HttpResponseRedirect(redirect_url)
 
             # return Response({"access": str(access), "refresh": str(refresh)})
@@ -243,9 +255,13 @@ class GoogleCallbackView(APIView):
             print(f"Token verification error: {e}") # Debugging
             return Response({'error': 'Invalid token'}, status=400)
 
-        except Exception as e: # Catch any other exceptions
-            print(f"An unexpected error occurred: {e}") # Debugging
-            return Response({'error': 'An unexpected error occurred'}, status=500) # Generic error message
+        # except Exception as e: # Catch any other exceptions
+        #     print(f"An unexpected error occurred: {e}") # Debugging
+        #     return Response({'error': 'An unexpected error occurred'}, status=500) # Generic error message
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())  # full traceback in docker logs
+            return Response({'error': str(e)}, status=500)  # see it in browser too
 
 
 class UserListView(APIView):
