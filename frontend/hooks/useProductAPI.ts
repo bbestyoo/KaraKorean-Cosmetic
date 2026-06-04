@@ -17,7 +17,7 @@ export const useProductAPI = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_ORIGIN}/api/${productId}/`);
+      const response = await fetch(`${API_ORIGIN}/shop/api/${productId}/`);
       if (!response.ok) throw new Error('Failed to fetch product');
       const data = await response.json();
       return data;
@@ -35,7 +35,7 @@ export const useProductAPI = () => {
     setError(null);
     try {
       const params = new URLSearchParams({ page: page.toString(), ...filters });
-      const response = await fetch(`${API_ORIGIN}/api/?${params}`);
+      const response = await fetch(`${API_ORIGIN}/shop/api/?${params}`);
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
       return data;

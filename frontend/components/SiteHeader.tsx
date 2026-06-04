@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, Heart, User } from "lucide-react";
 import { CartButton } from "@/components/CartButton";
+import { NavSearch } from "@/components/NavSearch";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -152,9 +153,10 @@ export function SiteHeader() {
           </nav>
 
           {/* User icon dropdown (desktop) */}
-         
+
 
           <div className="flex items-center gap-1">
+            <NavSearch />
             <Link
               href="/wishlist"
               className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -228,14 +230,14 @@ export function SiteHeader() {
                           onClick={() => setIsUserMenuOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-[#c9a46b]/10 hover:text-[#8a6e3a] transition-all duration-200 group"
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 group-hover:text-[#c9a46b] transition-colors"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 group-hover:text-[#c9a46b] transition-colors"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                           My Profile
                         </Link>
                         <button
                           onClick={() => { logout(); setIsUserMenuOpen(false); router.push('/'); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group mt-0.5"
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
                           Sign Out
                         </button>
                       </div>
@@ -262,7 +264,7 @@ export function SiteHeader() {
                           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#5c6e69'; (e.currentTarget as HTMLElement).style.background = 'rgba(92,110,105,0.1)'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(92,110,105,0.35)'; (e.currentTarget as HTMLElement).style.background = 'rgba(92,110,105,0.05)'; }}
                         >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
                           Sign In
                         </Link>
                         <Link
@@ -271,7 +273,7 @@ export function SiteHeader() {
                           className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:opacity-90"
                           style={{ background: 'linear-gradient(135deg, #c9a46b 0%, #a07840 100%)', boxShadow: '0 4px 14px -4px rgba(201,164,107,0.5)' }}
                         >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
                           Create Account
                         </Link>
                       </div>

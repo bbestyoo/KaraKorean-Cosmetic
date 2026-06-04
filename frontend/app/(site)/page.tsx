@@ -111,7 +111,7 @@ export default function Home() {
           <RevealOnScroll
             direction="down"
             delay={200}
-            className="hidden xl:block relative ml-4 text-left md:absolute md:top-60 2xl:top-40 md:right-40 pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none"
+            className="hidden xl:block relative ml-4 text-left md:absolute md:top-60 2xl:top-40 md:right-40 2xl:right pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none"
           >
             <div className="font-symphony lowercase text-[#0f3b2b] text-6xl sm:text-6xl md:text-[6.8rem] 2xl:text-[14rem] leading-none">
               glow like

@@ -27,6 +27,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'qr'>('cod');
+  const [transactionId, setTransactionId] = useState('');
 
   const [formData, setFormData] = useState<DeliveryFormData>({
     firstName: '',
@@ -115,6 +117,8 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
           shippingAddress: formData.shippingAddress,
           subtotal,
           shippingCost,
+          paymentMethod,
+          transactionId: paymentMethod === 'qr' ? transactionId : undefined,
           cartItems: items.map(item => ({
             product_id: item.product_id,
             quantity: item.quantity,
@@ -316,29 +320,113 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                 </div>
               </div>
 
-              {/* Payment Method - COD Only */}
+              {/* Payment Method */}
               <div>
                 <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <CreditCard size={20} className="text-red-500" />
                   Payment Method
                 </h2>
 
-                <div className="bg-white border border-gray-300 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex items-center h-6">
-                      <input
-                        type="radio"
-                        id="cod"
-                        checked={true}
-                        disabled
-                        className="w-4 h-4 cursor-default"
-                      />
+                <div className="space-y-3">
+                  {/* Cash on Delivery */}
+                  <div
+                    onClick={() => setPaymentMethod('cod')}
+                    className={`bg-white border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                      paymentMethod === 'cod'
+                        ? 'border-[#0f3b2b] ring-1 ring-[#0f3b2b]/20'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center h-6">
+                        <input
+                          type="radio"
+                          id="cod"
+                          name="paymentMethod"
+                          checked={paymentMethod === 'cod'}
+                          onChange={() => setPaymentMethod('cod')}
+                          className="w-4 h-4 accent-[#0f3b2b] cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor="cod" className="font-semibold text-gray-900 cursor-pointer">
+                          Cash on Delivery
+                        </label>
+                        <p className="text-sm text-gray-600 mt-1">Pay when you receive your order</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <label htmlFor="cod" className="font-semibold text-gray-900 cursor-default">
-                        Cash on Delivery
-                      </label>
-                      <p className="text-sm text-gray-600 mt-1">Pay when you receive your order</p>
+                  </div>
+
+                  {/* Pay via QR Code */}
+                  <div
+                    onClick={() => setPaymentMethod('qr')}
+                    className={`bg-white border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                      paymentMethod === 'qr'
+                        ? 'border-[#0f3b2b] ring-1 ring-[#0f3b2b]/20'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center h-6">
+                        <input
+                          type="radio"
+                          id="qr"
+                          name="paymentMethod"
+                          checked={paymentMethod === 'qr'}
+                          onChange={() => setPaymentMethod('qr')}
+                          className="w-4 h-4 accent-[#0f3b2b] cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor="qr" className="font-semibold text-gray-900 cursor-pointer">
+                          Pay via QR Code
+                        </label>
+                        <p className="text-sm text-gray-600 mt-1">Scan and pay using your banking app</p>
+                      </div>
+                    </div>
+
+                    {/* QR Expanded Section */}
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        paymentMethod === 'qr' ? 'max-h-[700px] opacity-100 mt-5' : 'max-h-0 opacity-0'
+                      }`}
+                    >
+                      <div className="border-t border-gray-200 pt-5">
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          Scan the QR code and complete your payment. After payment please contact us via
+                          Instagram or Whatsapp or Viber at{' '}
+                          <span className="font-semibold text-gray-900">+977-9821573070</span> /{' '}
+                          <span className="font-semibold text-gray-900">+977-9845178341</span>
+                        </p>
+
+                        {/* QR Code Image */}
+                        <div className="flex justify-center my-5">
+                          <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                            <Image
+                              src="/images/payment-qr.jpg"
+                              alt="Kara Korean Store - Prabhu Bank QR Code"
+                              width={240}
+                              height={320}
+                              className="object-contain rounded"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Transaction ID Input */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-900 mb-2">
+                            Transaction ID
+                          </label>
+                          <input
+                            type="text"
+                            value={transactionId}
+                            onChange={(e) => setTransactionId(e.target.value)}
+                            placeholder="Enter Transaction ID"
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/40 focus:border-[#0f3b2b] transition-colors"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
