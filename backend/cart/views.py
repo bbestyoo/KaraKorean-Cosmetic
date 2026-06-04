@@ -51,36 +51,7 @@ class CheckoutAPIView(APIView):
         if not cart_items_data:
             return Response({'detail': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Create order
-        user = request.user if request.user.is_authenticated else None
-        order = Order.objects.create(user=user, status='Pending')
-        
-        # Create order items from cart items
-        # try:
-        #     for item in cart_items_data:
-        #         product = Product.objects.get(product_id=item.get('product_id'))
-                
-        #         # Get size if available
-        #         size = None
-                
-              
-        #         if item.get('size'):
-        #             size = Size.objects.filter(name=item.get('size')).first()
-                
-        #         OrderItem.objects.create(
-        #             order=order,
-        #             product=product,
-        #             size=size,
-        #             quantity=item.get('quantity', 1),
-        #             price=item.get('price', 0)
-        #         )
-        # except Product.DoesNotExist:
-        #     order.delete()
-        #     return Response({'detail': 'Product not found'}, status=status.HTTP_400_BAD_REQUEST)
-        # except Exception as e:
-        #     order.delete()
-        #     return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+       
         try:
             for item in cart_items_data:
                 logger.error("PROCESSING ITEM: %s", item)
@@ -153,13 +124,14 @@ class CheckoutAPIView(APIView):
                 'full_name': data.get('fullName'),
                 'email': data.get('email', ''),
                 'shipping_address': data.get('shippingAddress'),
-                'payment_method': 'COD',
+                'payment_method': data.get('paymentMethod', 'COD'),
                 'shipping_cost': shipping_cost,
                 'subtotal': subtotal,
-                'discount': 0,
+                'discount': data.get('discountAmount', 0),
                 'payment_amount': subtotal + shipping_cost,
                 'payment_status': 'Pending',
-                'transaction_id': data.get('transactionId', None)
+                'transaction_id': data.get('transactionId', None),
+                'coupon_code': data.get('couponCode', None)
             }
             
             logger.error("DELIVERY DATA: %s", delivery_data)

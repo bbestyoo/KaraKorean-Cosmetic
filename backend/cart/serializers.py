@@ -20,7 +20,7 @@ class DeliverySerializer(serializers.ModelSerializer):
         model = Delivery
         fields = ['id', 'order', 'phone_number', 'full_name', 'email', 
                   'shipping_address', 'payment_method', 'shipping_cost', 'subtotal', 
-                  'discount', 'payment_amount', 'payment_status', 'order_items', 'created_at']
+                  'discount', 'payment_amount', 'payment_status', 'order_items', 'created_at', 'transaction_id', 'coupon_code']
         read_only_fields = ['order']
     
     def get_order_items(self, obj):
