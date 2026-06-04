@@ -1,7 +1,14 @@
 {
   "name": "bibesh",
   "email": "bibesh@gmail.com",
-  "phone": "",
-  "addresses": [],
-  "updatedAt": "2026-06-04T04:33:26.663Z"
+  "phone": "98918989",
+  "addresses": [
+    {
+      "id": "",
+      "line1": "",
+      "city": "",
+      "country": ""
+    }
+  ],
+  "updatedAt": "2026-06-04T06:45:39.148Z"
 }

@@ -8,20 +8,28 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 
 interface DeliveryFormData {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   phoneNumber: string;
   email: string;
   shippingAddress: string;
+  city: string;
+  country: string;
   createAccount: boolean;
   password: string;
 }
 
 interface FormErrors {
-  firstName?: string;
-  lastName?: string;
+  fullName?: string;
   phoneNumber?: string;
   shippingAddress?: string;
+  transactionId?: string;
+}
+
+interface CouponResult {
+  status: string;
+  amount?: string;
+  percentage?: string;
+  code?: string;
 }
 
 export default function CheckoutPage() {
@@ -32,95 +40,111 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'qr'>('cod');
   const [transactionId, setTransactionId] = useState('');
 
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [couponResult, setCouponResult] = useState<CouponResult | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+
   const [formData, setFormData] = useState<DeliveryFormData>({
-    firstName: '',
-    lastName: '',
+    fullName: '',
     phoneNumber: '',
     email: '',
     shippingAddress: '',
+    city: '',
+    country: '',
     createAccount: false,
     password: '',
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
 
+  const API_BASE_URL = (() => {
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+    return base.replace(/\/shop\/?$/, '');
+  })();
+
+  const getAuthHeader = () => {
+    if (!token) return null;
+    return token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
+  };
+
   useEffect(() => {
-    if (isLoggedIn && user) {
-      // First, prefill from the local user object in auth context if available
-      const nameParts = (user.name || user.username || '').split(' ');
-      const fName = nameParts[0] || '';
-      const lName = nameParts.slice(1).join(' ') || '';
-      
-      setFormData(prev => ({
-        ...prev,
-        firstName: prev.firstName || fName,
-        lastName: prev.lastName || lName,
-        email: prev.email || user.email || '',
-      }));
+    if (!isLoggedIn || !token) return;
+    const authHeader = getAuthHeader();
+    if (!authHeader) return;
 
-      // Then fetch the latest from the backend user info and orders
-      const fetchUserData = async () => {
-        try {
-          if (!token) return;
-          const authHeader = token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
-          
-          // 1. Fetch latest user info
-          const userRes = await fetch(`${API_BASE_URL}/userauth/api/me/`, {
-            headers: { 'Authorization': authHeader }
-          });
-          if (userRes.ok) {
-            const userData = await userRes.json();
-            const latestNameParts = (userData.name || '').split(' ');
-            const latestFName = latestNameParts[0] || '';
-            const latestLName = latestNameParts.slice(1).join(' ') || '';
-            
-            setFormData(prev => ({
-              ...prev,
-              firstName: latestFName,
-              lastName: latestLName,
-              email: userData.email || prev.email,
-            }));
-          }
-
-          // 2. Fetch past orders to prefill phone and address
-          const ordersRes = await fetch(`${API_BASE_URL}/cart/api/order/`, {
-            headers: { 'Authorization': authHeader }
-          });
-          if (ordersRes.ok) {
-            const ordersData = await ordersRes.json();
-            const orders = Array.isArray(ordersData) ? ordersData : (ordersData.results || []);
-            
-            // Find the most recent order with delivery info
-            const lastOrderWithDelivery = orders.find((o: any) => o.delivery && (o.delivery.phone_number || o.delivery.shipping_address));
-            if (lastOrderWithDelivery && lastOrderWithDelivery.delivery) {
-              setFormData(prev => ({
-                ...prev,
-                phoneNumber: prev.phoneNumber || lastOrderWithDelivery.delivery.phone_number || '',
-                shippingAddress: prev.shippingAddress || lastOrderWithDelivery.delivery.shipping_address || '',
-              }));
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching user info/orders from backend:', error);
+    const fetchUserInfo = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/userauth/api/info/`, {
+          headers: { Authorization: authHeader },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const nameParts = (data.name || data.username || '').split(' ');
+          setFormData(prev => ({
+            ...prev,
+            fullName: nameParts[0] || prev.fullName,
+            email: data.email || prev.email,
+            phoneNumber: data.phone || data.phone_number || prev.phoneNumber,
+            shippingAddress: data.address || data.shipping_address || prev.shippingAddress,
+            city: data.city || prev.city,
+            country: data.country || prev.country,
+          }));
         }
-      };
+      } catch (err) {
+        console.error('Error fetching user info:', err);
+      }
+    };
 
-      fetchUserData();
+    fetchUserInfo();
+  }, [isLoggedIn, token]);
+
+  // Coupon apply handler
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setApplyingCoupon(true);
+    setCouponError('');
+    setCouponResult(null);
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      const authHeader = getAuthHeader();
+      if (authHeader) headers['Authorization'] = authHeader;
+      const res = await fetch(`${API_BASE_URL}/cart/api/coupon/?code=${couponCode.trim()}`, {
+        method: 'GET',
+        headers,
+      });
+      const data = await res.json();
+      if (res.ok && data.status === 'Success') {
+        setCouponResult({ ...data, code: couponCode.trim() });
+      } else {
+        setCouponError(data.detail || data.message || 'Invalid or expired coupon.');
+      }
+    } catch {
+      setCouponError('Failed to apply coupon. Try again.');
+    } finally {
+      setApplyingCoupon(false);
     }
-  }, [isLoggedIn, user, token]);
+  };
 
   const subtotal = getTotalPrice();
   const shippingCost = subtotal > 5000 ? 0 : 120;
-  const total = subtotal + shippingCost;
 
+  // Compute discount from coupon
+  const discountAmount = (() => {
+    if (!couponResult) return 0;
+    if (couponResult.percentage) {
+      const percentage = parseFloat(couponResult.percentage);
+      return isNaN(percentage) ? 0 : Math.round(subtotal * percentage / 100);
+    }
+    if (couponResult.amount) {
+      const amt = parseFloat(couponResult.amount);
+      return isNaN(amt) ? 0 : amt;
+    }
+    return 0;
+  })();
 
-const API_BASE_URL1 = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-if (!API_BASE_URL1) {
-  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
-}
-
-const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
+  const total = subtotal + shippingCost - discountAmount;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -141,17 +165,17 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
   const handleContinueToPayment = async () => {
     const newErrors: FormErrors = {};
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'First name is required';
     }
     if (!formData.phoneNumber.trim()) {
       newErrors.phoneNumber = 'Phone number is required';
     }
     if (!formData.shippingAddress.trim()) {
       newErrors.shippingAddress = 'Address is required';
+    }
+    if (paymentMethod === 'qr' && !transactionId.trim()) {
+      newErrors.transactionId = 'Transaction ID is required for QR payment';
     }
 
     setErrors(newErrors);
@@ -178,31 +202,39 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
         headers['Authorization'] = token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
       }
 
+      const orderPayload = {
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
+        shippingAddress: formData.shippingAddress,
+        subtotal,
+        shippingCost,
+        discountAmount,
+        total,
+        couponCode: couponResult ? couponResult.code : undefined,
+        paymentMethod,
+        transactionId: paymentMethod === 'qr' ? transactionId : undefined,
+        cartItems: items.map(item => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+          price: item.price,
+          size: item.size,
+        })),
+      };
+
+      // Debug: confirm the discounted values being sent
+      console.log('📦 Order payload:', orderPayload);
+      console.log(`💰 subtotal=${subtotal}, discount=${discountAmount}, total=${total}, coupon=${couponResult?.code}`);
+
       const response = await fetch(`${API_BASE_URL}/cart/api/checkout/`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phoneNumber: formData.phoneNumber,
-          email: formData.email,
-          shippingAddress: formData.shippingAddress,
-          subtotal,
-          shippingCost,
-          paymentMethod,
-          transactionId: paymentMethod === 'qr' ? transactionId : undefined,
-          cartItems: items.map(item => ({
-            product_id: item.product_id,
-            quantity: item.quantity,
-            price: item.price,
-            size: item.size,
-          })),
-        }),
+        body: JSON.stringify(orderPayload),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrors({ firstName: errorData.detail || 'Order creation failed' });
+        setErrors({ fullName: errorData.detail || 'Order creation failed' });
         return;
       }
 
@@ -215,7 +247,7 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
       router.push(`/order-confirmation/${orderData.id}`);
     } catch (error) {
       console.error('Error submitting order:', error);
-      setErrors({ firstName: 'Failed to submit order. Please try again.' });
+      setErrors({ fullName: 'Failed to submit order. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -249,7 +281,7 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">Already have an account?</h3>
                       <p className="text-sm text-gray-600 mb-4">Sign in to use saved addresses and track your orders.</p>
-                      <button 
+                      <button
                         onClick={() => router.push('/login')}
                         className="px-4 py-2  text-white rounded font-semibold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b] border border-black transition-colors"
                       >
@@ -272,40 +304,23 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-2">
-                        First Name <span className="text-red-500">*</span>
+                        Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        name="firstName"
-                        placeholder="Enter first name"
-                        value={formData.firstName}
+                        name="FullName"
+                        placeholder="Enter full name"
+                        value={formData.fullName}
                         onChange={(e) => {
                           handleInputChange(e);
-                          setErrors(prev => ({ ...prev, firstName: '' }));
+                          setErrors(prev => ({ ...prev, fullName: '' }));
                         }}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${errors.firstName ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${errors.fullName ? 'border-red-500' : 'border-gray-300'
                           }`}
                       />
-                      {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+                      {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">
-                        Last Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        placeholder="Enter last name"
-                        value={formData.lastName}
-                        onChange={(e) => {
-                          handleInputChange(e);
-                          setErrors(prev => ({ ...prev, lastName: '' }));
-                        }}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${errors.lastName ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                      />
-                      {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
-                    </div>
+
                   </div>
 
                   <div className='grid grid-cols-2 gap-4'>
@@ -373,23 +388,28 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                     {errors.shippingAddress && <p className="text-red-500 text-xs mt-1">{errors.shippingAddress}</p>}
                   </div>
 
-                  {/* City and Area */}
+                  {/* City and Country */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-2">City</label>
                       <input
                         type="text"
+                        name="city"
                         placeholder="Enter city"
+                        value={formData.city}
+                        onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
 
-                    {/* ZIP Code */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">ZIP Code</label>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">Country</label>
                       <input
                         type="text"
-                        placeholder="Enter ZIP code"
+                        name="country"
+                        placeholder="Enter country"
+                        value={formData.country}
+                        onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
@@ -408,11 +428,10 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                   {/* Cash on Delivery */}
                   <div
                     onClick={() => setPaymentMethod('cod')}
-                    className={`bg-white border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      paymentMethod === 'cod'
-                        ? 'border-[#0f3b2b] ring-1 ring-[#0f3b2b]/20'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
+                    className={`bg-white border rounded-lg p-4 cursor-pointer transition-all duration-200 ${paymentMethod === 'cod'
+                      ? 'border-[#0f3b2b] ring-1 ring-[#0f3b2b]/20'
+                      : 'border-gray-300 hover:border-gray-400'
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex items-center h-6">
@@ -437,11 +456,10 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                   {/* Pay via QR Code */}
                   <div
                     onClick={() => setPaymentMethod('qr')}
-                    className={`bg-white border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      paymentMethod === 'qr'
-                        ? 'border-[#0f3b2b] ring-1 ring-[#0f3b2b]/20'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
+                    className={`bg-white border rounded-lg p-4 cursor-pointer transition-all duration-200 ${paymentMethod === 'qr'
+                      ? 'border-[#0f3b2b] ring-1 ring-[#0f3b2b]/20'
+                      : 'border-gray-300 hover:border-gray-400'
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex items-center h-6">
@@ -464,16 +482,15 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
 
                     {/* QR Expanded Section */}
                     <div
-                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                        paymentMethod === 'qr' ? 'max-h-[700px] opacity-100 mt-5' : 'max-h-0 opacity-0'
-                      }`}
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${paymentMethod === 'qr' ? 'max-h-[700px] opacity-100 mt-5' : 'max-h-0 opacity-0'
+                        }`}
                     >
                       <div className="border-t border-gray-200 pt-5">
                         <p className="text-sm text-gray-700 leading-relaxed">
-                          Scan the QR code and complete your payment. After payment please contact us via
+                          Scan the QR code and complete your payment. You can also contact us via
                           Instagram or Whatsapp or Viber at{' '}
-                          <span className="font-semibold text-gray-900">+977-9821573070</span> /{' '}
-                          <span className="font-semibold text-gray-900">+977-9845178341</span>
+                          <span className="font-semibold text-gray-900">+977-9849900249 </span> /{' '}
+                          <span className="font-semibold text-gray-900">+977-9851413678</span>
                         </p>
 
                         {/* QR Code Image */}
@@ -492,16 +509,17 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                         {/* Transaction ID Input */}
                         <div>
                           <label className="block text-sm font-semibold text-gray-900 mb-2">
-                            Transaction ID
+                            Transaction ID <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="text"
                             value={transactionId}
-                            onChange={(e) => setTransactionId(e.target.value)}
+                            onChange={(e) => { setTransactionId(e.target.value); setErrors(prev => ({ ...prev, transactionId: '' })); }}
                             placeholder="Enter Transaction ID"
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/40 focus:border-[#0f3b2b] transition-colors"
+                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/40 focus:border-[#0f3b2b] transition-colors ${errors.transactionId ? 'border-red-500' : 'border-gray-300'}`}
                           />
+                          {errors.transactionId && <p className="text-red-500 text-xs mt-1">{errors.transactionId}</p>}
                         </div>
                       </div>
                     </div>
@@ -592,15 +610,33 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                   <input
                     type="text"
                     placeholder="Enter promo code"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                    value={couponCode}
+                    onChange={(e) => { setCouponCode(e.target.value); setCouponError(''); setCouponResult(null); }}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/40"
                   />
-                  <button className="px-4 py-2  text-white rounded border border-black font-semibold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b]">
-                    Apply
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={applyingCoupon}
+                    className="px-4 py-2 text-white rounded border border-black font-semibold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border-[#0f3b2b] disabled:opacity-60"
+                  >
+                    {applyingCoupon ? '...' : 'Apply'}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  <span className="text-red-500">*</span> Apply Promotion Code
-                </p>
+                {couponError && <p className="text-xs text-red-500 mt-2">{couponError}</p>}
+                {couponResult && (
+                  <p className="text-xs text-green-600 mt-2 font-medium">
+                    ✓ Coupon <span className="font-bold">{couponResult.code}</span> applied —{' '}
+                    {couponResult.percentage
+                      ? `${couponResult.percentage}% off`
+                      : `NPR ${parseFloat(couponResult.amount || '0').toLocaleString()} off`}
+                  </p>
+                )}
+                {!couponResult && !couponError && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    <span className="text-red-500">*</span> Apply Promotion Code
+                  </p>
+                )}
               </div>
 
               {/* Pricing */}
@@ -613,6 +649,14 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                   <span>Shipping</span>
                   <span>{shippingCost === 0 ? 'FREE' : `NPR ${shippingCost}`}</span>
                 </div>
+                {couponResult && discountAmount > 0 && (
+                  <div className="flex justify-between text-green-600 font-medium">
+                    <span>
+                      Discount{couponResult.percentage ? ` (${couponResult.percentage})` : ''}
+                    </span>
+                    <span>- NPR {discountAmount.toLocaleString()}</span>
+                  </div>
+                )}
                 {subtotal > 0 && subtotal <= 5000 && (
                   <p className="text-xs text-gray-500 mt-2">Free delivery on orders above NPR 5000</p>
                 )}
@@ -625,11 +669,6 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
               </div>
 
               {/* Place Order Button */}
-              <button
-                className="w-full  text-white py-3 rounded-lg font-bold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b] border border-black  transition-colors"
-              >
-                Place Order - NPR {total.toLocaleString()}
-              </button>
 
               {/* Security Message */}
               <p className="text-xs text-gray-600 mt-4 flex items-center gap-2 text-center">
