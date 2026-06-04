@@ -39,8 +39,7 @@ class OrderItem(models.Model):
 class Delivery(models.Model):
     order = models.OneToOneField(Order, related_name='delivery', on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=100)    
     email = models.EmailField(null=True, blank=True)
     shipping_address = models.CharField(max_length=255)
     payment_method = models.CharField(max_length=50, default='COD')
