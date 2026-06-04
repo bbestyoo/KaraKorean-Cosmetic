@@ -50,6 +50,7 @@ class Delivery(models.Model):
     payment_status = models.CharField(max_length=20, default='Pending')
     transaction_id = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+    coupon_code = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return f"Delivery for Order {self.order.id}"
