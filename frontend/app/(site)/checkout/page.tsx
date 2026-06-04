@@ -65,7 +65,7 @@ export default function CheckoutPage() {
   })();
 
   const getAuthHeader = () => {
-    if (!token) return null;
+    if (!token || typeof token !== 'string') return null;
     return token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
   };
 

@@ -20,12 +20,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  const cleanToken = (tokenVal: any): string | null => {
+    if (!tokenVal) return null;
+    if (typeof tokenVal === 'object') {
+      return tokenVal.access || tokenVal.token || tokenVal.auth_token || null;
+    }
+    return tokenVal;
+  };
+
   useEffect(() => {
     const savedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
     if (savedAuth) {
       try {
         const { token, user } = JSON.parse(savedAuth);
-        setToken(token);
+        const cleanedToken = cleanToken(token);
+        setToken(cleanedToken);
         setUser(user);
         setIsLoggedIn(true);
       } catch (error) {
@@ -35,11 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsHydrated(true);
   }, []);
 
-  const login = (newToken: string, newUser: any) => {
-    setToken(newToken);
+  const login = (newToken: any, newUser: any) => {
+    const cleanedToken = cleanToken(newToken);
+    setToken(cleanedToken);
     setUser(newUser);
     setIsLoggedIn(true);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ token: newToken, user: newUser }));
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ token: cleanedToken, user: newUser }));
   };
 
   const logout = () => {
