@@ -130,13 +130,13 @@ export function NavSearch() {
         className={cn(
           "flex items-center rounded-full transition-all duration-300 ease-out h-10 select-none",
           isExpanded
-            ? "w-44 sm:w-52 md:w-60 lg:w-64 bg-[#f2efe9] border border-[#c9a46b]/30 px-3"
+            ? "w-44 sm:w-52 md:w-60 lg:w-78 bg-[#f2efe9] border border-[#c9a46b]/30 px-3"
             : "w-10 justify-center cursor-pointer hover:bg-gray-100"
         )}
         onClick={handleIconClick}
       >
         <Search
-          size={20}
+          size={23}
           className={cn(
             "text-gray-900 transition-colors shrink-0",
             isExpanded ? "text-[#c9a46b]" : "hover:text-[#c9a46b]"
@@ -183,7 +183,7 @@ export function NavSearch() {
       {/* Results Dropdown */}
       {isOpen && query.trim().length >= 2 && (
         <div
-          className="absolute right-0 top-full mt-3 w-[300px] sm:w-[350px] md:w-[400px] rounded-2xl shadow-2xl transition-all duration-200"
+          className="absolute right-0 top-full mt-3 w-[300px]  sm:w-[350px] md:w-[450px] rounded-2xl shadow-2xl transition-all duration-200"
           style={{
             background: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(20px) saturate(160%)",
@@ -210,7 +210,7 @@ export function NavSearch() {
 
           {/* Results list */}
           {!loading && results.length > 0 && (
-            <div className="max-h-[360px] overflow-y-auto py-2" data-lenis-prevent>
+            <div className="max-h-[400px] overflow-y-auto py-2" data-lenis-prevent>
               <div className="px-4 py-1.5 text-[0.65rem] font-bold tracking-widest text-[#5c6e69] uppercase border-b border-neutral-100">
                 Products Found ({results.length})
               </div>
@@ -222,12 +222,12 @@ export function NavSearch() {
                     onClick={() => handleSelectProduct(product.id)}
                     onMouseEnter={() => setActiveIndex(idx)}
                     className={cn(
-                      "w-full text-left flex cursor-pointer items-center gap-3.5 px-4 py-3 border-b border-neutral-100 last:border-none transition-all duration-200 group",
+                      "w-full text-left flex cursor-pointer items-center gap-5 px-4 py-3 border-b border-neutral-100 last:border-none transition-all duration-200 group",
                       isActive ? "bg-[#c9a46b]/10" : "hover:bg-neutral-50"
                     )}
                   >
                     {/* Thumbnail Image */}
-                    <div className="relative w-12 h-12 bg-neutral-100 rounded-lg overflow-hidden shrink-0 border border-neutral-200/50">
+                    <div className="relative w-16 h-16 bg-neutral-100 rounded-lg overflow-hidden shrink-0 border border-neutral-200/50">
                       <Image
                         src={resolveImageUrl(product.image)}
                         alt={product.name}

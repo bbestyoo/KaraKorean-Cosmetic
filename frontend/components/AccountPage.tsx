@@ -17,9 +17,9 @@ type Address = {
 export default function AccountPage() {
   const { user, isLoggedIn } = useAuth();
   const [active, setActive] = useState<"profile" | "addresses" | "settings">("profile");
-  const [profile, setProfile] = useState({ name: "Jane Doe", email: "jane@example.com", phone: "+1 (555) 123-4567" });
+  const [profile, setProfile] = useState({ name: "Jane Doe", email: "jane@example.com", phone: "" });
   const [addresses, setAddresses] = useState<Address[]>([
-    { id: "1", label: "Home", line1: "123 Main St", city: "Springfield", state: "CA", zip: "90210", country: "USA" },
+    { id: "", label: "", line1: "", city: "", country: "" },
   ]);
   const [newAddress, setNewAddress] = useState<Address>({ id: "", label: "", line1: "", city: "", state: "", zip: "", country: "" });
   const [status, setStatus] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
@@ -156,10 +156,10 @@ export default function AccountPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <button type="submit" disabled={saving} className="px-6 py-3 bg-[#0f3b2b] text-white rounded-md font-semibold hover:opacity-95">
+                <button type="submit" disabled={saving} className="px-6 py-3 cursor-pointer bg-[#0f3b2b] text-white rounded-md font-semibold hover:opacity-95">
                   {saving ? "Saving..." : "Save changes"}
                 </button>
-                <button type="button" onClick={() => { setProfile({ name: "Jane Doe", email: "jane@example.com", phone: "+1 (555) 123-4567" }); setStatus({ type: "info", message: "Changes reverted" }); setTimeout(() => setStatus(null), 2000); }} className="px-4 py-3 border rounded-md">
+                <button type="button" onClick={() => { setProfile({ name: "Jane Doe", email: "jane@example.com", phone: "+1 (555) 123-4567" }); setStatus({ type: "info", message: "Changes reverted" }); setTimeout(() => setStatus(null), 2000); }} className="px-4 py-3 cursor-pointer border rounded-md">
                   Reset
                 </button>
               </div>
@@ -170,12 +170,12 @@ export default function AccountPage() {
             <div className="space-y-6">
               <h2 className="text-xl font-semibold">Addresses</h2>
               <div className="space-y-4">
-                {addresses.map((addr) => (
+                {addresses.length > 1 && addresses.map((addr) => (
                   <div key={addr.id} className="flex items-start justify-between p-4 border rounded-md">
                     <div>
                       <div className="font-semibold">{addr.label || "Address"}</div>
                       <div className="text-sm text-neutral-600">{addr.line1}</div>
-                      <div className="text-sm text-neutral-600">{addr.city}, {addr.state} {addr.zip}</div>
+                      <div className="text-sm text-neutral-600">{addr.city}, </div>
                       <div className="text-sm text-neutral-600">{addr.country}</div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
@@ -196,11 +196,9 @@ export default function AccountPage() {
                 <input placeholder="Label (Home, Work)" value={newAddress.label} onChange={(e) => setNewAddress((p) => ({ ...p, label: e.target.value }))} className="p-3 border rounded-md" />
                 <input placeholder="Address line" value={newAddress.line1} onChange={(e) => setNewAddress((p) => ({ ...p, line1: e.target.value }))} className="p-3 border rounded-md md:col-span-2" />
                 <input placeholder="City" value={newAddress.city} onChange={(e) => setNewAddress((p) => ({ ...p, city: e.target.value }))} className="p-3 border rounded-md" />
-                <input placeholder="State" value={newAddress.state} onChange={(e) => setNewAddress((p) => ({ ...p, state: e.target.value }))} className="p-3 border rounded-md" />
-                <input placeholder="ZIP" value={newAddress.zip} onChange={(e) => setNewAddress((p) => ({ ...p, zip: e.target.value }))} className="p-3 border rounded-md" />
                 <input placeholder="Country" value={newAddress.country} onChange={(e) => setNewAddress((p) => ({ ...p, country: e.target.value }))} className="p-3 border rounded-md" />
                 <div className="md:col-span-2 flex items-center gap-3">
-                  <button type="submit" className="px-5 py-3 bg-[#0f3b2b] text-white rounded-md">Add address</button>
+                  <button type="submit" className="px-5 py-3 bg-[#0f3b2b] hover:border-[#0f3b2bb3] hover:border hover:bg-white hover:text-[#0f3b2b]  border  cursor-pointer text-white rounded-md">Add address</button>
                 </div>
               </form>
             </div>

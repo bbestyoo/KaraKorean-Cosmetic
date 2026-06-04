@@ -122,7 +122,7 @@ export function SiteHeader() {
                 alt="Kara KOREAN BEAUTY STORE"
                 width={250}
                 height={90}
-                className="object-contain mt-4 w-[25vw] md:w-[14vw] mb-2"
+                className="object-contain mt-4 p-8  w-[25vw] md:w-[14vw] mb-2"
               />
             </Link>
           </div>
