@@ -51,6 +51,7 @@ class CheckoutAPIView(APIView):
         if not cart_items_data:
             return Response({'detail': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
         
+        order = Order.objects.create(status="Pending")
        
         try:
             for item in cart_items_data:
