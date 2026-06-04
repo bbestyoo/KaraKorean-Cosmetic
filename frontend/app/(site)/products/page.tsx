@@ -174,6 +174,7 @@ function ProductsContent() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [selectedPriceRange, setSelectedPriceRange] = useState('All Prices');
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedSort, setSelectedSort] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -238,45 +239,71 @@ function ProductsContent() {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchAllProducts = async () => {
+    const fetchProducts = async () => {
       try {
         setLoading(true);
         setError('');
 
         const sp = new URLSearchParams(searchParamsString);
+        const categoryParam = sp.get('category');
+        const brandParam = sp.get('brand');
+        const priceParam = sp.get('price');
+        const sortParam = sp.get('sort');
+        const pageParam = sp.get('page') || '1';
+
         const usecaseParam = sp.get('usecase');
         const featuredParam = sp.get('featured');
 
-        const firstQuery = new URLSearchParams({ page: '1', page_size: '100' });
-        if (usecaseParam) firstQuery.set('usecase', usecaseParam);
-        if (featuredParam) firstQuery.set('featured', featuredParam);
+        const apiParams = new URLSearchParams();
+        apiParams.set('page', pageParam);
+        apiParams.set('page_size', String(ITEMS_PER_PAGE));
 
-        const firstResponse = await fetch(`${API_BASE_URL}/api/?${firstQuery.toString()}`);
-        if (!firstResponse.ok) {
+        if (categoryParam && categoryParam !== 'All') {
+          apiParams.set('category', categoryParam);
+        }
+        if (brandParam && brandParam !== 'All') {
+          apiParams.set('brand', brandParam);
+        }
+        if (priceParam && priceParam !== 'All Prices') {
+          const priceRange = PRICE_RANGES.find((r) => r.label === priceParam);
+          if (priceRange) {
+            if (priceRange.min > 0) {
+              apiParams.set('min_price', String(priceRange.min));
+            }
+            if (priceRange.max !== Infinity) {
+              apiParams.set('max_price', String(priceRange.max));
+            }
+          }
+        }
+        if (sortParam) {
+          if (sortParam === 'price_asc') {
+            apiParams.set('ordering', 'price');
+          } else if (sortParam === 'price_desc') {
+            apiParams.set('ordering', '-price');
+          } else if (sortParam === 'name_asc') {
+            apiParams.set('ordering', 'name');
+          }
+        }
+        if (usecaseParam) {
+          apiParams.set('usecase', usecaseParam);
+        }
+        if (featuredParam) {
+          apiParams.set('featured', featuredParam);
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/?${apiParams.toString()}`);
+        if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
 
-        const firstData = await firstResponse.json();
-        const totalPages = Number(firstData?.total_pages) || 1;
-        const results = Array.isArray(firstData?.results) ? firstData.results : [];
-
-        const additionalPages = await Promise.all(
-          Array.from({ length: Math.max(0, totalPages - 1) }, async (_, index) => {
-            const page = index + 2;
-            const q = new URLSearchParams({ page: String(page), page_size: '100' });
-            if (usecaseParam) q.set('usecase', usecaseParam);
-            if (featuredParam) q.set('featured', featuredParam);
-            const response = await fetch(`${API_BASE_URL}/api/?${q.toString()}`);
-            if (!response.ok) return [];
-            const data = await response.json();
-            return Array.isArray(data?.results) ? data.results : [];
-          })
-        );
+        const data = await response.json();
 
         if (!isMounted) return;
 
-        const merged = [...results, ...additionalPages.flat()].map(normalizeProduct);
-        setProducts(merged);
+        const results = Array.isArray(data?.results) ? data.results : [];
+        const normalized = results.map(normalizeProduct);
+        setProducts(normalized);
+        setTotalPages(Number(data?.total_pages) || 1);
       } catch (fetchError) {
         if (!isMounted) return;
         console.error('Error fetching products:', fetchError);
@@ -288,7 +315,7 @@ function ProductsContent() {
       }
     };
 
-    fetchAllProducts();
+    fetchProducts();
 
     return () => {
       isMounted = false;
@@ -348,26 +375,7 @@ function ProductsContent() {
     }
   }, [categories, brands]);
 
-  // Filtered + sorted products
-  const filteredProducts = products.filter((p) => {
-    const priceRange = PRICE_RANGES.find(r => r.label === selectedPriceRange) || PRICE_RANGES[0];
-    return (
-      (selectedCategory === 'All' || p.category_name === selectedCategory) &&
-      (selectedBrand === 'All' || p.brand === selectedBrand) &&
-      (p.price >= priceRange.min && p.price <= priceRange.max)
-    );
-  }).sort((a, b) => {
-    if (selectedSort === 'price_asc') return a.price - b.price;
-    if (selectedSort === 'price_desc') return b.price - a.price;
-    if (selectedSort === 'name_asc') return a.name.localeCompare(b.name);
-    return 0;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const paginatedProducts = products;
 
   const resetPage = () => setCurrentPage(1);
 
@@ -438,7 +446,7 @@ function ProductsContent() {
             </div>
 
             {/* Pagination controls */}
-            <div className="flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-1">
               <button
                 onClick={() => setCurrentPage(p => {
                   const newP = Math.max(1, p - 1);

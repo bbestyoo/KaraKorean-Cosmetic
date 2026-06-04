@@ -39,7 +39,7 @@ function WishlistContent() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Shared items parsed from URL query parameter
   const [sharedItems, setSharedItems] = useState<WishlistItem[]>([]);
 
@@ -149,7 +149,7 @@ function WishlistContent() {
 
   return (
     <main className="min-h-screen bg-[#f7f6f2] pt-32 pb-24 px-6 md:px-12 lg:px-20 relative">
-      
+
       {/* Toast Notification */}
       {showShareToast && (
         <div className="fixed bottom-8 right-8 z-50 bg-[#0f3b2b] text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3 animate-slide-in">
@@ -210,7 +210,7 @@ function WishlistContent() {
               </>
             )}
           </button>
-          
+
           {wishlist.length > 0 && (
             <button
               onClick={clearWishlist}
@@ -285,7 +285,7 @@ function WishlistContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            
+
             {/* Render Shared Items first if any */}
             {sharedItems.map((item) => (
               <div
@@ -295,7 +295,7 @@ function WishlistContent() {
                 <div className="absolute top-4 left-4 z-20 bg-[#E9F3A4] text-[#0f3b2b] text-[8px] font-bold uppercase tracking-wider px-2.5 py-1 shadow-sm">
                   Shared
                 </div>
-                
+
                 <button
                   onClick={() => addToWishlist(item)}
                   className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white shadow-md hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-colors"
@@ -424,7 +424,6 @@ function WishlistContent() {
                         price: item.price,
                         image: item.image,
                         size: '',
-                        color: '',
                         quantity: 1,
                       });
                     }}

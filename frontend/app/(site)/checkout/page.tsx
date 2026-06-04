@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Lock, Mail, MapPin, CreditCard } from 'lucide-react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface DeliveryFormData {
   firstName: string;
@@ -26,6 +27,7 @@ interface FormErrors {
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
+  const { isLoggedIn, user, token } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'qr'>('cod');
   const [transactionId, setTransactionId] = useState('');
@@ -41,6 +43,71 @@ export default function CheckoutPage() {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      // First, prefill from the local user object in auth context if available
+      const nameParts = (user.name || user.username || '').split(' ');
+      const fName = nameParts[0] || '';
+      const lName = nameParts.slice(1).join(' ') || '';
+      
+      setFormData(prev => ({
+        ...prev,
+        firstName: prev.firstName || fName,
+        lastName: prev.lastName || lName,
+        email: prev.email || user.email || '',
+      }));
+
+      // Then fetch the latest from the backend user info and orders
+      const fetchUserData = async () => {
+        try {
+          if (!token) return;
+          const authHeader = token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
+          
+          // 1. Fetch latest user info
+          const userRes = await fetch(`${API_BASE_URL}/userauth/api/me/`, {
+            headers: { 'Authorization': authHeader }
+          });
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            const latestNameParts = (userData.name || '').split(' ');
+            const latestFName = latestNameParts[0] || '';
+            const latestLName = latestNameParts.slice(1).join(' ') || '';
+            
+            setFormData(prev => ({
+              ...prev,
+              firstName: latestFName,
+              lastName: latestLName,
+              email: userData.email || prev.email,
+            }));
+          }
+
+          // 2. Fetch past orders to prefill phone and address
+          const ordersRes = await fetch(`${API_BASE_URL}/cart/api/order/`, {
+            headers: { 'Authorization': authHeader }
+          });
+          if (ordersRes.ok) {
+            const ordersData = await ordersRes.json();
+            const orders = Array.isArray(ordersData) ? ordersData : (ordersData.results || []);
+            
+            // Find the most recent order with delivery info
+            const lastOrderWithDelivery = orders.find((o: any) => o.delivery && (o.delivery.phone_number || o.delivery.shipping_address));
+            if (lastOrderWithDelivery && lastOrderWithDelivery.delivery) {
+              setFormData(prev => ({
+                ...prev,
+                phoneNumber: prev.phoneNumber || lastOrderWithDelivery.delivery.phone_number || '',
+                shippingAddress: prev.shippingAddress || lastOrderWithDelivery.delivery.shipping_address || '',
+              }));
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user info/orders from backend:', error);
+        }
+      };
+
+      fetchUserData();
+    }
+  }, [isLoggedIn, user, token]);
 
   const subtotal = getTotalPrice();
   const shippingCost = subtotal > 5000 ? 0 : 120;
@@ -104,11 +171,16 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
     // Submit order to backend
     setIsLoading(true);
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
+      }
+
       const response = await fetch(`${API_BASE_URL}/cart/api/checkout/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -170,18 +242,23 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
           <div className="lg:col-span-2">
             <div className="space-y-6">
               {/* Sign In Prompt */}
-              <div className="bg-[#0f3b2b]/10 border border-blue-200 rounded-lg p-6">
-                <div className="flex gap-3 items-start">
-                  <Mail size={20} className="text-[#0f3b2b] mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Already have an account?</h3>
-                    <p className="text-sm text-gray-600 mb-4">Sign in to use saved addresses and track your orders.</p>
-                    <button className="px-4 py-2  text-white rounded font-semibold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b] border border-black transition-colors">
-                      Sign In
-                    </button>
+              {!isLoggedIn && (
+                <div className="bg-[#0f3b2b]/10 border border-blue-200 rounded-lg p-6">
+                  <div className="flex gap-3 items-start">
+                    <Mail size={20} className="text-[#0f3b2b] mt-1 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">Already have an account?</h3>
+                      <p className="text-sm text-gray-600 mb-4">Sign in to use saved addresses and track your orders.</p>
+                      <button 
+                        onClick={() => router.push('/login')}
+                        className="px-4 py-2  text-white rounded font-semibold bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b] border border-black transition-colors"
+                      >
+                        Sign In
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Contact Information */}
               <div>
@@ -433,37 +510,39 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
               </div>
 
               {/* Create Account */}
-              <div className="pt-2">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="createAccount"
-                    name="createAccount"
-                    checked={formData.createAccount}
-                    onChange={handleInputChange}
-                    className="w-4 h-4 rounded border-gray-300 cursor-pointer"
-                  />
-                  <label htmlFor="createAccount" className="text-sm text-gray-900 cursor-pointer">
-                    Create an account
-                  </label>
-                </div>
-                <p className="text-xs text-gray-600 mt-2">Save your information for faster checkout next time</p>
-
-                {/* Password Field (if creating account) */}
-                {formData.createAccount && (
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-900 mb-2">Password</label>
+              {!isLoggedIn && (
+                <div className="pt-2">
+                  <div className="flex items-center gap-3">
                     <input
-                      type="password"
-                      name="password"
-                      placeholder="Create a password"
-                      value={formData.password}
+                      type="checkbox"
+                      id="createAccount"
+                      name="createAccount"
+                      checked={formData.createAccount}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-4 h-4 rounded border-gray-300 cursor-pointer"
                     />
+                    <label htmlFor="createAccount" className="text-sm text-gray-900 cursor-pointer">
+                      Create an account
+                    </label>
                   </div>
-                )}
-              </div>
+                  <p className="text-xs text-gray-600 mt-2">Save your information for faster checkout next time</p>
+
+                  {/* Password Field (if creating account) */}
+                  {formData.createAccount && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-900 mb-2">Password</label>
+                      <input
+                        type="password"
+                        name="password"
+                        placeholder="Create a password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Continue Button */}
               <button
