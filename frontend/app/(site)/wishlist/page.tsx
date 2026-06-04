@@ -8,7 +8,22 @@ import { Heart, Share2, LogIn, X, Clipboard, Check, ShoppingBag, Plus } from 'lu
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { useProductAPI } from '@/hooks/useProductAPI';
+
+// Local resolution dictionary for mock products
+const PRODUCT_CATALOG: Record<string, { name: string; price: number; old_price?: number; image: string; category_name: string }> = {
+  '1': { name: 'COSRX Snail Mucin 96% Power Repairing Essence', price: 2800, old_price: 3200, category_name: 'Essence', image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop' },
+  '2': { name: 'Anua Heartleaf 77% Soothing Toner', price: 3100, category_name: 'Toner', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop' },
+  '3': { name: 'Some By Mi AHA BHA PHA 30 Days Miracle Toner', price: 1950, old_price: 2400, category_name: 'Toner', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop' },
+  '4': { name: 'Isntree Hyaluronic Acid Toner', price: 2200, category_name: 'Toner', image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop' },
+  '5': { name: 'Skin1004 Madagascar Centella Ampoule', price: 3500, old_price: 4000, category_name: 'Ampoule', image: 'https://images.unsplash.com/photo-1617897903246-719242758050?w=600&auto=format&fit=crop' },
+  '6': { name: 'Medicube Age R Booster Shot', price: 5200, category_name: 'Serum', image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&auto=format&fit=crop' },
+  '7': { name: 'Roundlab 1025 Dokdo Cleanser', price: 1800, old_price: 2000, category_name: 'Cleanser', image: 'https://images.unsplash.com/photo-1601612628452-9e99ced43524?w=600&auto=format&fit=crop' },
+  '8': { name: 'BOJ Ceramide Repair Cream', price: 4100, category_name: 'Moisturizer', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&auto=format&fit=crop' },
+  '9': { name: 'COSRX Advanced Snail 92 All in one Cream', price: 3300, old_price: 3800, category_name: 'Moisturizer', image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop' },
+  '10': { name: 'Anua Heartleaf Pore Control Cleansing Oil', price: 2700, category_name: 'Cleanser', image: 'https://images.unsplash.com/photo-1614159102043-d3b56a98b8bc?w=600&auto=format&fit=crop' },
+  '11': { name: 'Skin1004 Centella Hyalu-Cica Water-Fit Sun Serum', price: 2900, old_price: 3500, category_name: 'Sunscreen', image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&auto=format&fit=crop' },
+  '12': { name: 'Isntree C-Niacin Toning Ampoule', price: 3800, category_name: 'Ampoule', image: 'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=600&auto=format&fit=crop' },
+};
 
 function WishlistContent() {
   const { wishlist, addToWishlist, removeFromWishlist, clearWishlist } = useWishlist();
@@ -24,23 +39,30 @@ function WishlistContent() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  
   // Shared items parsed from URL query parameter
   const [sharedItems, setSharedItems] = useState<WishlistItem[]>([]);
-  const { getProduct } = useProductAPI();
+
   useEffect(() => {
     setIsHydrated(true);
 
     const sharedIds = searchParams.get('shared');
-    if (!sharedIds) return;
-
-    const ids = sharedIds.split(',');
-
-    const fetchShared = async () => {
+    if (sharedIds) {
+      const ids = sharedIds.split(',');
       const parsedItems: WishlistItem[] = [];
-
-      for (const id of ids) {
-        if (id.startsWith('featured-')) {
+      ids.forEach((id) => {
+        const item = PRODUCT_CATALOG[id];
+        if (item) {
+          parsedItems.push({
+            product_id: id,
+            name: item.name,
+            price: item.price,
+            old_price: item.old_price,
+            image: item.image,
+            category_name: item.category_name,
+          });
+        } else if (id.startsWith('featured-')) {
+          // Fallback parsing for featured items in FeaturedProducts
           parsedItems.push({
             product_id: id,
             name: 'Featured RADIANCE Renewal Serum',
@@ -48,39 +70,11 @@ function WishlistContent() {
             image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=600&auto=format&fit=crop',
             category_name: 'Serum',
           });
-          continue;
         }
-
-        try {
-          const data: any = await getProduct(id);
-          if (data) {
-            parsedItems.push({
-              product_id: String(data.id || id),
-              name: data.title || data.name || data.product_name || 'Product',
-              price: data.price || data.selling_price || data.sale_price || 0,
-              old_price: data.old_price || data.list_price || undefined,
-              image: data.image || (data.images && data.images[0]) || 'https://via.placeholder.com/400',
-              category_name: data.category?.name || data.category_name || data.category || '',
-            });
-            continue;
-          }
-        } catch (e) {
-          // ignore and fallback to placeholder
-        }
-
-        parsedItems.push({
-          product_id: id,
-          name: 'Unknown Product',
-          price: 0,
-          image: 'https://via.placeholder.com/400',
-        });
-      }
-
+      });
       setSharedItems(parsedItems);
-    };
-
-    fetchShared();
-  }, [searchParams, getProduct]);
+    }
+  }, [searchParams]);
 
   if (!isHydrated) {
     return (
@@ -154,8 +148,8 @@ function WishlistContent() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] pt-10 pb-24 px-6 md:px-12 lg:px-20 relative">
-
+    <main className="min-h-screen bg-[#f7f6f2] pt-32 pb-24 px-6 md:px-12 lg:px-20 relative">
+      
       {/* Toast Notification */}
       {showShareToast && (
         <div className="fixed bottom-8 right-8 z-50 bg-[#0f3b2b] text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3 animate-slide-in">
@@ -189,7 +183,7 @@ function WishlistContent() {
       )}
 
       {/* Header Info */}
-      <div className="max-w-[1600xp] mx-auto flex flex-col md:flex-row md:items-end justify-between border-b border-[#0f3b2b]/10 pb-8 mb-5">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between border-b border-[#0f3b2b]/10 pb-8 mb-12">
         <div>
           <span className="text-[10px] tracking-[0.35em] text-[#6b766f] font-semibold uppercase block mb-3">
             ✦ Your Saved Luxuries
@@ -202,7 +196,7 @@ function WishlistContent() {
         <div className="mt-6 md:mt-0 flex gap-4">
           <button
             onClick={handleShareWishlist}
-            className="flex cursor-pointer items-center gap-2 px-6 py-3 border border-[#0f3b2b]/20 hover:border-[#0f3b2b] text-xs font-semibold tracking-widest text-[#0f3b2b] uppercase transition-all hover:bg-[#0f3b2b] hover:text-white"
+            className="flex items-center gap-2 px-6 py-3 border border-[#0f3b2b]/20 hover:border-[#0f3b2b] text-xs font-semibold tracking-widest text-[#0f3b2b] uppercase transition-all hover:bg-[#0f3b2b] hover:text-white"
           >
             {isLoggedIn ? (
               <>
@@ -216,7 +210,7 @@ function WishlistContent() {
               </>
             )}
           </button>
-
+          
           {wishlist.length > 0 && (
             <button
               onClick={clearWishlist}
@@ -229,8 +223,8 @@ function WishlistContent() {
       </div>
 
       {/* Luxury Quick Links */}
-      <div className="max-w-[1620px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
-        <div className="bg-white/50 cursor-pointer hover:shadow-lg  border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="bg-white/50 border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
           <span className="text-[10px] tracking-[0.2em] text-[#6b766f] font-semibold uppercase">✦ EXPERIENCE</span>
           <h3 className="font-serif text-lg text-[#0f3b2b] mt-2 mb-4">Complimentary Consultation</h3>
           <p className="text-xs text-[#6b766f] leading-relaxed mb-6">
@@ -244,7 +238,7 @@ function WishlistContent() {
           </a>
         </div>
 
-        <div className="bg-white/50 cursor-pointer hover:shadow-lg  border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
+        <div className="bg-white/50 border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
           <span className="text-[10px] tracking-[0.2em] text-[#6b766f] font-semibold uppercase">✦ RITUAL</span>
           <h3 className="font-serif text-lg text-[#0f3b2b] mt-2 mb-4">Tailored Beauty Routine</h3>
           <p className="text-xs text-[#6b766f] leading-relaxed mb-6">
@@ -258,7 +252,7 @@ function WishlistContent() {
           </Link>
         </div>
 
-        <div className="bg-white/50  cursor-pointer hover:shadow-lg border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
+        <div className="bg-white/50 border border-white/80 p-6 flex flex-col justify-between group hover:bg-white transition-all duration-300">
           <span className="text-[10px] tracking-[0.2em] text-[#6b766f] font-semibold uppercase">✦ PACKAGING</span>
           <h3 className="font-serif text-lg text-[#0f3b2b] mt-2 mb-4">Shipped With Premium Care</h3>
           <p className="text-xs text-[#6b766f] leading-relaxed mb-6">
@@ -274,7 +268,7 @@ function WishlistContent() {
       </div>
 
       {/* Main Grid or Empty state */}
-      <div className="max-w-[1600px] mx-auto">
+      <div className="max-w-7xl mx-auto">
         {wishlist.length === 0 && sharedItems.length === 0 ? (
           <div className="text-center py-24 bg-white/40 border border-dashed border-[#0f3b2b]/15 rounded-lg flex flex-col items-center">
             <Heart className="w-12 h-12 text-[#6b766f]/40 mb-6 animate-pulse" />
@@ -291,17 +285,17 @@ function WishlistContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-
+            
             {/* Render Shared Items first if any */}
             {sharedItems.map((item) => (
               <div
                 key={`shared-${item.product_id}`}
-                className="group bg-[#0f3b2b]/5 border border-[#0f3b2b]/20 flex flex-col justify-between relative hover:shadow-lg transition-all duration-500 overflow-hidden "
+                className="group bg-[#0f3b2b]/5 border border-[#0f3b2b]/20 flex flex-col justify-between relative hover:shadow-lg transition-all duration-500 overflow-hidden"
               >
                 <div className="absolute top-4 left-4 z-20 bg-[#E9F3A4] text-[#0f3b2b] text-[8px] font-bold uppercase tracking-wider px-2.5 py-1 shadow-sm">
                   Shared
                 </div>
-
+                
                 <button
                   onClick={() => addToWishlist(item)}
                   className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white shadow-md hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-colors"
@@ -373,7 +367,7 @@ function WishlistContent() {
             {wishlist.map((item) => (
               <div
                 key={item.product_id}
-                className="group bg-white border border-neutral-100 flex flex-col justify-between relative hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer hover:bg-gray-100"
+                className="group bg-white border border-neutral-100 flex flex-col justify-between relative hover:shadow-lg transition-all duration-500 overflow-hidden"
               >
                 <button
                   onClick={() => removeFromWishlist(item.product_id)}
@@ -430,6 +424,7 @@ function WishlistContent() {
                         price: item.price,
                         image: item.image,
                         size: '',
+                        color: '',
                         quantity: 1,
                       });
                     }}
