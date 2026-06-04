@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useProductAPI } from "@/hooks/useProductAPI";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: string;
@@ -17,6 +18,7 @@ interface Product {
 }
 
 export default function NewArrivalsCarousel() {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [fadeState, setFadeState] = useState<"in" | "out">("in");
@@ -167,7 +169,10 @@ export default function NewArrivalsCarousel() {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Featured product card */}
-      <div className="bg-[#eeebd8]/70  flex flex-col md:flex-row  gap-3 p-1 sm:gap-10 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90 cursor-pointer">
+      <div 
+        onClick={() => router.push(`/products/${currentProduct.id}`)}
+        className="bg-[#eeebd8]/70  flex flex-col md:flex-row  gap-3 p-1 sm:gap-10 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90 cursor-pointer"
+      >
 
         {/* Product Image Container */}
         <div className=" sm:w-38 md:w-42 h-28 w-32 sm:h-64 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
@@ -202,7 +207,10 @@ export default function NewArrivalsCarousel() {
           </div>
           <button
             type="button"
-            onClick={() => handleAddToBag(currentProduct)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToBag(currentProduct);
+            }}
             className="bg-[#0f3b2b] cursor-pointer text-[#f7f6f2] text-[10px] sm:text-xs tracking-[0.2em] font-sans  p-1 px-2 sm:px-4 sm:py-2 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm shadow-sm curosr-pointer"
             aria-label={`Add ${currentProduct.name} to bag`}
           >
