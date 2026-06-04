@@ -49,6 +49,7 @@ class Delivery(models.Model):
     discount = models.FloatField(default=0)
     payment_amount = models.FloatField(default=0)
     payment_status = models.CharField(max_length=20, default='Pending')
+    transaction_id = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

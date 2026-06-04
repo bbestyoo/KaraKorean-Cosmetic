@@ -159,7 +159,8 @@ class CheckoutAPIView(APIView):
                 'subtotal': subtotal,
                 'discount': 0,
                 'payment_amount': subtotal + shipping_cost,
-                'payment_status': 'Pending'
+                'payment_status': 'Pending',
+                'transaction_id': data.get('transactionId', None)
             }
             
             logger.error("DELIVERY DATA: %s", delivery_data)

@@ -47,6 +47,10 @@ class User(AbstractBaseUser,PermissionsMixin):
     dp = models.ImageField(upload_to='user/images', default='', null=True)
     bio = models.CharField(max_length=100, default='', null=True)
     google_id = models.CharField(max_length=255, unique=True,null=True,blank=True) # Important for Google Auth
+    phone_number = models.CharField(max_length=15, default='', null=True, blank=True)
+    address = models.CharField(max_length=255, default='', null=True, blank=True)
+    city = models.CharField(max_length=100, default='', null=True, blank=True)
+    country = models.CharField(max_length=100, default='', null=True, blank=True)
 
       # Include groups if needed
     groups = models.ManyToManyField(
