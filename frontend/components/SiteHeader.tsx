@@ -122,13 +122,13 @@ export function SiteHeader() {
                 alt="Kara KOREAN BEAUTY STORE"
                 width={250}
                 height={90}
-                className="object-contain mt-4 p-8  w-[25vw] md:w-[14vw] mb-2"
+                className="object-contain mt-4 md:p-8 p-2  w-[35vw] sm:w-[25vw] lg:w-[19vw] 2xl:w-[14vw] xl:w-[17vw] mb-2"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex md:gap-5 lg:gap-10 xl:gap-12 2xl:gap-16 items-center absolute left-1/2 -translate-x-1/2 text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
+          <nav className="hidden md:flex md:gap-5 lg:gap-10 xl:gap-12 2xl:gap-16 items-center absolute left-1/2 -translate-x-3/4  text-lg font-bold tracking-[0.15em] text-[#5c6e69] uppercase">
             {NAV_LINKS.map(({ label, href }) => {
               const active = isActive(href);
               return (
@@ -136,7 +136,7 @@ export function SiteHeader() {
                   key={href}
                   href={href}
                   className={cn(
-                    "relative pb-1 transition-colors hover:text-black group",
+                    "relative pb-1  transition-colors hover:text-black group",
                     active ? "text-[#4a5a56]" : ""
                   )}
                 >

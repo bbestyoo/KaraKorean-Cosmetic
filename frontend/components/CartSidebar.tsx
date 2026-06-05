@@ -91,7 +91,7 @@ export function CartSidebar() {
 
                   <div className="flex justify-between items-end">
                     <p className="text-md font-medium text-gray-900 font-sans">
-                      ${item.price.toFixed(2)}
+                      Rs.{item.price.toFixed(2)}
                     </p>
 
                     <div className="flex flex-col items-center">
@@ -139,7 +139,7 @@ export function CartSidebar() {
             <div className="flex justify-between items-center py-2 font-mono">
               <span className="text-lg text-gray-900">Total</span>
               <span className="text-xl font-medium text-gray-900">
-                Rs.&nsbp;{displayTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                Rs.{displayTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
 

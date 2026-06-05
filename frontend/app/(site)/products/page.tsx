@@ -30,7 +30,7 @@ const SORT_OPTIONS = [
   { value: 'name_asc', label: 'Name: A–Z' },
 ];
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 16;
 
 interface ApiProduct {
   product_id: string;
