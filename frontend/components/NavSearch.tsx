@@ -118,12 +118,12 @@ export function NavSearch() {
     <div ref={containerRef} className="relative flex items-center z-50">
       {/* Search Input Container */}
       <div
-        className="flex items-center rounded-full h-10 select-none w-44 sm:w-52 md:w-60 lg:w-[28vw] bg-[#f2efe9] border border-[#c9a46b]/30 px-3 cursor-text"
+        className="flex items-center rounded-full h-10 select-none w-[47vw] sm:w-52 md:w-60 lg:w-[28vw] bg-[#f2efe9] border border-[#c9a46b]/30 px-3 cursor-text"
         onClick={handleIconClick}
       >
         <Search
           size={23}
-          className="text-[#c9a46b] shrink-0"
+          className="text-[#c9a46b] w-[15px] sm:w-[20px] shrink-0"
         />
 
         <input
@@ -138,7 +138,7 @@ export function NavSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="What are you looking for?"
-          className="w-full bg-transparent border-none outline-none text-sm text-neutral-800 placeholder-neutral-400 font-medium ml-2 transition-all duration-200 opacity-100"
+          className="w-full  bg-transparent border-none outline-none text-[10px] sm:text-sm text-neutral-800 placeholder-neutral-400 font-medium ml-2 transition-all duration-200 opacity-100"
         />
 
         {/* Action Button (Clear) */}

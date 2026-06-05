@@ -136,7 +136,7 @@ export default function Home() {
             <p className="font-sans text-xs tracking-[0.2em] text-[#6b766f] leading-relaxed normal-case">
               Not sure where to start ?
               <br />
-              
+
             </p>
             <Link
               href="/quiz"
@@ -159,10 +159,10 @@ export default function Home() {
       <BestSellers />
 
       {/* Collections Section */}
-<div className="sm:py-20 mt-10">
+      <div className=" py-10 mt-0 md:py-20 mdLmt-10">
 
-      <FeaturedProducts />
-</div>
+        <FeaturedProducts />
+      </div>
       <Collections />
 
       <NewnessSection />
