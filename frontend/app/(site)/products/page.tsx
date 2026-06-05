@@ -31,7 +31,7 @@ const SORT_OPTIONS = [
 ];
 
 const ITEMS_PER_PAGE = 16;
-
+1
 interface ApiProduct {
   product_id: string;
   name: string;

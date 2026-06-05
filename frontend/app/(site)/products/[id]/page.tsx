@@ -159,6 +159,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     fetchProduct();
   }, [params]);
 
+  useEffect(() => {
+    if (!product) {
+      setSelectedSize(null);
+      return;
+    }
+    if (product.sizes && product.sizes.length === 1) {
+      setSelectedSize(product.sizes[0].name);
+    } else {
+      setSelectedSize(null);
+    }
+  }, [product]);
+
   const getSizeAdjustment = () => {
     if (!selectedSize || !product?.sizes) return 0;
     const selectedSizeObj = product.sizes.find((s) => s.name === selectedSize);
