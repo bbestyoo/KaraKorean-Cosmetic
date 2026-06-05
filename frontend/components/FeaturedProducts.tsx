@@ -143,8 +143,8 @@ export default function FeaturedProducts() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-baseline gap-2">
                           <span className="text-base sm:text-xl font-medium text-neutral-900">Rs. {Number(product.price || 0).toLocaleString()}</span>
-                          {product.old_price !== undefined && (
-                            <span className="text-xs text-neutral-400 line-through">Rs. {Number(product.old_price).toLocaleString()}</span>
+{product.old_price !== undefined && !Number.isNaN(product.old_price) && (
+                            <span className="text-lg text-neutral-800 line-through">Rs. {Number(product.old_price).toLocaleString()}</span>
                           )}
                         </div>
                         <button

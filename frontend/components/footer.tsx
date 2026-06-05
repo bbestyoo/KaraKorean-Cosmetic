@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { FiInstagram, FiLinkedin, FiTwitter, FiYoutube } from "react-icons/fi";
+import { FiInstagram, FiLinkedin, FiYoutube } from "react-icons/fi";
+import { FaTiktok } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -73,11 +74,11 @@ export default function Footer() {
                 <FiLinkedin size={22} />
               </Link>
 
-              <Link href="#" className="text-white hover:scale-110 transition-transform">
+              <Link href="https://www.instagram.com/kara_korean_store?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" className="text-white hover:scale-110 transition-transform">
                 <FiInstagram size={22} />
               </Link>
-              <Link href="#" className="text-white hover:scale-110 transition-transform">
-                <FiTwitter size={22} />
+              <Link href="https://www.tiktok.com/@karakoreanstore" className="text-white hover:scale-110 transition-transform">
+                < FaTiktok size={22} />
               </Link>
               <Link href="#" className="text-white hover:scale-110 transition-transform">
                 <FiYoutube size={22} />
