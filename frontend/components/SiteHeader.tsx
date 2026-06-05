@@ -331,7 +331,7 @@ export function SiteHeader() {
             <NavSearch />
             <Link
               href="/wishlist"
-              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="relative p-2 hidden md:block hover:bg-gray-100 rounded-lg transition-colors"
               aria-label="Wishlist"
             >
               <Heart
