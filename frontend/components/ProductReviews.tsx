@@ -22,7 +22,7 @@ if (!API_BASE_URL) {
   throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
 }
 
-const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
+const API_ORIGIN = API_BASE_URL;
 
 
 export default function ProductReviews({ productId }: { productId: string }) {
@@ -53,7 +53,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
   async function fetchReviews() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/reviews?productId=${encodeURIComponent(productId)}`);
+      const res = await fetch(`${API_ORIGIN}/api/reviews/${encodeURIComponent(productId)}/`);
       if (res.ok) {
         const json = await res.json();
         setReviews(json.reviews || []);
@@ -90,7 +90,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
         userId: user?.id || user?.username || null,
       };
 
-      const res = await fetch('/api/reviews', {
+      const res = await fetch(`${API_ORIGIN}/api/reviews/${encodeURIComponent(productId)}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

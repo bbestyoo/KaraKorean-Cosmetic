@@ -221,6 +221,7 @@ class GetDealProduct(APIView):
 
 
 class ApiSearch(generics.ListAPIView):
+    
     serializer_class = GetProductSerializer 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['product_id','name', 'description','brand__name','category__name','sub_category__name']
@@ -523,6 +524,16 @@ class ReplyView(APIView):
 
 
 class RatingView(APIView):
+    
+    # def get(self, request, product_id):
+    #     ratings = Rating.objects.filter(product_id=product_id)
+    #     average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
+    #     ratings_count = ratings.count()
+    #     return Response({
+    #         'average_rating': average_rating,
+    #         'ratings_count': ratings_count
+    #     })
+
     def post(self,request,product_id):
         data = request.data
         user = request.user
