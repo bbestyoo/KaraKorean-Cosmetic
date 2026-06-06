@@ -28,7 +28,6 @@ export function NavSearch() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const router = useRouter();
@@ -63,26 +62,22 @@ export function NavSearch() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Handle click outside to close dropdown and collapse search
+  // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        if (query === "") {
-          setIsExpanded(false);
-        }
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [query]);
+  }, []);
 
   // Handle key down events for accessibility / keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       setIsOpen(false);
-      setIsExpanded(false);
       inputRef.current?.blur();
       return;
     }
@@ -106,15 +101,11 @@ export function NavSearch() {
   const handleSelectProduct = (productId: string) => {
     setIsOpen(false);
     setQuery("");
-    setIsExpanded(false);
     router.push(`/products/${productId}`);
   };
 
   const handleIconClick = () => {
-    if (!isExpanded) {
-      setIsExpanded(true);
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
+    inputRef.current?.focus();
   };
 
   const handleClear = () => {
@@ -127,20 +118,12 @@ export function NavSearch() {
     <div ref={containerRef} className="relative flex items-center z-50">
       {/* Search Input Container */}
       <div
-        className={cn(
-          "flex items-center rounded-full transition-all duration-300 ease-out h-10 select-none",
-          isExpanded
-            ? "w-44 sm:w-52 md:w-60 lg:w-78 bg-[#f2efe9] border border-[#c9a46b]/30 px-3"
-            : "w-10 justify-center cursor-pointer hover:bg-gray-100"
-        )}
+        className="flex items-center rounded-full h-8 sm:h-10 select-none w-[47vw] sm:w-52 md:w-60 lg:w-[27vw] bg-[#f2efe9] border border-[#c9a46b]/30 px-3 cursor-text"
         onClick={handleIconClick}
       >
         <Search
           size={23}
-          className={cn(
-            "text-gray-900 transition-colors shrink-0",
-            isExpanded ? "text-[#c9a46b]" : "hover:text-[#c9a46b]"
-          )}
+          className="text-[#c9a46b] w-[15px] sm:w-[20px] shrink-0"
         />
 
         <input
@@ -154,24 +137,16 @@ export function NavSearch() {
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Search products..."
-          className={cn(
-            "w-full bg-transparent border-none outline-none text-sm text-neutral-800 placeholder-neutral-400 font-medium ml-2 transition-all duration-200",
-            isExpanded ? "opacity-100 w-full" : "w-0 opacity-0 pointer-events-none"
-          )}
+          placeholder="What are you looking for?"
+          className="w-full  bg-transparent border-none outline-none text-[10px] sm:text-sm text-neutral-800 placeholder-neutral-400 font-medium ml-2 transition-all duration-200 opacity-100"
         />
 
-        {/* Action Button (Clear or Close) */}
-        {isExpanded && (
+        {/* Action Button (Clear) */}
+        {query && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (query) {
-                handleClear();
-              } else {
-                setIsExpanded(false);
-                setIsOpen(false);
-              }
+              handleClear();
             }}
             className="p-1 rounded-full hover:bg-neutral-200/50 text-neutral-500 hover:text-neutral-800 transition-colors shrink-0 ml-1"
           >
@@ -183,7 +158,7 @@ export function NavSearch() {
       {/* Results Dropdown */}
       {isOpen && query.trim().length >= 2 && (
         <div
-          className="absolute right-0 top-full mt-3 w-[300px]  sm:w-[350px] md:w-[450px] rounded-2xl shadow-2xl transition-all duration-200"
+          className="absolute right-0 top-full mt-3 w-[300px]  sm:w-[350px] md:w-[28vw] rounded-2xl shadow-2xl transition-all duration-200"
           style={{
             background: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(20px) saturate(160%)",
