@@ -20,7 +20,7 @@ const NAV_LINKS = [
   { label: "Products", href: "/products" },
   { label: "Blog", href: "/blog" },
   { label: "Quiz", href: "/quiz" },
-  { label: "About Us", href: "/about" },
+  { label: "About", href: "/about" },
 ];
 
 // ── Hover Mega-Dropdown ──────────────────────────────────────────────────────
