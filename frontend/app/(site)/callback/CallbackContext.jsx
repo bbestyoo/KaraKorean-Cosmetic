@@ -31,12 +31,12 @@ export default function CallbackPage() {
                 if (!res.ok) throw new Error('Failed to fetch user');
 
                 const user = await res.json();
-                login(access, user);  // match your AuthContext login signature
+                login(access, user, refresh);
                 router.replace('/');
             } catch (err) {
                 console.error(err);
                 // Even if profile fetch fails, still log in with tokens
-                login(access, null);
+                login(access, null, refresh);
                 router.replace('/');
             }
         };

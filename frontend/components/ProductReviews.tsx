@@ -26,7 +26,7 @@ const API_ORIGIN = API_BASE_URL;
 
 
 export default function ProductReviews({ productId }: { productId: string }) {
-  const { isLoggedIn, user, login, token } = useAuth();
+  const { isLoggedIn, user, login, token, fetchWithAuth } = useAuth();
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState<any>({ total_ratings: 0, rating_dict: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, avg_rating: 0 });
@@ -45,13 +45,6 @@ export default function ProductReviews({ productId }: { productId: string }) {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
-
-
-    
-  const getAuthHeader = () => {
-    if (!token || typeof token !== 'string') return null;
-    return token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
-  };
 
 
   useEffect(() => {
@@ -82,10 +75,6 @@ export default function ProductReviews({ productId }: { productId: string }) {
       setShowLogin(true);
       return;
     }
-    const authHeader = getAuthHeader();
-
-    
-
     if (!comment.trim()) {
       setMessage("Please write a review before submitting.");
       return;
@@ -101,9 +90,9 @@ export default function ProductReviews({ productId }: { productId: string }) {
         userId: user?.id || user?.username || null,
       };
 
-      const res = await fetch(`${API_ORIGIN}/api/reviews/${encodeURIComponent(productId)}/`, {
+      const res = await fetchWithAuth(`${API_ORIGIN}/api/reviews/${encodeURIComponent(productId)}/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization':authHeader },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 

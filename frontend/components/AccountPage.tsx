@@ -21,7 +21,7 @@ const DEFAULT_PROFILE: ProfileData = {
 };
 
 export default function AccountPage() {
-  const { user, isLoggedIn, token } = useAuth();
+  const { user, isLoggedIn, token, fetchWithAuth } = useAuth();
   const [active, setActive] = useState<"profile" | "settings">("profile");
 
   const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
@@ -45,21 +45,13 @@ export default function AccountPage() {
     return base.replace(/\/shop\/?$/, "");
   })();
 
-  const getAuthHeader = useCallback(() => {
-    if (!token || typeof token !== 'string') return null;
-    return token.includes(".") ? `Bearer ${token}` : `Token ${token}`;
-  }, [token]);
-
   // ─── 1. Fetch user info ───────────────────────────────────────────────────
   const fetchUserInfo = useCallback(async () => {
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
+    if (!token) return;
 
     setLoadingProfile(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/userauth/api/info/`, {
-        headers: { Authorization: authHeader },
-      });
+      const res = await fetchWithAuth(`${API_BASE_URL}/userauth/api/info/`);
       if (res.ok) {
         const data = await res.json();
         const fetched: ProfileData = {
@@ -79,7 +71,7 @@ export default function AccountPage() {
     } finally {
       setLoadingProfile(false);
     }
-  }, [API_BASE_URL, getAuthHeader]);
+  }, [API_BASE_URL, fetchWithAuth, token]);
 
   useEffect(() => {
     if (isLoggedIn && token) {
@@ -90,20 +82,16 @@ export default function AccountPage() {
   // ─── 2. Update user info (PATCH) ─────────────────────────────────────────
   async function handleProfileSave(e: React.FormEvent) {
     e.preventDefault();
-    const authHeader = getAuthHeader();
-    if (!authHeader) {
+    if (!token) {
       setStatus({ type: "error", message: "You are not authenticated." });
       return;
     }
 
     setSaving(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/userauth/api/info/`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/userauth/api/info/`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: profile.name,
           email: profile.email,
@@ -151,8 +139,7 @@ export default function AccountPage() {
   // ─── 3. Change password ──────────────────────────────────────────────────
   async function handlePasswordChange(e: React.FormEvent) {
     e.preventDefault();
-    const authHeader = getAuthHeader();
-    if (!authHeader) {
+    if (!token) {
       setPasswordStatus({ type: "error", message: "You are not authenticated." });
       return;
     }
@@ -169,12 +156,9 @@ export default function AccountPage() {
 
     setChangingPassword(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/userauth/api/change-password/`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/userauth/api/change-password/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           oldpassword: passwords.oldpassword,
           password: passwords.password,
