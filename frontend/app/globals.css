@@ -2,7 +2,8 @@
 @import "tw-animate-css";
 
 /* Lenis recommended CSS */
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
 
@@ -1329,6 +1330,17 @@ html[data-theme="dark"] {
   font-style: normal;
 }
 
+@font-face {
+  font-family: "elementary";
+  src: url("/fonts/Elementarybold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 .font-symphony {
   font-family: "Symphony", cursive;
+}
+
+.font-elementary {
+  font-family: "elementary", ;
 }

@@ -21,6 +21,7 @@ const NAV_LINKS = [
   { label: "Blog", href: "/blog" },
   { label: "Quiz", href: "/quiz" },
   { label: "About Us", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 // ── Hover Mega-Dropdown ──────────────────────────────────────────────────────
@@ -76,7 +77,7 @@ function NavDropdown({
           "absolute left-1/2 -translate-x-1/2 top-full pt-4 z-50 transition-all duration-200 origin-top",
           open ? "opacity-100 scale-y-100 pointer-events-auto" : "opacity-0 scale-y-95 pointer-events-none"
         )}
-        style={{ minWidth: "340px" }}
+        style={{ minWidth: "420px" }}
       >
         {/* Arrow tip */}
         <div className="mx-auto w-3 h-3 rotate-45 bg-white border-l border-t border-[#c9a46b]/20 mb-[-6px] ml-[calc(50%-6px)]" />
@@ -95,7 +96,7 @@ function NavDropdown({
           </p>
           {/* Grid */}
           <div className="grid grid-cols-3 gap-1.5">
-            {items.map((item) => (
+            {[...items].sort((a, b) => a.localeCompare(b)).map((item) => (
               <Link
                 key={item}
                 href={buildHref(item)}
@@ -161,8 +162,8 @@ export function SiteHeader() {
         };
 
         if (mounted) {
-          setNavCategories(Array.from(new Set(parseList(catData))));
-          setNavBrands(Array.from(new Set(parseList(brandData))));
+          setNavCategories(Array.from(new Set(parseList(catData))).sort((a, b) => a.localeCompare(b)));
+          setNavBrands(Array.from(new Set(parseList(brandData))).sort((a, b) => a.localeCompare(b)));
         }
       } catch (err) {
         console.error("Failed to fetch nav categories/brands", err);
@@ -227,7 +228,7 @@ export function SiteHeader() {
         <div className="h-16 sm:h-20 md:h-24 px-6 lg:px-8 flex items-center justify-between relative">
           {/* Hamburger */}
           <button
-            className="md:hidden p-2 -ml-2 text-neutral-800 transition-transform duration-200 active:scale-90"
+            className="xl:hidden p-2 -ml-2 text-neutral-800 transition-transform duration-200 active:scale-90"
             onClick={isMobileMenuOpen ? closeMenu : openMenu}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -263,7 +264,7 @@ export function SiteHeader() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex md:gap-5 lg:gap-8 xl:gap-10 2xl:gap-14 items-center absolute left-1/6 text-[#5c6e69]">
+          <nav className="hidden xl:flex md:gap-5 lg:gap-8 xl:gap-10 2xl:gap-14 items-center absolute left-1/6 text-[#5c6e69]">
             {NAV_LINKS.map(({ label, href }) => {
               // Insert dropdowns after "Products"
               if (label === "Products") {
@@ -507,7 +508,7 @@ export function SiteHeader() {
                     )}
                   >
                     <div className="flex flex-wrap gap-2">
-                      {navCategories.map((cat) => (
+                      {[...navCategories].sort((a, b) => a.localeCompare(b)).map((cat) => (
                         <Link
                           key={cat}
                           href={`/products?category=${encodeURIComponent(cat)}`}
@@ -542,7 +543,7 @@ export function SiteHeader() {
                     )}
                   >
                     <div className="flex flex-wrap gap-2">
-                      {navBrands.map((brand) => (
+                      {[...navBrands].sort((a, b) => a.localeCompare(b)).map((brand) => (
                         <Link
                           key={brand}
                           href={`/products?brand=${encodeURIComponent(brand)}`}

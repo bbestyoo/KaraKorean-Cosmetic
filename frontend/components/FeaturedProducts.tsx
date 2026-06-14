@@ -90,17 +90,17 @@ export default function FeaturedProducts() {
               <RevealOnScroll direction="up" delay={index * 150} className="h-full">
                 <Link href={`/products/${product.product_id}`} className="block">
                   <div
-                    className="relative bg-[#EBE7DD] rounded-t-lg pt-4 px-3 pb-5 sm:pt-6 sm:px-5 sm:pb-8 h-full flex flex-col group"
-                    style={{
-                      maskImage: "linear-gradient(to bottom, black calc(100% - 10px), transparent calc(100% - 10px)), radial-gradient(circle at 10px 100%, transparent 10px, black 10.5px)",
-                      maskSize: "100% 100%, 20px 10px",
-                      maskPosition: "top, bottom",
-                      maskRepeat: "no-repeat, repeat-x",
-                      WebkitMaskImage: "linear-gradient(to bottom, black calc(100% - 10px), transparent calc(100% - 10px)), radial-gradient(circle at 10px 100%, transparent 10px, black 10.5px)",
-                      WebkitMaskSize: "100% 100%, 20px 10px",
-                      WebkitMaskPosition: "top, bottom",
-                      WebkitMaskRepeat: "no-repeat, repeat-x"
-                    }}
+                    className="relative bg-white rounded-t-lg pt-4 px-3 pb-5 sm:pt-6 sm:px-5 sm:pb-8 h-full flex flex-col group"
+                  // style={{
+                  //   maskImage: "linear-gradient(to bottom, black calc(100% - 10px), transparent calc(100% - 10px)), radial-gradient(circle at 10px 100%, transparent 10px, black 10.5px)",
+                  //   maskSize: "100% 100%, 20px 10px",
+                  //   maskPosition: "top, bottom",
+                  //   maskRepeat: "no-repeat, repeat-x",
+                  //   WebkitMaskImage: "linear-gradient(to bottom, black calc(100% - 10px), transparent calc(100% - 10px)), radial-gradient(circle at 10px 100%, transparent 10px, black 10.5px)",
+                  //   WebkitMaskSize: "100% 100%, 20px 10px",
+                  //   WebkitMaskPosition: "top, bottom",
+                  //   WebkitMaskRepeat: "no-repeat, repeat-x"
+                  // }}
                   >
                     <div className="flex justify-between items-start z-10 relative">
                       <span className="bg-[#E9F3A4] text-neutral-900 text-[0.65rem] font-bold tracking-widest px-2 py-1 rounded">{product.badge}</span>
@@ -133,18 +133,18 @@ export default function FeaturedProducts() {
                         alt={product.name}
                         fill
                         unoptimized
-                        className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                        className="object-contain bg-white mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
 
                     <div className="mt-auto relative z-10">
                       <h3 className="font-semibold text-sm sm:text-lg truncate text-neutral-900 mb-1 leading-tight">{product.name}</h3>
-                      <p className="text-[0.6rem] font-bold tracking-widest text-neutral-500 uppercase mb-2 sm:mb-4 border-b border-neutral-300 border-dashed pb-2 sm:pb-4">{product.category}</p>
+                      <p className="text-[0.8rem] font-bold tracking-widest text-[#ec7cfd] uppercase mb-2 sm:mb-4 border-b border-neutral-300 border-dashed pb-2 sm:pb-4">{product.category}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-baseline gap-2">
                           <span className="text-base sm:text-xl font-medium text-neutral-900">Rs. {Number(product.price || 0).toLocaleString()}</span>
-{product.old_price !== undefined && !Number.isNaN(product.old_price) && (
-                            <span className="text-lg text-neutral-800 line-through">Rs. {Number(product.old_price).toLocaleString()}</span>
+                          {product.old_price !== undefined && !Number.isNaN(product.old_price) && (
+                            <span className="text-xl text-[#ec7cfd] line-through">Rs. {Number(product.old_price).toLocaleString()}</span>
                           )}
                         </div>
                         <button

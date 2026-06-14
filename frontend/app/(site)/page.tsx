@@ -8,11 +8,14 @@ import NewnessSection from "@/components/NewnessSection";
 import SpringCollection from "@/components/SpringCollection";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import NewArrivalsCarousel from "@/components/NewArrivalsCarousel";
+import WhyChooseKara from "@/components/WhyChooseKara";
+import { Heart } from "lucide-react";
 
 export default function Home() {
   return (
     <main>
-      <div className="flex h-[83vh] sm:h-auto md:h-[90vh] md:min-h-[90vh] bg-[#f7f6f2] relative overflow-hidden">
+      {/* ── DESKTOP HERO SECTION (md and up) ── */}
+      <div className="hidden md:flex h-[83vh] sm:h-auto md:h-[90vh] md:min-h-[90vh] bg-[#f7f6f2] relative overflow-hidden">
         <div className="flex xl:flex-row flex-1 relative  px-4 md:px-6 pt-10  sm:pt-12 pb-32 md:py-10 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full md:gap-0 ">
 
           <div
@@ -28,7 +31,7 @@ export default function Home() {
               alt="Hero image"
               fill
               priority
-              className="object-contain object-left min-[450px]:object-right md:object-right xl:object-center -translate-x-8 min-[400px]:translate-x-0 select-none pointer-events-none"
+              className="object-contain object-left min-[450px]:object-right md:object-right xl:object-right xl:-translate-x-34 -translate-x-8 min-[400px]:translate-x-0 select-none pointer-events-none"
               sizes="
         (max-width: 640px) 280px,
         (max-width: 768px) 420px,
@@ -43,86 +46,27 @@ export default function Home() {
           <RevealOnScroll
             direction="left"
             delay={200}
-            className="relative top-32 md:absolute md:left-10 md:top-12 z-20 flex flex-col gap-0 md:items-start w-sm md:w-auto  md:mt-0 order-1 md:order-1"
+            className="relative top-32 md:absolute md:left-12 lg:left-16 md:top-32 z-20 flex flex-col gap-0 md:items-start w-full max-w-[90vw] md:w-[45vw] xl:w-[50vw] md:mt-0 order-1 md:order-1"
           >
-            {/* New arrivals badge */}
-            {/* <span className=" border border-[#0f3b2b] text-[#0f3b2b] text-[0.5rem] md:text-mdz tracking-[0.25em] font-sans p-1 w-full rounded-full mb-2">
-              ✦ NEW ARRIVALS
-            </span> */}
-            <span className="inline-flex items-center gap-2 border border-[#0f3b2b] text-[#0f3b2b] text-[0.5rem] md:text-xs tracking-[0.2em] font-sans px-4 py-2 w-fit rounded-full mb-2">
-              <span>✦</span>
-              <span>NEW ARRIVALS</span>
-            </span>
-
-            {/* Featured product card carousel */}
-            <NewArrivalsCarousel />
-
-            {/* Divider */}
-            <div className="hidden md:block w-full h-px bg-[#e0ddd5] mb-5 mt-5" />
-
-            {/* Trust signals */}
-            <div className="hidden md:flex flex-col gap-4 mb-5">
-              {[
-                { title: "100% Authentic", sub: "Sourced directly from Korea" },
-                { title: "Free Delivery", sub: "On orders above Rs. 3,500" },
-                {
-                  title: "Expert Curation",
-                  sub: "Skin-matched routines for you",
-                },
-              ].map(({ title, sub }) => (
-                <div key={title} className="flex items-start gap-3">
-                  <span className="text-[#0f3b2b] text-xs mt-0.5">✦</span>
-                  <div>
-                    <p className="font-sans text-lg sm:text-[0.65rem] font-semibold text-[#0f3b2b] tracking-wide normal-case">
-                      {title}
-                    </p>
-                    <p className="font-sans text-sm sm:text-[0.6rem] text-[#6b766f] normal-case">
-                      {sub}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Divider */}
-            <div className="hidden md:block w-full h-px bg-[#e0ddd5] mb-4" />
-
-            {/* Skin quiz */}
-            {/* <p className="hidden md:block font-sans text-[0.6rem] text-[#6b766f] normal-case tracking-wide mb-1">
-              Not sure where to start?
-            </p>
-            <Link
-              href="/skincare-test"
-              className="hidden md:block font-sans text-[0.65rem] text-[#0f3b2b] normal-case tracking-wide hover:underline underline-offset-4"
-            >
-              → Take the Skin Quiz
-            </Link> */}
+            <WhyChooseKara />
           </RevealOnScroll>
-
-          {/* ELEGANCE / BEAUTY labels — hidden on mobile */}
-          <div className="hidden 2xl:block absolute left-[65%] bottom-64 text-4xl uppercase tracking-[0.4em] text-[#6b766f] z-20">
-            BEAUTY
-          </div>
-          <div className="hidden 2xl:block absolute left-[25%] bottom-64 text-4xl uppercase tracking-[0.4em] text-[#6b766f] z-20">
-            ELEGANCE
-          </div>
 
           {/* Hero typography */}
           <RevealOnScroll
             direction="down"
             delay={200}
-            className="hidden xl:block relative ml-4 text-left md:absolute md:top-60 2xl:top-40 md:right-40 2xl:right pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none"
+            className="hidden xl:block relative ml-4 text-left md:absolute md:top-40 2xl:top-16 md:right-40 2xl:right-20 pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none"
           >
-            <div className="font-symphony lowercase text-[#0f3b2b] text-6xl sm:text-6xl md:text-[6.8rem] 2xl:text-[14rem] leading-none">
+            <div className="font-symphony lowercase text-[#0f3b2b] text-6xl sm:text-6xl md:text-[6rem] 2xl:text-[10rem] leading-none">
               glow like
             </div>
           </RevealOnScroll>
           <RevealOnScroll
             direction="up"
             delay={300}
-            className="hidden xl:block relative text-left md:absolute md:top-80 2xl:top-80 md:right-20 z-10 w-full md:w-auto md:text-left mt-[-20px] md:mt-0 order-2 md:order-none"
+            className="hidden xl:block relative text-left md:absolute md:top-60 2xl:top-[180px] md:right-20 2xl:right-10 z-10 w-full md:w-auto md:text-left mt-[-20px] md:mt-0 order-2 md:order-none"
           >
-            <span className="font-serif lowercase text-[#0f3b2b] text-4xl sm:text-6xl md:text-[3.8rem] 2xl:text-[8rem] leading-tight tracking-tight block">
+            <span className="font-serif lowercase text-[#0f3b2b] text-4xl sm:text-6xl md:text-[3rem] 2xl:text-[5.5rem] leading-tight tracking-tight block">
               never before
             </span>
           </RevealOnScroll>
@@ -131,30 +75,71 @@ export default function Home() {
           <RevealOnScroll
             direction="right"
             delay={400}
-            className="hidden xl:flex absolute right-10 bg-red-3001  bottom-40 z-20 flex-col items-end gap-5 text-left"
+            className="hidden xl:flex absolute right-10 bottom-40 z-20 flex-col items-end gap-2 text-left"
           >
-            <p className="font-sans text-xs tracking-[0.2em] text-[#6b766f] leading-relaxed normal-case">
-              Not sure where to start ?
-              <br />
+            <span className="inline-flex items-center gap-2 border border-[#0f3b2b] text-[#0f3b2b] text-[0.5rem] md:text-xs tracking-[0.2em] font-sans px-4 py-2 w-fit rounded-full mb-2 bg-[#f7f6f2]">
+              <span>✦</span>
+              <span>NEW ARRIVALS</span>
+            </span>
 
-            </p>
-            <Link
-              href="/quiz"
-              className="inline-block bg-[#0f3b2b] font-semibold text-[#f7f6f2] text-[0.6rem] tracking-[0.35em] uppercase px-8 py-3 hover:bg-[#1a5c42] transition-colors duration-500 font-sans"
-            >
-              Take the skin quiz
-            </Link>
-            <Link
-              href="/journal"
-              className="flex items-center gap-3 text-[#6b766f] text-[0.6rem] tracking-[0.25em] uppercase font-sans hover:text-[#0f3b2b] transition-colors duration-300 normal-case"
-            >
-              <span className="block w-8 h-px bg-current" />
-              Crafted for your skin&apos;s story.
-            </Link>
+            {/* Featured product card carousel */}
+            <NewArrivalsCarousel />
           </RevealOnScroll>
 
           <Brands />
         </div>
+      </div>
+
+      {/* ── MOBILE HERO SECTION (below md) ── */}
+      <div className="flex md:hidden flex-col bg-[#f7f6f2] w-full pt-2 pb-4 overflow-hidden relative">
+        {/* why choose kara text at the center */}
+        <div className="mb-4 text-center px-4">
+          <h2 className="text-[#0f3b2b] text-3xl sm:text-4xl  leading-tight tracking-tight uppercase font-elementary">
+            Why Choose
+            <br />
+            <span className="text-[#a4659f] inline-flex font-elementary items-center gap-2 justify-center">
+              KARA?
+              <Heart className="w-6 h-6 text-[#a4659f] fill-current" />
+            </span>
+          </h2>
+        </div>
+
+        {/* fulll wdth banner below that */}
+        <div className="w-full ">
+          <WhyChooseKara hideHeading={true} isMobile={true} />
+        </div>
+
+        {/* hero model below that with glow like and never before text on either side of the hero model image */}
+        <div className="relative w-full flex justify-center items-center h-[340px] overflow-hidden">
+          {/* glow like on the left */}
+          <div className="absolute left-6 top-[60%] -translate-y-1/2 z-10 pointer-events-none select-none">
+            <span className="font-symphony lowercase text-[#0f3b2b] text-5xl sm:text-5xl leading-none">
+              glow like
+            </span>
+          </div>
+
+          {/* Model image in the center */}
+          <div className="relative h-full aspect-[3/4] -mt-13 z-0">
+            <Image
+              src="/images/crophero.png"
+              alt="Hero model"
+              fill
+              priority
+              className="object-contain select-none pointer-events-none"
+              sizes="(max-width: 640px) 240px, 320px"
+            />
+          </div>
+
+          {/* never before on the right */}
+          <div className="absolute right-3 bottom-1/3 translate-y-1/2 z-10 pointer-events-none select-none text-right">
+            <span className="font-serif lowercase text-[#0f3b2b] text-2xl sm:text-3xl leading-tight tracking-tight block">
+              never before
+            </span>
+          </div>
+        </div>
+
+        {/* brand logo below that */}
+        <Brands />
       </div>
       <BestSellers />
 

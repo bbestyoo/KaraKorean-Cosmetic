@@ -17,7 +17,11 @@ interface Product {
   link?: string;
 }
 
-export default function NewArrivalsCarousel() {
+interface NewArrivalsCarouselProps {
+  compact?: boolean;
+}
+
+export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCarouselProps) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -140,28 +144,115 @@ export default function NewArrivalsCarousel() {
     });
   };
 
+  const loadingClass = compact ? "flex flex-col w-full h-full items-center justify-center" : "flex flex-col lg:w-[480px] items-center justify-center p-4";
+
   if (products.length === 0) {
     if (loading) {
       return (
-        <div className="flex flex-col lg:w-[480px] items-center justify-center p-4">
+        <div className={loadingClass}>
           <div className="text-sm text-neutral-500">Loading new arrivals…</div>
         </div>
       );
     }
     if (error) {
       return (
-        <div className="flex flex-col lg:w-[480px] items-center justify-center p-4">
+        <div className={loadingClass}>
           <div className="text-sm text-red-500">Failed to load new arrivals</div>
         </div>
       );
     }
     return (
-      <div className="flex flex-col lg:w-[480px] items-center justify-center p-4">
+      <div className={loadingClass}>
         <div className="text-sm text-neutral-500">No new arrivals</div>
       </div>
     );
   }
 
+  if (compact) {
+    // ── COMPACT MODE (right hero panel) ──
+    return (
+      <div
+        className="flex flex-col w-full h-full"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Compact product card */}
+        <div
+          onClick={() => router.push(`/products/${currentProduct.id}`)}
+          className="bg-[#eeebd8]/60 flex flex-row gap-2 p-2 rounded-lg border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-sm hover:bg-[#eeebd8]/80 cursor-pointer flex-1 min-h-0"
+        >
+          {/* Image */}
+          <div className="w-16 shrink-0 bg-[#d4cfa8]/50 flex items-center justify-center overflow-hidden relative rounded-md">
+            <Image
+              src={currentProduct.image}
+              alt={currentProduct.name}
+              fill
+              sizes="64px"
+              className={`object-cover transition-opacity duration-300 ${fadeState === "in" ? "opacity-100" : "opacity-0"}`}
+              priority
+            />
+          </div>
+
+          {/* Details */}
+          <div
+            className={`flex flex-col justify-between py-0.5 flex-1 transition-opacity duration-300 ${fadeState === "in" ? "opacity-100" : "opacity-0"}`}
+          >
+            <p className="font-serif italic text-[#0f3b2b] text-xs leading-tight line-clamp-2">
+              {currentProduct.name}
+            </p>
+            <p className="font-sans text-[#0f3b2b] text-[0.6rem] font-semibold normal-case">
+              {currentProduct.price}
+            </p>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToBag(currentProduct);
+              }}
+              className="bg-[#0f3b2b] cursor-pointer text-[#f7f6f2] text-[0.5rem] tracking-[0.15em] font-sans px-2 py-1 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm"
+              aria-label={`Add ${currentProduct.name} to bag`}
+            >
+              ADD TO BAG
+            </button>
+          </div>
+        </div>
+
+        {/* Compact controls */}
+        <div className="flex items-center justify-between pt-2 px-1">
+          <div className="flex gap-1.5">
+            {products.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => handleDotClick(index)}
+                className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
+                  currentIndex === index ? "bg-[#0f3b2b] w-4" : "bg-[#0f3b2b]/20 hover:bg-[#0f3b2b]/40 w-1"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+          <div className="flex gap-1.5">
+            <button
+              onClick={handlePrev}
+              className="p-1 border border-[#0f3b2b]/20 rounded-full text-[#0f3b2b] hover:bg-[#0f3b2b] hover:text-[#f7f6f2] transition-all duration-300 cursor-pointer"
+              aria-label="Previous product"
+            >
+              <ChevronLeft className="w-3 h-3" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-1 border border-[#0f3b2b]/20 rounded-full text-[#0f3b2b] hover:bg-[#0f3b2b] hover:text-[#f7f6f2] transition-all duration-300 cursor-pointer"
+              aria-label="Next product"
+            >
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── DEFAULT (full size) MODE ──
   return (
     <div
       className="flex flex-col lg:w-[480px]"

@@ -102,7 +102,7 @@ export function NavSearch() {
     setIsOpen(false);
     setQuery("");
     router.push(`/products/${productId}`);
-  };
+  }
 
   const handleIconClick = () => {
     inputRef.current?.focus();
