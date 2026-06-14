@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { User, Settings, RefreshCw, ShoppingBag } from "lucide-react";
+import { User, Settings, RefreshCw } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface ProfileData {
@@ -27,9 +27,6 @@ export default function AccountPage() {
   const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
   const [originalProfile, setOriginalProfile] = useState<ProfileData>(DEFAULT_PROFILE);
   const [loadingProfile, setLoadingProfile] = useState(false);
-
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loadingOrders, setLoadingOrders] = useState(false);
 
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -74,19 +71,13 @@ export default function AccountPage() {
     } finally {
       setLoadingProfile(false);
     }
-  }, [API_BASE_URL, getAuthHeader]);
+  }, [API_BASE_URL, fetchWithAuth, token]);
 
   useEffect(() => {
     if (isLoggedIn && token) {
       fetchUserInfo();
     }
   }, [isLoggedIn, token, fetchUserInfo]);
-
-  useEffect(() => {
-    if (isLoggedIn && token && active === "orders") {
-      fetchUserOrders();
-    }
-  }, [isLoggedIn, token, active, fetchUserOrders]);
 
   // ─── 2. Update user info (PATCH) ─────────────────────────────────────────
   async function handleProfileSave(e: React.FormEvent) {
@@ -237,15 +228,6 @@ export default function AccountPage() {
                 }`}
             >
               <Settings size={16} /> Settings
-            </button>
-            <button
-              onClick={() => setActive("orders")}
-              className={`w-full text-left px-3 py-2 rounded-md flex items-center gap-2 transition-colors ${active === "orders"
-                ? "bg-[#0f3b2b] text-white"
-                : "text-neutral-700 hover:bg-neutral-100"
-                }`}
-            >
-              <ShoppingBag size={16} /> Order History
             </button>
           </nav>
         </aside>
@@ -430,65 +412,6 @@ export default function AccountPage() {
                 </button>
               </div>
             </form>
-          )}
-
-          {/* ── Orders Tab ── */}
-          {active === "orders" && (
-            <div className="space-y-5">
-              <h2 className="text-xl font-semibold">Order History</h2>
-              {loadingOrders ? (
-                <div className="flex justify-center py-8">
-                  <RefreshCw size={24} className="animate-spin text-neutral-400" />
-                </div>
-              ) : orders.length === 0 ? (
-                <p className="text-sm text-neutral-500 py-4 font-sans">You have not placed any orders yet.</p>
-              ) : (
-                <div className="space-y-4">
-                  {orders.map((order: any) => (
-                    <div key={order.id} className="border rounded-lg p-4 space-y-3 hover:shadow-sm transition-shadow font-sans">
-                      <div className="flex justify-between items-center border-b pb-2">
-                        <div>
-                          <p className="text-sm font-semibold text-[#0f3b2b]">
-                            Order #{order.id.substring(0, 8).toUpperCase()}
-                          </p>
-                          <p className="text-xs text-neutral-500">
-                            {new Date(order.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'Cleared' ? 'bg-green-100 text-green-800' :
-                            order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                              order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                'bg-blue-100 text-blue-800'
-                          }`}>
-                          {order.status}
-                        </span>
-                      </div>
-
-                      {/* Products Summary */}
-                      <div className="space-y-2">
-                        {order.items?.map((item: any) => (
-                          <div key={item.id} className="flex justify-between text-sm">
-                            <span className="text-neutral-700">
-                              {item.product_name || "Product"} <span className="text-neutral-400">x{item.quantity}</span>
-                            </span>
-                            <span className="font-medium text-neutral-900">
-                              NPR {item.price}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex justify-between items-center border-t pt-2 text-sm font-semibold">
-                        <span>Total Paid</span>
-                        <span className="text-green-600">
-                          NPR {order.delivery?.payment_amount || order.total || order.subtotal || "—"}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           )}
         </section>
       </div>
