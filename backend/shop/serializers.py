@@ -48,7 +48,6 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class RatingSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only = True)
     product = serializers.PrimaryKeyRelatedField(read_only =True)
-    image = serializers.SerializerMethodField()
     user_dp = serializers.SerializerMethodField(read_only = True)
     
     class Meta:
@@ -58,14 +57,9 @@ class RatingSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         return obj.user.name
     
-    def get_image(self, obj):
-        request = self.context.get('request')
-        if obj.image:
-            return request.build_absolute_uri(obj.image.url)
-        return None
     def get_user_dp(self, obj):
         request = self.context.get('request')
-        if obj.user.dp:
+        if obj.user.dp and request:
             return request.build_absolute_uri(f"/media/{obj.user.dp}")
         
 class ProductAttributeSerializer(serializers.ModelSerializer):

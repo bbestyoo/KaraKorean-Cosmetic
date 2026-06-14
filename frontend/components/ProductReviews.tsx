@@ -8,7 +8,7 @@ interface Review {
   id: string;
   productId: string;
   rating: number;
-  content: string;
+  comment: string;
   userName: string;
   userId?: string | null;
   createdAt: string;
@@ -22,11 +22,11 @@ if (!API_BASE_URL) {
   throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
 }
 
-const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
+const API_ORIGIN = API_BASE_URL;
 
 
 export default function ProductReviews({ productId }: { productId: string }) {
-  const { isLoggedIn, user, login } = useAuth();
+  const { isLoggedIn, user, login, token, fetchWithAuth } = useAuth();
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState<any>({ total_ratings: 0, rating_dict: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, avg_rating: 0 });
@@ -34,7 +34,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
 
   // form state
   const [rating, setRating] = useState(5);
-  const [content, setContent] = useState("");
+  const [comment, setComment] = useState("");
   const [name, setName] = useState(user?.username || "");
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -46,6 +46,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
 
+
   useEffect(() => {
     fetchReviews();
   }, [productId]);
@@ -53,7 +54,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
   async function fetchReviews() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/reviews?productId=${encodeURIComponent(productId)}`);
+      const res = await fetch(`${API_ORIGIN}/api/reviews/${encodeURIComponent(productId)}/`);
       if (res.ok) {
         const json = await res.json();
         setReviews(json.reviews || []);
@@ -74,8 +75,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
       setShowLogin(true);
       return;
     }
-
-    if (!content.trim()) {
+    if (!comment.trim()) {
       setMessage("Please write a review before submitting.");
       return;
     }
@@ -85,12 +85,12 @@ export default function ProductReviews({ productId }: { productId: string }) {
       const body = {
         productId,
         rating,
-        content,
+        comment,
         userName: user?.username || name || "Anonymous",
         userId: user?.id || user?.username || null,
       };
 
-      const res = await fetch('/api/reviews', {
+      const res = await fetchWithAuth(`${API_ORIGIN}/api/reviews/${encodeURIComponent(productId)}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -98,7 +98,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
 
       if (res.ok) {
         setMessage('Thanks — your review was submitted and is pending admin approval.');
-        setContent('');
+        setComment('');
         setRating(5);
       } else {
         setMessage('Failed to submit review.');
@@ -199,7 +199,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
                         ))}
                       </div>
                     </div>
-                    <p className="text-sm text-[#6b766f] mt-2">{rev.content}</p>
+                    <p className="text-sm text-[#6b766f] mt-2">{rev.comment}</p>
                     <div className="text-xs text-[#6b766f] mt-2">{new Date(rev.createdAt).toLocaleDateString()}</div>
                   </div>
                 </div>
@@ -256,7 +256,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
 
               <div>
                 <label className="text-xs text-[#6b766f] uppercase tracking-wide">Write Your Review</label>
-                <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={5} className="w-full mt-2 border border-gray-200 rounded px-3 py-2 text-sm" />
+                <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={5} className="w-full mt-2 border border-gray-200 rounded px-3 py-2 text-sm" />
               </div>
 
               {message && <div className="text-sm text-[#6b766f]">{message}</div>}

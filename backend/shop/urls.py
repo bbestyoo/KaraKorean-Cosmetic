@@ -34,5 +34,6 @@ urlpatterns = [
     path('api/brandsearch',views.BrandSearch.as_view(),name='brandsearch'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/rating/<str:product_id>/',views.RatingView.as_view(), name="rating"),
+    path('api/reviews/<str:product_id>/', views.RatingView.as_view(), name='review'),
+    # path('api/rating/<str:product_id>/',views.RatingView.as_view(), name="rating"),
 ]

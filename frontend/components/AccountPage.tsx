@@ -21,8 +21,8 @@ const DEFAULT_PROFILE: ProfileData = {
 };
 
 export default function AccountPage() {
-  const { user, isLoggedIn, token } = useAuth();
-  const [active, setActive] = useState<"profile" | "settings" | "orders">("profile");
+  const { user, isLoggedIn, token, fetchWithAuth } = useAuth();
+  const [active, setActive] = useState<"profile" | "settings">("profile");
 
   const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
   const [originalProfile, setOriginalProfile] = useState<ProfileData>(DEFAULT_PROFILE);
@@ -48,21 +48,13 @@ export default function AccountPage() {
     return base.replace(/\/shop\/?$/, "");
   })();
 
-  const getAuthHeader = useCallback(() => {
-    if (!token || typeof token !== 'string') return null;
-    return token.includes(".") ? `Bearer ${token}` : `Token ${token}`;
-  }, [token]);
-
   // ─── 1. Fetch user info ───────────────────────────────────────────────────
   const fetchUserInfo = useCallback(async () => {
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
+    if (!token) return;
 
     setLoadingProfile(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/userauth/api/info/`, {
-        headers: { Authorization: authHeader },
-      });
+      const res = await fetchWithAuth(`${API_BASE_URL}/userauth/api/info/`);
       if (res.ok) {
         const data = await res.json();
         const fetched: ProfileData = {
@@ -84,38 +76,6 @@ export default function AccountPage() {
     }
   }, [API_BASE_URL, getAuthHeader]);
 
-  const fetchUserOrders = useCallback(async () => {
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
-
-    setLoadingOrders(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/cart/api/order/`, {
-        headers: { Authorization: authHeader },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setOrders(data.results || data || []);
-      }
-    } catch (err) {
-      console.error("Error fetching orders:", err);
-    } finally {
-      setLoadingOrders(false);
-    }
-  }, [API_BASE_URL, getAuthHeader]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const tab = params.get("tab");
-      if (tab === "orders") {
-        setActive("orders");
-      } else if (tab === "settings") {
-        setActive("settings");
-      }
-    }
-  }, []);
-
   useEffect(() => {
     if (isLoggedIn && token) {
       fetchUserInfo();
@@ -131,20 +91,16 @@ export default function AccountPage() {
   // ─── 2. Update user info (PATCH) ─────────────────────────────────────────
   async function handleProfileSave(e: React.FormEvent) {
     e.preventDefault();
-    const authHeader = getAuthHeader();
-    if (!authHeader) {
+    if (!token) {
       setStatus({ type: "error", message: "You are not authenticated." });
       return;
     }
 
     setSaving(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/userauth/api/info/`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/userauth/api/info/`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: profile.name,
           email: profile.email,
@@ -192,8 +148,7 @@ export default function AccountPage() {
   // ─── 3. Change password ──────────────────────────────────────────────────
   async function handlePasswordChange(e: React.FormEvent) {
     e.preventDefault();
-    const authHeader = getAuthHeader();
-    if (!authHeader) {
+    if (!token) {
       setPasswordStatus({ type: "error", message: "You are not authenticated." });
       return;
     }
@@ -210,12 +165,9 @@ export default function AccountPage() {
 
     setChangingPassword(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/userauth/api/change-password/`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/userauth/api/change-password/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           oldpassword: passwords.oldpassword,
           password: passwords.password,
@@ -503,16 +455,15 @@ export default function AccountPage() {
                             {new Date(order.created_at).toLocaleDateString()}
                           </p>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          order.status === 'Cleared' ? 'bg-green-100 text-green-800' :
-                          order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                          order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                          'bg-blue-100 text-blue-800'
-                        }`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'Cleared' ? 'bg-green-100 text-green-800' :
+                            order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                              order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                                'bg-blue-100 text-blue-800'
+                          }`}>
                           {order.status}
                         </span>
                       </div>
-                      
+
                       {/* Products Summary */}
                       <div className="space-y-2">
                         {order.items?.map((item: any) => (

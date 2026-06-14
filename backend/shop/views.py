@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Product, Comment, Size, ProductImage, Category, Brand, UseCase
+from .models import Product, Comment, Size, ProductImage, Category, Brand, UseCase, Rating
 from math import ceil
 from .serializers import ProductSerializer, CommentSerializer, ReplySerializer, RatingSerializer, GetProductSerializer, SizeSerializer, ProductImageSerializer, UseCaseSerializer
 from rest_framework.response import Response
@@ -221,6 +221,7 @@ class GetDealProduct(APIView):
 
 
 class ApiSearch(generics.ListAPIView):
+    
     serializer_class = GetProductSerializer 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['product_id','name', 'description','brand__name','category__name','sub_category__name']
@@ -523,11 +524,30 @@ class ReplyView(APIView):
 
 
 class RatingView(APIView):
+    
+    def get(self, request, product_id):
+        ratings = Rating.objects.filter(product_id=product_id).select_related('user')
+        average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
+        ratings_count = ratings.count()
+
+        star_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+        qs = ratings.values('rating').annotate(count=Count('rating'))
+        star_counts.update({item['rating']: item['count'] for item in qs})
+
+        details = RatingSerializer(ratings, many=True, context={'request': request}).data
+
+        return Response({
+            'average_rating': average_rating,
+            'ratings_count': ratings_count,
+            'star_counts': star_counts,
+            'details': details
+        })
+
     def post(self,request,product_id):
         data = request.data
         user = request.user
         product = Product.objects.get(pk=product_id)
-        serializer = RatingSerializer(data=data)
+        serializer = RatingSerializer(data=data, context={'request': request})
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=user, product=product)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

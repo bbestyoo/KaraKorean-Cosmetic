@@ -35,7 +35,7 @@ interface CouponResult {
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
-  const { isLoggedIn, user, token } = useAuth();
+  const { isLoggedIn, user, token, fetchWithAuth } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'qr'>('cod');
   const [transactionId, setTransactionId] = useState('');
@@ -64,21 +64,12 @@ export default function CheckoutPage() {
     return base.replace(/\/shop\/?$/, '');
   })();
 
-  const getAuthHeader = () => {
-    if (!token || typeof token !== 'string') return null;
-    return token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
-  };
-
   useEffect(() => {
     if (!isLoggedIn || !token) return;
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
 
     const fetchUserInfo = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/userauth/api/info/`, {
-          headers: { Authorization: authHeader },
-        });
+        const res = await fetchWithAuth(`${API_BASE_URL}/userauth/api/info/`);
         if (res.ok) {
           const data = await res.json();
           const nameParts = (data.name || data.username || '').split(' ');
@@ -107,12 +98,9 @@ export default function CheckoutPage() {
     setCouponError('');
     setCouponResult(null);
     try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      const authHeader = getAuthHeader();
-      if (authHeader) headers['Authorization'] = authHeader;
-      const res = await fetch(`${API_BASE_URL}/cart/api/coupon/?code=${couponCode.trim()}`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/cart/api/coupon/?code=${couponCode.trim()}`, {
         method: 'GET',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
       });
       const data = await res.json();
       if (res.ok && data.status === 'Success') {
@@ -195,13 +183,6 @@ export default function CheckoutPage() {
     // Submit order to backend
     setIsLoading(true);
     try {
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = token.includes('.') ? `Bearer ${token}` : `Token ${token}`;
-      }
-
       const orderPayload = {
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
@@ -226,9 +207,9 @@ export default function CheckoutPage() {
       console.log('📦 Order payload:', orderPayload);
       console.log(`💰 subtotal=${subtotal}, discount=${discountAmount}, total=${total}, coupon=${couponResult?.code}`);
 
-      const response = await fetch(`${API_BASE_URL}/cart/api/checkout/`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/cart/api/checkout/`, {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload),
       });
 

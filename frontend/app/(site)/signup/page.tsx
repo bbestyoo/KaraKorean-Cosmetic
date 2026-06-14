@@ -59,14 +59,15 @@ export default function SignupPage() {
       const data = await res.json();
       if (!res.ok) { setError(data?.msg || data?.detail || 'Registration failed'); return; }
       const access = data?.token?.access || data?.token;
+      const refresh = data?.token?.refresh || null;
       if (access) {
         try {
           const meRes = await fetch(`${API_ORIGIN}/userauth/api/me/`, {
             headers: { Authorization: `Bearer ${access}` },
           });
-          if (meRes.ok) { const me = await meRes.json(); login(access, me); router.push('/'); return; }
+          if (meRes.ok) { const me = await meRes.json(); login(access, me, refresh); router.push('/'); return; }
         } catch { /* fallback */ }
-        login(access, { email }); router.push('/'); return;
+        login(access, { email }, refresh); router.push('/'); return;
       }
       setMessage('Registration successful. Please sign in.');
       router.push('/login');
