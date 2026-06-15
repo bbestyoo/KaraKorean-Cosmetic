@@ -55,7 +55,7 @@ export default function Brands() {
                                     <img
                                         src={brand.src}
                                         alt={brand.alt}
-                                        className="brand-img cursor-pointer h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
+                                        className="brand-img cursor-pointer h-14 mb-3 sm:mb-0  sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
                                     />
                                 </Link>
                             </div>
@@ -70,7 +70,7 @@ export default function Brands() {
                                     <img
                                         src={brand.src}
                                         alt={brand.alt}
-                                        className="brand-img cursor-pointer h-10 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
+                                        className="brand-img cursor-pointer h-14 mb-3 sm:mb-0 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
                                     />
                                 </Link>
                             </div>
