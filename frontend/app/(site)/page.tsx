@@ -91,9 +91,9 @@ export default function Home() {
       </div>
 
       {/* ── MOBILE HERO SECTION (below md) ── */}
-      <div className="flex md:hidden flex-col bg-[#f7f6f2] w-full pt-2 pb-4 overflow-hidden relative">
+      <div className="flex md:hidden flex-col bg-[#f7f6f2] w-full pt-2 overflow-hidden relative">
         {/* why choose kara text at the center */}
-        <div className="mb-4 text-center px-4">
+        <div className=" text-center px-4">
           <h2 className="text-[#0f3b2b] text-3xl sm:text-4xl  leading-tight tracking-tight uppercase font-elementary">
             Why Choose
             <br />

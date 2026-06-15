@@ -25,7 +25,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
   }, [emblaApi]);
 
   return (
-    <div className={isMobile ? "w-full" : "flex flex-col w-full max-w-3xl xl:max-w-[65vw] mt-12 md:mt-0"}>
+    <div className={isMobile ? "w-full" : "flex flex-col w-full max-w-3xl xl:max-w-[65vw]  md:mt-0"}>
       {!hideHeading && (
         <div className="mb-4 pl-4 md:pl-0">
           <h2 className="text-[#0f3b2b] text-4xl sm:text-5xl lg:text-[4.5rem] font-bold leading-none tracking-tight uppercase font-sans-serif">
@@ -43,7 +43,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
         <div className="overflow-hidden z-10 relative" ref={emblaRef}>
           <div className="flex">
             {/* Slide 1 */}
-            <div className={`flex-[0_0_100%] min-w-0 relative w-full ${isMobile ? "h-52 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[400px]"}`}>
+            <div className={`flex-[0_0_100%] min-w-0 relative w-full ${isMobile ? "h-48 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[400px]"}`}>
               <Image
                 src="/images/banner/1.jpeg"
                 alt="Banner 1"
@@ -54,7 +54,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             </div>
 
             {/* Slide 2 */}
-            <div className={`flex-[0_0_100%] min-w-0 relative w-full ${isMobile ? "h-52 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[400px]"}`}>
+            <div className={`flex-[0_0_100%] min-w-0 relative w-full ${isMobile ? "h-48 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[400px]"}`}>
               <Image
                 src="/images/banner/2.jpeg"
                 alt="Banner 2"
@@ -64,7 +64,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             </div>
 
             {/* Slide 3 */}
-            <div className={`flex-[0_0_100%] min-w-0 relative w-full ${isMobile ? "h-52 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[400px]"}`}>
+            <div className={`flex-[0_0_100%] min-w-0 relative w-full ${isMobile ? "h-48 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[400px]"}`}>
               <Image
                 src="/images/banner/3.jpeg"
                 alt="Banner 3"
@@ -74,7 +74,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             </div>
 
             {/* Slide 4 */}
-            <div className={`flex-[0_0_100%] min-w-0 relative w-full ${isMobile ? "h-52 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[400px]"}`}>
+            <div className={`flex-[0_0_100%] min-w-0 relative w-full ${isMobile ? "h-48 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[400px]"}`}>
               <Image
                 src="/images/banner/4.jpeg"
                 alt="Banner 4"
