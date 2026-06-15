@@ -356,11 +356,11 @@ export function SiteHeader() {
                 aria-label="User menu"
               >
                 <User size={22} className="hover:text-[#c9a46b]" />
-                {isLoggedIn && (
+                {/* {isLoggedIn && (
                   <span className="hidden lg:inline-block text-sm font-semibold">
                     {user?.username || user?.name || "Account"}
                   </span>
-                )}
+                )} */}
               </button>
               {isUserMenuOpen && (
                 <div
