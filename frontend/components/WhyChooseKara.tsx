@@ -49,7 +49,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
                 alt="Banner 1"
                 fill
                 priority
-                className={`object-cover ${isMobile ? "rounded-none" : "rounded-xl sm:rounded-r-3xl"}`}
+                className={` ${isMobile ? "rounded-none object-contain" : "rounded-xl sm:rounded-r-3xl object-cover"}`}
               />
             </div>
 
@@ -59,7 +59,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
                 src="/images/banner/2.jpeg"
                 alt="Banner 2"
                 fill
-                className={`object-cover ${isMobile ? "rounded-none" : "rounded-xl sm:rounded-r-3xl"}`}
+                className={`${isMobile ? "rounded-none object-contain" : "rounded-xl sm:rounded-r-3xl object-cover"}`}
               />
             </div>
 
@@ -69,7 +69,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
                 src="/images/banner/3.jpeg"
                 alt="Banner 3"
                 fill
-                className={`object-cover ${isMobile ? "rounded-none" : "rounded-xl sm:rounded-r-3xl"}`}
+                className={` ${isMobile ? "rounded-none  object-contain" : "rounded-xl sm:rounded-r-3xl object-cover"}`}
               />
             </div>
 
@@ -79,7 +79,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
                 src="/images/banner/4.jpeg"
                 alt="Banner 4"
                 fill
-                className={`object-cover ${isMobile ? "rounded-none" : "rounded-xl sm:rounded-r-3xl"}`}
+                className={` ${isMobile ? "rounded-none object-contain " : "rounded-xl sm:rounded-r-3xl object-cover"}`}
               />
             </div>
           </div>

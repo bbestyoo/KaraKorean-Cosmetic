@@ -307,7 +307,7 @@ export default function EditProduct() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_BASE_URL}/shop/category/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/category/`, {
         headers: { 'Authorization': `Token ${token}` },
       });
       if (response.ok) {
@@ -322,7 +322,7 @@ export default function EditProduct() {
   const fetchBrands = async () => {
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_BASE_URL}/shop/brand/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/brand/`, {
         headers: { 'Authorization': `Token ${token}` },
       });
       if (response.ok) {
@@ -398,7 +398,7 @@ export default function EditProduct() {
       
       // Only delete from API if it has a numeric ID (was created)
       if (!isNaN(Number(imageId))) {
-        await fetch(`${API_BASE_URL}/shop/product-image/${imageId}/`, {
+        await fetch(`${API_ORIGIN}/shop/product-image/${imageId}/`, {
           method: 'DELETE',
           headers: { 'Authorization': `Token ${token}` },
         });
@@ -436,7 +436,7 @@ export default function EditProduct() {
       
       // Only delete from API if it was created (has numeric ID from API)
       if (!isNaN(Number(apiColorId))) {
-        await fetch(`${API_BASE_URL}/shop/color/${apiColorId}/`, {
+        await fetch(`${API_ORIGIN}/shop/color/${apiColorId}/`, {
           method: 'DELETE',
           headers: { 'Authorization': `Token ${token}` },
         });
@@ -478,7 +478,7 @@ export default function EditProduct() {
         }
       });
 
-      const response = await fetch(`${API_BASE_URL}/shop/api/${productId}/`, {
+      const response = await fetch(`${API_ORIGIN}/shop/api/${productId}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -516,7 +516,7 @@ export default function EditProduct() {
       for (const color of colors) {
         // Only create new colors (those without numeric IDs from API)
         if (isNaN(Number(color.id))) {
-          const response = await fetch(`${API_BASE_URL}/shop/color/`, {
+          const response = await fetch(`${API_ORIGIN}/shop/color/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -546,7 +546,7 @@ export default function EditProduct() {
             formDataImg.append('product', productId);
             formDataImg.append('color', isNaN(Number(color.id)) ? createdColorIds[color.id] || color.id : color.id);
 
-            await fetch(`${API_BASE_URL}/shop/product-image/`, {
+            await fetch(`${API_ORIGIN}/shop/product-image/`, {
               method: 'POST',
               headers: { 'Authorization': `Token ${token}` },
               body: formDataImg,

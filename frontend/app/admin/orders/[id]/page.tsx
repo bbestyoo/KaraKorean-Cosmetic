@@ -112,7 +112,7 @@ function OrderDetailContent() {
       setError('');
       const token = localStorage.getItem('auth_token');
 
-      const response = await fetch(`${API_BASE_URL}/cart/api/${orderId}/`, {
+      const response = await fetch(`${API_ORIGIN}/cart/api/${orderId}/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Token ${token}`,

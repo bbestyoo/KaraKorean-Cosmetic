@@ -42,7 +42,7 @@ export function AdminProtected({ children }: AdminProtectedProps) {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/userauth/api/me/`, {
+      const response = await fetch(`${API_ORIGIN}/userauth/api/me/`, {
         headers: {
           'Authorization': `Token ${token}`,
         },
