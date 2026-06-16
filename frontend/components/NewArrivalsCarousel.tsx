@@ -172,7 +172,7 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
     // ── COMPACT MODE (right hero panel) ──
     return (
       <div
-        className="flex flex-col w-full h-full"
+        className="flex flex-col w-full h-full ]"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
@@ -197,7 +197,7 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
           <div
             className={`flex flex-col justify-between py-0.5 flex-1 transition-opacity duration-300 ${fadeState === "in" ? "opacity-100" : "opacity-0"}`}
           >
-            <p className="font-serif italic text-[#0f3b2b] text-xs leading-tight line-clamp-2">
+            <p className="font-serif italic text-[#0f3b2b] text-xs leading-tight  line-clamp-2">
               {currentProduct.name}
             </p>
             <p className="font-sans text-[#0f3b2b] text-[0.6rem] font-semibold normal-case">
@@ -224,9 +224,8 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
               <button
                 key={index}
                 onClick={() => handleDotClick(index)}
-                className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
-                  currentIndex === index ? "bg-[#0f3b2b] w-4" : "bg-[#0f3b2b]/20 hover:bg-[#0f3b2b]/40 w-1"
-                }`}
+                className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${currentIndex === index ? "bg-[#0f3b2b] w-4" : "bg-[#0f3b2b]/20 hover:bg-[#0f3b2b]/40 w-1"
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
@@ -255,18 +254,18 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
   // ── DEFAULT (full size) MODE ──
   return (
     <div
-      className="flex flex-col lg:w-[480px]"
+      className="flex flex-col w-[186px]  2xl:w-[480px] "
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Featured product card */}
-      <div 
+      <div
         onClick={() => router.push(`/products/${currentProduct.id}`)}
-        className="bg-[#eeebd8]/70  flex flex-col md:flex-row  gap-3 p-1 sm:gap-10 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90 cursor-pointer"
+        className="bg-[#eeebd8]/70  flex flex-col 2xl:flex-row  2xl:gap-3 p-1 sm:gap-10 lg:gap-1 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90 cursor-pointer"
       >
 
         {/* Product Image Container */}
-        <div className=" sm:w-38 md:w-42 h-28 w-32 sm:h-64 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
+        <div className=" sm:w-38 md:w-42 h-28 w-32 sm:h-64 2xl:h-64 md:h-44 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
           <Image
             src={currentProduct.image}
             alt={currentProduct.name}
@@ -284,12 +283,12 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
             }`}
         >
           <div>
-            <p className="font-serif italic text-[#0f3b2b] text-sm sm:text-2xl leading-tight">
+            <p className="font-serif italic text-[#0f3b2b] text-sm lg:text-md 2xl:text-2xl leading-tight">
               {currentProduct.name}
             </p>
           </div>
           <div>
-            <p className="font-sans text-[#0f3b2b] text-xs sm:text-lg font-semibold normal-case">
+            <p className="font-sans text-[#0f3b2b] text-xs sm:text-lg font-semibold normal-case truncate">
               {currentProduct.price}
             </p>
             <p className="hidden md:block font-sans line-through text-[#0f3b2b]/60 text-sm normal-case mt-0.5">

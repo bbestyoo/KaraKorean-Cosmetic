@@ -55,18 +55,18 @@ export default function Home() {
           <RevealOnScroll
             direction="down"
             delay={200}
-            className="hidden xl:block relative ml-4 text-left md:absolute md:top-40 2xl:top-16 md:right-40 2xl:right-20 pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none"
+            className="hidden xl:block relative ml-4 text-left md:absolute md:top-40 2xl:top-16 md:right-40 xl:right-13 xl:top-30 2xl:right-20 pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none"
           >
-            <div className="font-symphony lowercase text-[#0f3b2b] text-6xl sm:text-6xl md:text-[6rem] 2xl:text-[10rem] leading-none">
+            <div className="font-symphony lowercase text-[#0f3b2b] text-6xl sm:text-6xl md:text-[6rem] xl:text-[4.5rem] 2xl:text-[10rem] leading-none">
               glow like
             </div>
           </RevealOnScroll>
           <RevealOnScroll
             direction="up"
             delay={300}
-            className="hidden xl:block relative text-left md:absolute md:top-60 2xl:top-[180px] md:right-20 2xl:right-10 z-10 w-full md:w-auto md:text-left mt-[-20px] md:mt-0 order-2 md:order-none"
+            className="hidden xl:block relative text-left md:absolute md:top-60 2xl:top-[180px] xl:top-48 xl:right-16 2xl:right-10 z-10 w-full md:w-auto md:text-left mt-[-20px] md:mt-0 order-2 md:order-none"
           >
-            <span className="font-serif lowercase text-[#0f3b2b] text-4xl sm:text-6xl md:text-[3rem] 2xl:text-[5.5rem] leading-tight tracking-tight block">
+            <span className="font-serif lowercase text-[#0f3b2b] text-4xl sm:text-6xl md:text-[3rem] xl:text-[2.8rem] 2xl:text-[5.5rem] leading-tight tracking-tight block">
               never before
             </span>
           </RevealOnScroll>
@@ -75,7 +75,7 @@ export default function Home() {
           <RevealOnScroll
             direction="right"
             delay={400}
-            className="hidden xl:flex absolute right-10 bottom-40 z-20 flex-col items-end gap-2 text-left"
+            className="hidden xl:flex absolute right-10 bottom-40 lg:bottom-35 2xl:bottom-40 z-20 flex-col items-end gap-2 text-left"
           >
             <span className="inline-flex items-center gap-2 border border-[#0f3b2b] text-[#0f3b2b] text-[0.5rem] md:text-xs tracking-[0.2em] font-sans px-4 py-2 w-fit rounded-full mb-2 bg-[#f7f6f2]">
               <span>✦</span>
