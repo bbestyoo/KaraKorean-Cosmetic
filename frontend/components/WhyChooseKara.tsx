@@ -28,10 +28,10 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
     <div className={isMobile ? "w-full" : "flex flex-col w-full max-w-3xl xl:max-w-[65vw]  md:mt-0"}>
       {!hideHeading && (
         <div className="mb-4 pl-4 md:pl-0">
-          <h2 className="text-[#0f3b2b] text-4xl sm:text-5xl lg:text-[4.5rem] font-bold leading-none tracking-tight uppercase font-sans-serif">
+          <h2 className="text-[#0f3b2b] text-4xl sm:text-5xl lg:text-[4.5rem] font-bold leading-none tracking-tight uppercase font-elementary">
             Why Choose
             <br />
-            <span className="text-[#a4659f] flex items-center gap-2">
+            <span className="text-[#a4659f] flex items-center font-elementary gap-2">
               KARA?
               <Heart className="w-8 h-8 lg:w-10 lg:h-10 text-[#a4659f] fill-current" />
             </span>
@@ -45,13 +45,23 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             {/* Slide 1 */}
             <div className={`flex-[0_0_100%] min-w-0   relative w-full ${isMobile ? "h-48 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[500px] 2xl:h-[400px]"}`}>
               <Image
+                src="/images/banner/5.jpeg"
+                alt="Banner 1"
+                fill
+                priority
+                className={` ${isMobile ? "rounded-none object-contain" : "rounded-xl sm:rounded-r-3xl object-contain object-right"}`}
+              />
+            </div>
+            <div className={`flex-[0_0_100%] min-w-0   relative w-full ${isMobile ? "h-48 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[500px] 2xl:h-[400px]"}`}>
+              <Image
                 src="/images/banner/1.jpeg"
                 alt="Banner 1"
                 fill
                 priority
-                className={` ${isMobile ? "rounded-none object-contain" : "rounded-xl sm:rounded-r-3xl xl:object-contain object-right"}`}
+                className={` ${isMobile ? "rounded-none object-contain" : "rounded-xl sm:rounded-r-3xl object-contain object-right"}`}
               />
             </div>
+
 
             {/* Slide 2 */}
             <div className={`flex-[0_0_100%] min-w-0   relative w-full ${isMobile ? "h-48 sm:h-64" : "h-56 sm:h-72 md:h-[350px] lg:h-[500px] 2xl:h-[400px]"}`}>

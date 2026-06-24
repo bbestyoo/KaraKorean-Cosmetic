@@ -635,7 +635,7 @@ function ProductsContent() {
                           Rs.&nbsp;{product.price.toLocaleString()}
                         </span>
                         {product.old_price && (
-                          <span className="text-[12px] md:text-md  text-gray-400 line-through">
+                          <span className="text-[12px] text-[#ec7cfd] md:text-md font-medium line-through">
                             Rs.&nbsp;{product.old_price.toLocaleString()}
                           </span>
                         )}
