@@ -174,6 +174,7 @@ function ProductsContent() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [selectedPriceRange, setSelectedPriceRange] = useState('All Prices');
+  const [searchQuery, setSearchQuery] = useState('');
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSort, setSelectedSort] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -185,6 +186,7 @@ function ProductsContent() {
     const priceParam = sp.get('price');
     const sortParam = sp.get('sort');
     const pageParam = sp.get('page');
+    const searchParam = sp.get('search');
 
     if (categoryParam) {
       setSelectedCategory(categoryParam);
@@ -215,15 +217,22 @@ function ProductsContent() {
     } else {
       setCurrentPage(1);
     }
+
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    } else {
+      setSearchQuery('');
+    }
   }, [searchParamsString]);
 
   // Update URL only on explicit user actions to avoid navigation loops
-  const updateUrl = (overrides: { category?: string; brand?: string; price?: string; sort?: string; page?: number } = {}) => {
+  const updateUrl = (overrides: { category?: string; brand?: string; price?: string; sort?: string; page?: number; search?: string } = {}) => {
     const category = overrides.category !== undefined ? overrides.category : selectedCategory;
     const brand = overrides.brand !== undefined ? overrides.brand : selectedBrand;
     const price = overrides.price !== undefined ? overrides.price : selectedPriceRange;
     const sort = overrides.sort !== undefined ? overrides.sort : selectedSort;
     const page = overrides.page !== undefined ? overrides.page : currentPage;
+    const search = overrides.search !== undefined ? overrides.search : searchQuery;
 
     const params = new URLSearchParams();
     if (category && category !== 'All') params.set('category', category);
@@ -231,6 +240,7 @@ function ProductsContent() {
     if (price && price !== 'All Prices') params.set('price', price);
     if (sort) params.set('sort', sort);
     if (page && page > 1) params.set('page', String(page));
+    if (search) params.set('search', search);
 
     const qs = params.toString();
     router.push(`${pathname}${qs ? `?${qs}` : ''}`);
@@ -250,6 +260,7 @@ function ProductsContent() {
         const priceParam = sp.get('price');
         const sortParam = sp.get('sort');
         const pageParam = sp.get('page') || '1';
+        const searchParam = sp.get('search');
 
         const usecaseParam = sp.get('usecase');
         const featuredParam = sp.get('featured');
@@ -263,6 +274,9 @@ function ProductsContent() {
         }
         if (brandParam && brandParam !== 'All') {
           apiParams.set('brand', brandParam);
+        }
+        if (searchParam) {
+          apiParams.set('search', searchParam);
         }
         if (priceParam && priceParam !== 'All Prices') {
           const priceRange = PRICE_RANGES.find((r) => r.label === priceParam);
@@ -494,7 +508,7 @@ function ProductsContent() {
 
           {/* ── PAGE TITLE ── */}
           <h1 className="text-3xl font-serif text-gray-800 mt-8 mb-8 font-normal">
-            Korean Beauty Shop
+            {searchQuery ? `Search Results for "${searchQuery}"` : 'Korean Beauty Shop'}
           </h1>
 
           {loading && products.length === 0 && (
@@ -516,9 +530,18 @@ function ProductsContent() {
           )}
 
           {/* ── ACTIVE FILTERS ── */}
-          {(selectedCategory !== 'All' || selectedBrand !== 'All' || selectedPriceRange !== 'All Prices') && (
+          {(selectedCategory !== 'All' || selectedBrand !== 'All' || selectedPriceRange !== 'All Prices' || searchQuery) && (
             <div className="flex items-center gap-2 mb-6 flex-wrap">
               <span className="text-[11px] text-gray-400 uppercase tracking-wider">Active filters:</span>
+              {searchQuery && (
+                <button
+                  onClick={() => { setSearchQuery(''); resetPage(); updateUrl({ search: '', page: 1 }); }}
+                  className="flex items-center gap-1.5 text-[11px] border border-gray-300 px-3 py-1 hover:border-gray-800 transition-colors"
+                >
+                  Search: {searchQuery}
+                  <X size={10} />
+                </button>
+              )}
               {selectedCategory !== 'All' && (
                 <button
                   onClick={() => { setSelectedCategory('All'); resetPage(); updateUrl({ category: 'All', page: 1 }); }}
@@ -547,7 +570,7 @@ function ProductsContent() {
                 </button>
               )}
               <button
-                onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); resetPage(); updateUrl({ category: 'All', brand: 'All', price: 'All Prices', page: 1 }); }}
+                onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); setSearchQuery(''); resetPage(); updateUrl({ category: 'All', brand: 'All', price: 'All Prices', search: '', page: 1 }); }}
                 className="text-[11px] text-gray-400 underline hover:text-gray-800 ml-2"
               >
                 Clear all
@@ -695,7 +718,7 @@ function ProductsContent() {
             <div className="py-32 text-center">
               <p className="text-gray-400 text-sm mb-4">No products found.</p>
               <button
-                onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); }}
+                onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSelectedPriceRange('All Prices'); setSearchQuery(''); resetPage(); updateUrl({ category: 'All', brand: 'All', price: 'All Prices', search: '', page: 1 }); }}
                 className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
               >
                 Clear Filters

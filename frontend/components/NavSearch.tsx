@@ -82,18 +82,26 @@ export function NavSearch() {
       return;
     }
 
-    if (results.length === 0) return;
-
     if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActiveIndex((prev) => (prev + 1 < results.length ? prev + 1 : 0));
+      if (results.length > 0) {
+        e.preventDefault();
+        setIsOpen(true);
+        setActiveIndex((prev) => (prev + 1 < results.length ? prev + 1 : 0));
+      }
     } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActiveIndex((prev) => (prev - 1 >= 0 ? prev - 1 : results.length - 1));
+      if (results.length > 0) {
+        e.preventDefault();
+        setIsOpen(true);
+        setActiveIndex((prev) => (prev - 1 >= 0 ? prev - 1 : results.length - 1));
+      }
     } else if (e.key === "Enter") {
       e.preventDefault();
       if (activeIndex >= 0 && activeIndex < results.length) {
         handleSelectProduct(results[activeIndex].id);
+      } else if (query.trim()) {
+        setIsOpen(false);
+        inputRef.current?.blur();
+        router.push(`/products?search=${encodeURIComponent(query.trim())}`);
       }
     }
   };

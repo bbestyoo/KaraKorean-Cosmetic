@@ -3,22 +3,22 @@ import Link from "next/link";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 
 const cards = [
-  
+
   {
     title: "AntiAging",
-    subtitle: "THE VACATION SHOP",
+    subtitle: "Browse Products",
     image: "/images/model1.png",
     link: "/shop/toner",
   },
   {
     title: "Pigmentation",
-    subtitle: "NEW LINGERIE",
+    subtitle: "Browse Products",
     image: "/images/model2.png",
     link: "/shop/ampoule",
   },
   {
     title: "Acne Control",
-    subtitle: "NEW SHOES",
+    subtitle: "Browse Products",
     image: "/images/model3.png",
     link: "/shop/essence",
   },
@@ -35,7 +35,7 @@ export default function BestSellers() {
             direction="up"
             className="flex-1 h-full block"
           >
-            
+
             <Link
               href={(() => {
                 const slug = (card.title || '').toString().replace(/\s+/g, '').toLowerCase();
