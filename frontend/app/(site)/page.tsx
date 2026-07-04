@@ -16,12 +16,12 @@ export default function Home() {
     <main>
       {/* ── DESKTOP HERO SECTION (md and up) ── */}
       <div className="hidden md:flex h-[83vh] sm:h-auto md:h-[90vh] md:min-h-[90vh] bg-[#f7f6f2] relative overflow-hidden">
-        <div className="flex xl:flex-row flex-1 relative  px-4 md:px-6 pt-10  sm:pt-12 pb-32 md:py-10 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full md:gap-0 ">
+        <div className="flex xl:flex-row flex-1 relative  px-4 md:px-6 pt-10  sm:pt-12 pb-32 md:py-5 text-sm uppercase tracking-[0.3em] text-[#6b766f] w-full md:gap-0 ">
 
           <div
-            className="
+            className=" 
     relative  z-20 shrink-0 min-[420px]:shrink 
-    h-[480px] sm:h-[500px] md:h-[760px] xl:h-[900px]
+    h-[480px] sm:h-[500px] md:h-[760px] xl:h-[43vw] 
     md:aspect-[2/3] /* Forces the container to scale proportionally to the height */
     -mt-10 lg:mt-0 order-2 pointer-events-none
   "
@@ -31,7 +31,7 @@ export default function Home() {
               alt="Hero image"
               fill
               priority
-              className="object-contain object-left min-[450px]:object-right md:object-right xl:object-right xl:-translate-x-34 -translate-x-8 min-[400px]:translate-x-0 select-none pointer-events-none"
+              className=" object-contain translate-x-[13vw]"
               sizes="
         (max-width: 640px) 280px,
         (max-width: 768px) 420px,
@@ -46,7 +46,7 @@ export default function Home() {
           <RevealOnScroll
             direction="left"
             delay={200}
-            className="relative top-32 md:absolute md:left-12 lg:left-16 md:top-32 z-20 flex flex-col gap-0 md:items-start w-full max-w-[90vw] md:w-[45vw] xl:w-[50vw] md:mt-0 order-1 md:order-1"
+            className="relative top-32 md:absolute md:left-12 lg:left-16 md:top-[10%] z-20 flex flex-col gap-0 md:items-start w-full max-w-[90vw] md:w-[45vw] xl:w-[50vw] md:mt-0 order-1 md:order-1"
           >
             <WhyChooseKara />
           </RevealOnScroll>
@@ -55,7 +55,7 @@ export default function Home() {
           <RevealOnScroll
             direction="down"
             delay={200}
-            className="hidden xl:block relative ml-4 text-left md:absolute md:top-40 2xl:top-16 md:right-40 xl:right-13 xl:top-30 2xl:right-20 pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none"
+            className="hidden 2xl:block relative ml-4 text-left md:absolute md:top-40 2xl:top-16 md:right-40 xl:right-13 xl:top-30 2xl:right-20 pointer-events-none opacity-95 z-10 w-full md:w-auto md:text-left order-1 md:order-none"
           >
             <div className="font-symphony lowercase text-[#0f3b2b] text-6xl sm:text-6xl md:text-[6rem] xl:text-[4.5rem] 2xl:text-[10rem] leading-none">
               glow like
@@ -64,7 +64,7 @@ export default function Home() {
           <RevealOnScroll
             direction="up"
             delay={300}
-            className="hidden xl:block relative text-left md:absolute md:top-60 2xl:top-[180px] xl:top-48 xl:right-16 2xl:right-10 z-10 w-full md:w-auto md:text-left mt-[-20px] md:mt-0 order-2 md:order-none"
+            className="hidden 2xl:block relative text-left md:absolute md:top-60 2xl:top-[180px] xl:top-48 xl:right-16 2xl:right-10 z-10 w-full md:w-auto md:text-left mt-[-20px] md:mt-0 order-2 md:order-none"
           >
             <span className="font-serif lowercase text-[#0f3b2b] text-4xl sm:text-6xl md:text-[3rem] xl:text-[2.8rem] 2xl:text-[5.5rem] leading-tight tracking-tight block">
               never before
@@ -142,16 +142,12 @@ export default function Home() {
         <Brands />
       </div>
       <BestSellers />
-
       {/* Collections Section */}
       <div className=" py-10 mt-0 md:py-20 mdLmt-10">
-
         <FeaturedProducts />
       </div>
       <Collections />
-
       <NewnessSection />
-
       <SpringCollection />
     </main>
   );

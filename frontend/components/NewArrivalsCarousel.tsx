@@ -254,18 +254,18 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
   // ── DEFAULT (full size) MODE ──
   return (
     <div
-      className="flex flex-col w-[186px]  2xl:w-[480px] "
+      className="flex flex-col w-[186px] xl:w-[300px] 2xl:w-[480px] "
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Featured product card */}
       <div
         onClick={() => router.push(`/products/${currentProduct.id}`)}
-        className="bg-[#eeebd8]/70  flex flex-col 2xl:flex-row  2xl:gap-3 p-1 sm:gap-10 lg:gap-1 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90 cursor-pointer"
+        className="bg-[#eeebd8]/70  flex flex-col xl:flex-row   2xl:gap-3 p-1 sm:gap-10 lg:gap-1 mb-4 rounded-lg shadow-sm border border-[#0f3b2b]/5 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-[#eeebd8]/90 cursor-pointer"
       >
 
         {/* Product Image Container */}
-        <div className=" sm:w-38 md:w-42 h-28 w-32 sm:h-64 2xl:h-64 md:h-44 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
+        <div className=" sm:w-38 md:w-42 xl:w-38 xl:h-38 2xl:w-42 2xl:h-42 h-28 w-32 sm:h-64  2xl:h-64 md:h-44 bg-[#d4cfa8]/60 shrink-0 flex items-center justify-center overflow-hidden relative rounded-md">
           <Image
             src={currentProduct.image}
             alt={currentProduct.name}

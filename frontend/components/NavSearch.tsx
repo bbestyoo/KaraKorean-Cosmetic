@@ -126,7 +126,7 @@ export function NavSearch() {
     <div ref={containerRef} className="relative flex items-center z-50">
       {/* Search Input Container */}
       <div
-        className="flex items-center rounded-full h-8 sm:h-10 select-none w-[47vw] sm:w-52 md:w-60 lg:w-[27vw] bg-[#f2efe9] border border-[#c9a46b]/30 px-3 cursor-text"
+        className="flex items-center rounded-full h-8 sm:h-10 2xl:h-10 xl:h-9 select-none w-[47vw] sm:w-52 md:w-60 lg:w-[27vw] 2xl:w-[27vw] xl:w-[24vw] bg-[#f2efe9] border border-[#c9a46b]/30 px-3 cursor-text"
         onClick={handleIconClick}
       >
         <Search
