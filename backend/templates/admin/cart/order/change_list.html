@@ -1,0 +1,115 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/order_admin.css' %}">
+<style>
+  .order-stats-bar {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin: 0 0 20px 0; padding: 16px;
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+  }
+  .stat-card {
+    flex: 1 1 0%; min-width: 100px;
+    padding: 12px 16px; border-radius: 8px;
+    border: 1px solid #e5e7eb; text-align: center; background: #fafafa;
+  }
+  .stat-card .stat-value {
+    font-size: 24px; font-weight: 700; line-height: 1.2; margin: 0; padding: 0;
+  }
+  .stat-card .stat-label {
+    font-size: 11px; font-weight: 600; color: #6b7280;
+    text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 0 0 0; padding: 0;
+  }
+  .stat-pending .stat-value { color: #f59e0b; }
+  .stat-dispatched .stat-value { color: #3b82f6; }
+  .stat-cleared .stat-value { color: #10b981; }
+  .stat-cancelled .stat-value { color: #ef4444; }
+  .stat-total .stat-value { color: #111827; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  {# ── Stats Bar ── #}
+  {% if stats %}
+  <div class="order-stats-bar">
+    <div class="stat-card stat-total">
+      <div class="stat-value">{{ stats.total }}</div>
+      <div class="stat-label">Total Orders</div>
+    </div>
+    <div class="stat-card stat-pending">
+      <div class="stat-value">{{ stats.pending }}</div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card stat-dispatched">
+      <div class="stat-value">{{ stats.dispatched }}</div>
+      <div class="stat-label">Dispatched</div>
+    </div>
+    <div class="stat-card stat-cleared">
+      <div class="stat-value">{{ stats.cleared }}</div>
+      <div class="stat-label">Cleared</div>
+    </div>
+    <div class="stat-card stat-cancelled">
+      <div class="stat-value">{{ stats.cancelled }}</div>
+      <div class="stat-label">Cancelled</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% block object-tools %}
+    <ul class="object-tools">
+      {% block object-tools-items %}
+        {% change_list_object_tools %}
+      {% endblock %}
+    </ul>
+  {% endblock %}
+
+  {% if cl.formset and cl.formset.errors %}
+    <p class="errornote">
+    {% blocktranslate count counter=cl.formset.total_error_count %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+    </p>
+    {{ cl.formset.non_form_errors }}
+  {% endif %}
+
+  <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+    <div class="changelist-form-container">
+      {% block search %}{% search_form cl %}{% endblock %}
+      {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
+
+      <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+      {% if cl.formset %}
+        <div>{{ cl.formset.management_form }}</div>
+      {% endif %}
+
+      {% block result_list %}
+        {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+        {% result_list cl %}
+        {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+      {% endblock %}
+      {% block pagination %}{% pagination cl %}{% endblock %}
+      </form>
+    </div>
+
+    {% block filters %}
+      {% if cl.has_filters %}
+        <div id="changelist-filter">
+          <h2>{% translate 'Filter' %}</h2>
+          {% if cl.is_facets_optional or cl.has_active_filters %}<div id="changelist-filter-extra-actions">
+            {% if cl.is_facets_optional %}<h3>
+              {% if cl.add_facets %}<a href="{{ cl.remove_facet_link }}" class="hidelink">{% translate "Hide counts" %}</a>
+              {% else %}<a href="{{ cl.add_facet_link }}" class="viewlink">{% translate "Show counts" %}</a>{% endif %}
+            </h3>{% endif %}
+            {% if cl.has_active_filters %}<h3>
+              <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
+            </h3>{% endif %}
+          </div>{% endif %}
+          {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+        </div>
+      {% endif %}
+    {% endblock %}
+  </div>
+</div>
+{% endblock %}

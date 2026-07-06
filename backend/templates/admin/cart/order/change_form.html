@@ -1,0 +1,295 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/order_admin.css' %}">
+<style>
+  /* ── Order Header ── */
+  .order-header-wrap { margin: 0 0 20px 0; }
+  .order-header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 0 0 16px 0; flex-wrap: wrap; gap: 12px;
+  }
+  .order-title {
+    font-size: 22px !important; font-weight: 700 !important;
+    color: #111827 !important; margin: 0 !important; padding: 0;
+    line-height: 1.3;
+  }
+  .order-date {
+    font-size: 13px; color: #6b7280; margin: 4px 0 0 0; padding: 0;
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; padding: 6px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+  }
+  .badge-success { background: #d1fae5; color: #065f46; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+
+  /* ── Action Buttons ── */
+  .action-form { display: inline-block; margin: 0; padding: 0; }
+  .order-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid #d1d5db; cursor: pointer; background: #fff;
+    color: #374151; line-height: 1.4; text-decoration: none; margin: 0;
+  }
+  .action-btn:hover { background: #f3f4f6; border-color: #9ca3af; }
+  .action-btn.btn-primary { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+  .action-btn.btn-primary:hover { background: #2563eb; border-color: #2563eb; }
+  .action-btn.btn-danger { color: #dc2626; border-color: #fca5a5; }
+  .action-btn.btn-danger:hover { background: #fef2f2; }
+  .action-btn.btn-success { color: #059669; border-color: #6ee7b7; }
+  .action-btn.btn-success:hover { background: #ecfdf5; }
+
+  /* ── Status Timeline ── */
+  .order-timeline {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; padding: 16px 0 8px; max-width: 520px; margin: 0 auto;
+  }
+  .timeline-step {
+    display: flex; flex-direction: column; align-items: center;
+    position: relative; z-index: 1; flex-shrink: 0;
+  }
+  .timeline-step .step-circle {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+    border: 3px solid #d1d5db; background: #fff; color: #9ca3af;
+    line-height: 1; padding: 0; margin: 0;
+  }
+  .timeline-step.completed .step-circle {
+    background: #10b981; border-color: #10b981; color: #fff;
+  }
+  .timeline-step.active .step-circle {
+    background: #3b82f6; border-color: #3b82f6; color: #fff;
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.2);
+  }
+  .timeline-step.cancelled .step-circle {
+    background: #ef4444; border-color: #ef4444; color: #fff;
+  }
+  .timeline-step .step-label {
+    font-size: 11px; font-weight: 600; color: #9ca3af;
+    margin: 8px 0 0 0; padding: 0;
+    text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;
+  }
+  .timeline-step.completed .step-label,
+  .timeline-step.active .step-label { color: #374151; }
+  .timeline-step.cancelled .step-label { color: #ef4444; }
+  .timeline-connector {
+    flex: 1 1 0%; height: 3px; background: #d1d5db;
+    max-width: 72px; min-width: 24px; border: none; margin: 0 0 28px 0; padding: 0;
+  }
+  .timeline-connector.completed { background: #10b981; }
+  .timeline-connector.cancelled-connector { background: #fca5a5; }
+
+  /* ── Card Fieldsets ── */
+  fieldset.module.aligned {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+    margin: 0 0 16px 0; padding: 16px 20px;
+  }
+  fieldset.module.aligned h2 {
+    font-size: 13px; font-weight: 700; color: #374151;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin: 0 0 12px 0; padding: 0 0 8px 0;
+    background: none; border: none; border-bottom: 1px solid #f3f4f6;
+  }
+  fieldset.module.aligned .form-row {
+    border-bottom: 1px solid #f3f4f6; padding: 10px 0; margin: 0;
+  }
+  fieldset.module.aligned .form-row:last-child { border-bottom: none; }
+
+  /* Hide help text on custom display fields */
+  .field-customer_name_display .help,
+  .field-email_display .help, .field-phone_display .help,
+  .field-shipping_address_display .help, .field-summary_display .help,
+  .field-payment_info_display .help, .field-order_items_display .help {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  {% if original %}
+  {% with s=original.status %}
+  {# ── Order Header ── #}
+  <div class="order-header-wrap">
+    <div class="order-header-row">
+      <div>
+        <h1 class="order-title">Order #{{ original.id|stringformat:"s"|truncatechars:20 }}</h1>
+        <p class="order-date">Placed on {{ original.created_at|date:"F d, Y" }} at {{ original.created_at|date:"h:i A" }}</p>
+      </div>
+      <div class="order-actions">
+        {% if s == "Pending" %}
+        <form method="post" class="action-form">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="Dispatched">
+          <input type="hidden" name="_continue" value="1">
+          <button type="submit" class="action-btn btn-primary">Mark Dispatched</button>
+        </form>
+        <form method="post" class="action-form">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="Cancelled">
+          <input type="hidden" name="_continue" value="1">
+          <button type="submit" class="action-btn btn-danger">Cancel Order</button>
+        </form>
+        {% endif %}
+        {% if s == "Dispatched" %}
+        <form method="post" class="action-form">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="Cleared">
+          <input type="hidden" name="_continue" value="1">
+          <button type="submit" class="action-btn btn-success">Mark Cleared</button>
+        </form>
+        <form method="post" class="action-form">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="Cancelled">
+          <input type="hidden" name="_continue" value="1">
+          <button type="submit" class="action-btn btn-danger">Cancel Order</button>
+        </form>
+        {% endif %}
+        {% if s == "Cleared" %}
+        <span class="badge badge-success">Order Completed</span>
+        {% endif %}
+        {% if s == "Cancelled" %}
+        <span class="badge badge-danger">Order Cancelled</span>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── Status Timeline ── #}
+    <div class="order-timeline">
+      {# Step 1: Pending #}
+      <div class="timeline-step
+        {% if s == 'Pending' %}active{% endif %}
+        {% if s == 'Dispatched' or s == 'Cleared' %}completed{% endif %}
+        {% if s == 'Cancelled' %}completed{% endif %}">
+        <div class="step-circle">1</div>
+        <div class="step-label">Pending</div>
+      </div>
+      <div class="timeline-connector
+        {% if s == 'Dispatched' or s == 'Cleared' %}completed{% endif %}
+        {% if s == 'Cancelled' %}completed{% endif %}"></div>
+
+      {# Step 2: Dispatched #}
+      <div class="timeline-step
+        {% if s == 'Dispatched' %}active{% endif %}
+        {% if s == 'Cleared' %}completed{% endif %}">
+        <div class="step-circle">2</div>
+        <div class="step-label">Dispatched</div>
+      </div>
+      <div class="timeline-connector
+        {% if s == 'Cleared' %}completed{% endif %}"></div>
+
+      {# Step 3: Cleared #}
+      <div class="timeline-step
+        {% if s == 'Cleared' %}active{% endif %}">
+        <div class="step-circle">3</div>
+        <div class="step-label">Cleared</div>
+      </div>
+
+      {# Cancelled fork #}
+      {% if s == 'Cancelled' %}
+      <div class="timeline-connector cancelled-connector"></div>
+      <div class="timeline-step cancelled">
+        <div class="step-circle">✕</div>
+        <div class="step-label">Cancelled</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endwith %}
+  {% endif %}
+
+  {% if change and not is_popup %}
+    <ul class="object-tools">
+      {% change_form_object_tools %}
+    </ul>
+  {% endif %}
+
+  <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+  <div>
+  {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+  {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+  {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+  {% if errors %}
+      <p class="errornote">
+      {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+      </p>
+      {{ adminform.form.non_field_errors }}
+  {% endif %}
+
+  {% block field_sets %}
+  {% for fieldset in adminform %}
+    <fieldset class="module aligned {{ fieldset.classes }}">
+      {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+      {% if fieldset.description %}
+          <div class="description">{{ fieldset.description|safe }}</div>
+      {% endif %}
+      {% for line in fieldset %}
+          <div class="form-row{% if line.fields|length == 1 and line.errors %} errors{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
+              {% if line.fields|length == 1 %}{{ line.errors }}{% else %}<div class="flex-container form-multiline">{% endif %}
+              {% for field in line %}
+                  <div>
+                      {% if not line.fields|length == 1 and not field.is_readonly %}{{ field.errors }}{% endif %}
+                          <div class="flex-container{% if not line.fields|length == 1 %} fieldBox{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}{% if field.field.is_hidden %} hidden{% endif %}{% elif field.is_checkbox %} checkbox-row{% endif %}">
+                              {% if field.is_checkbox %}
+                                  {{ field.field }}{{ field.label_tag }}
+                              {% else %}
+                                  {{ field.label_tag }}
+                                  {% if field.is_readonly %}
+                                      <div class="readonly">{{ field.contents }}</div>
+                                  {% else %}
+                                      {{ field.field }}
+                                  {% endif %}
+                              {% endif %}
+                          </div>
+                      {% if field.field.help_text %}
+                          <div class="help"{% if field.field.id_for_label %} id="{{ field.field.id_for_label }}_helptext"{% endif %}>
+                              <div>{{ field.field.help_text|safe }}</div>
+                          </div>
+                      {% endif %}
+                  </div>
+              {% endfor %}
+              {% if not line.fields|length == 1 %}</div>{% endif %}
+          </div>
+      {% endfor %}
+    </fieldset>
+  {% endfor %}
+  {% endblock %}
+
+  {% block after_field_sets %}{% endblock %}
+
+  {% block inline_field_sets %}
+  {% for inline_admin_formset in inline_admin_formsets %}
+      {% include inline_admin_formset.opts.template %}
+  {% endfor %}
+  {% endblock %}
+
+  {% block after_related_objects %}{% endblock %}
+
+  {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+  {% block admin_change_form_document_ready %}
+      <script id="django-admin-form-add-constants"
+              src="{% static 'admin/js/change_form.js' %}"
+              {% if adminform and add %}
+                  data-model-name="{{ opts.model_name }}"
+              {% endif %}
+              async>
+      </script>
+  {% endblock %}
+
+  {% prepopulated_fields_js %}
+
+  </div>
+  </form>
+</div>
+{% endblock %}
