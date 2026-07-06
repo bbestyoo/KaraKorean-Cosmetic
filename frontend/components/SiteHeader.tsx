@@ -16,7 +16,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, "");
 
 const NAV_LINKS = [
-  { label: "Home", href: "/" },
   { label: "Products", href: "/products" },
   { label: "Blog", href: "/blog" },
   { label: "Quiz", href: "/quiz" },
@@ -54,7 +53,7 @@ function NavDropdown({
     >
       <button
         className={cn(
-          "relative pb-1 text-sm font-bold tracking-[0.15em] uppercase transition-colors hover:text-black group flex items-center gap-1",
+          "relative pb-1 text-sm 2xl:text-sm text-xs font-bold tracking-[0.15em] uppercase transition-colors hover:text-black group flex items-center gap-1",
           open ? "text-black" : "text-[#5c6e69]"
         )}
       >
@@ -225,7 +224,7 @@ export function SiteHeader() {
       >
         <PromoBanner />
 
-        <div className="h-16 sm:h-20 md:h-24 px-6 lg:px-8 flex items-center justify-between relative">
+        <div className="h-16 sm:h-20 md:h-24 xl:h-16 2xl:h-24 px-6 lg:px-8 2xl:px-8 xl:px-0 flex items-center justify-between relative">
           {/* Hamburger */}
           <button
             className="xl:hidden p-2 -ml-2 text-neutral-800 transition-transform duration-200 active:scale-90"
@@ -258,22 +257,22 @@ export function SiteHeader() {
                 alt="Kara KOREAN BEAUTY STORE"
                 width={250}
                 height={90}
-                className="object-contain mt-4 md:p-8 p-2 w-[35vw] sm:w-[25vw] lg:w-[19vw] 2xl:w-[14vw] xl:w-[17vw] mb-2"
+                className="object-contain mt-4 md:p-8 p-2 w-[35vw] sm:w-[25vw] lg:w-[19vw] 2xl:w-[14vw] xl:w-[15vw] mb-2"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex md:gap-5 lg:gap-8 xl:gap-10 2xl:gap-14 items-center absolute left-1/6 text-[#5c6e69]">
+          <nav className="hidden xl:flex md:gap-5 lg:gap-8 xl:gap-5 2xl:gap-14 items-center absolute left-1/6 xl:left-1/7 2xl:left-1/6 text-[#5c6e69]">
             {NAV_LINKS.map(({ label, href }) => {
               // Insert dropdowns after "Products"
               if (label === "Products") {
                 return (
-                  <div key={href} className="flex items-center gap-5 lg:gap-8 xl:gap-10">
+                  <div key={href} className="flex items-center gap-5 lg:gap-8 xl:gap-5 2xl:gap-10">
                     <Link
                       href={href}
                       className={cn(
-                        "relative pb-1 text-sm font-bold tracking-[0.15em] uppercase transition-colors hover:text-black group",
+                        "relative pb-1 2xl:text-sm xl:text-xs text-sm font-bold tracking-[0.15em] uppercase transition-colors hover:text-black group",
                         isActive(href) ? "text-[#4a5a56]" : ""
                       )}
                     >
@@ -311,7 +310,7 @@ export function SiteHeader() {
                   key={href}
                   href={href}
                   className={cn(
-                    "relative pb-1 text-sm font-bold tracking-[0.15em] uppercase transition-colors hover:text-black group",
+                    "relative pb-1 text-sm xl:text-xs 2xl:text-sm font-bold tracking-[0.15em] uppercase transition-colors hover:text-black group",
                     active ? "text-[#4a5a56]" : ""
                   )}
                 >
