@@ -150,6 +150,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+#Brevo API v3
+BREVO_API_KEY = os.getenv("SENDINBLUE_API_KEY")
+DEFAULT_FROM_EMAIL_ADDRESS = "contact@karakoreanbeauty.com"
+DEFAULT_FROM_EMAIL_NAME = "Kara Korean Beauty Store"
+
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

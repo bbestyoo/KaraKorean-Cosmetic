@@ -1,0 +1,408 @@
+/* ═══════════════════════════════════════════
+   Order Admin — Custom Styles
+   Classes are unique to this panel so no
+   parent scoping is needed.
+   ═══════════════════════════════════════════ */
+
+/* ── Stat Cards (list view) ── */
+.order-stats-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 20px 0;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.stat-card {
+  flex: 1 1 0%;
+  min-width: 100px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  background: #fafafa;
+}
+
+.stat-card .stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+}
+
+.stat-card .stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 4px 0 0 0;
+  padding: 0;
+}
+
+.stat-pending .stat-value { color: #f59e0b; }
+.stat-dispatched .stat-value { color: #3b82f6; }
+.stat-cleared .stat-value { color: #10b981; }
+.stat-cancelled .stat-value { color: #ef4444; }
+.stat-total .stat-value { color: #111827; }
+
+/* ── Order Header ── */
+.order-header-wrap {
+  margin: 0 0 20px 0;
+}
+
+.order-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 16px 0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.order-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  padding: 0;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+}
+
+.order-date {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0 0 0;
+  padding: 0;
+}
+
+/* ── Status Badges ── */
+.badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.badge-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ── Action Buttons ── */
+.action-form {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid #d1d5db;
+  cursor: pointer;
+  background: #fff;
+  color: #374151;
+  transition: all 0.15s ease;
+  line-height: 1.4;
+  text-decoration: none;
+  box-shadow: none;
+  text-shadow: none;
+  min-height: auto;
+  letter-spacing: normal;
+  text-transform: none;
+  font-family: inherit;
+  margin: 0;
+}
+
+.action-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.action-btn.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+}
+
+.action-btn.btn-primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.action-btn.btn-danger {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fff;
+}
+
+.action-btn.btn-danger:hover {
+  background: #fef2f2;
+}
+
+.action-btn.btn-success {
+  color: #059669;
+  border-color: #6ee7b7;
+  background: #fff;
+}
+
+.action-btn.btn-success:hover {
+  background: #ecfdf5;
+}
+
+.action-btn.btn-warning {
+  color: #d97706;
+  border-color: #fcd34d;
+  background: #fff;
+}
+
+.action-btn.btn-warning:hover {
+  background: #fffbeb;
+}
+
+/* ── Status Timeline ── */
+.order-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 16px 0 8px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.timeline-step .step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  border: 3px solid #d1d5db;
+  background: #fff;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  text-shadow: none;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.timeline-step.completed .step-circle {
+  background: #10b981;
+  border-color: #10b981;
+  color: #fff;
+}
+
+.timeline-step.active .step-circle {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.timeline-step.cancelled .step-circle {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.timeline-step .step-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  margin: 8px 0 0 0;
+  padding: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+}
+
+.timeline-step.completed .step-label,
+.timeline-step.active .step-label {
+  color: #374151;
+}
+
+.timeline-step.cancelled .step-label {
+  color: #ef4444;
+}
+
+.timeline-connector {
+  flex: 1 1 0%;
+  height: 3px;
+  background: #d1d5db;
+  max-width: 72px;
+  transition: background 0.3s ease;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 24px;
+  align-self: center;
+  margin-bottom: 28px;
+}
+
+.timeline-connector.completed {
+  background: #10b981;
+}
+
+.timeline-connector.cancelled-connector {
+  background: #fca5a5;
+}
+
+/* ── Card Fieldsets ── */
+fieldset.module.aligned {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin: 0 0 16px 0;
+  padding: 16px 20px;
+}
+
+fieldset.module.aligned h2 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px 0;
+  padding: 0 0 8px 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+fieldset.module.aligned .form-row {
+  border-bottom: 1px solid #f3f4f6;
+  padding: 10px 0;
+  margin: 0;
+}
+
+fieldset.module.aligned .form-row:last-child {
+  border-bottom: none;
+}
+
+/* Hide help text on custom display fields */
+.field-customer_name_display .help,
+.field-email_display .help,
+.field-phone_display .help,
+.field-shipping_address_display .help,
+.field-summary_display .help,
+.field-payment_info_display .help,
+.field-order_items_display .help {
+  display: none;
+}
+
+/* Field label styling for display-only fields */
+.field-customer_name_display > div > div label,
+.field-email_display > div > div label,
+.field-phone_display > div > div label,
+.field-shipping_address_display > div > div label,
+.field-summary_display > div > div label,
+.field-payment_info_display > div > div label,
+.field-order_items_display > div > div label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: auto;
+  width: auto;
+  padding: 0;
+  margin: 0 0 4px 0;
+  display: block;
+  float: none;
+  text-align: left;
+}
+
+/* Status dropdown */
+.field-status select {
+  padding: 6px 12px;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 160px;
+  background: #fff;
+  height: auto;
+  line-height: 1.4;
+  box-shadow: none;
+}
+
+.field-status select:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Inline groups (order items tabular) */
+.inline-group {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.inline-group h2 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  margin: 0;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  .order-stats-bar {
+    flex-direction: column;
+  }
+  .stat-card {
+    min-width: 100%;
+  }
+  .order-timeline {
+    max-width: 100%;
+  }
+}

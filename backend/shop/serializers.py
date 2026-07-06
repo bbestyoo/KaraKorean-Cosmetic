@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Comment, Repliess, ProductImage, Rating, ProductAttribute, Variant, Size, UseCase
+from .models import Product, Comment, Repliess, ProductImage, Rating, ProductAttribute, Variant, Size, UseCase, SkinType, Concern
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
@@ -117,6 +117,8 @@ class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.SerializerMethodField()
     sub_category_name = serializers.SerializerMethodField()
     usecases = serializers.SlugRelatedField(many=True, slug_field='name', queryset=UseCase.objects.all(), required=False)
+    skin_type = serializers.SlugRelatedField(many=True, slug_field='name', queryset=SkinType.objects.all(), required=False)
+    concern = serializers.SlugRelatedField(many=True, slug_field='name', queryset=Concern.objects.all(), required=False)
     # stock = serializers.SerializerMethodField()
     attributes = ProductAttributeSerializer(many=True, read_only=True)
     variants = VariantSerializer(many=True, read_only=True)

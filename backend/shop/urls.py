@@ -13,6 +13,9 @@ router.register(r'product-image', views.ProductImageViewSet)
 router.register(r'category', views.CategoryViewSet)
 router.register(r'brand', views.BrandViewSet)
 router.register(r'usecase', views.UseCaseViewSet)
+router.register(r'skintype', views.SkinTypeViewSet)
+router.register(r'concern', views.ConcernViewSet)
+router.register(r'combo', views.ComboViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

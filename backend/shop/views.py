@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Product, Comment, Size, ProductImage, Category, Brand, UseCase, Rating
+from .models import Product, Comment, Size, ProductImage, Category, Brand, UseCase, Rating, SkinType, Concern, Combo
 from math import ceil
 from .serializers import ProductSerializer, CommentSerializer, ReplySerializer, RatingSerializer, GetProductSerializer, SizeSerializer, ProductImageSerializer, UseCaseSerializer
 from rest_framework.response import Response
@@ -54,6 +54,9 @@ class GetProduct(APIView):
         ordering_fields = request.query_params.getlist('ordering')
         brand = request.query_params.get('brand')
         category = request.query_params.get('category')
+        skin_type = request.query_params.get('skin_type')
+        concern = request.query_params.get('concern')
+        combo = request.query_params.get('combo')
         # Base queryset annotated with average rating and rating count
         queryset = Product.objects.all().annotate(
             rating=Avg('ratings__rating'),
@@ -102,6 +105,21 @@ class GetProduct(APIView):
         if usecase:
             try:
                 queryset = queryset.filter(usecases__name__icontains=usecase)
+            except (ValueError, TypeError):
+                pass
+        if skin_type:
+            try:
+                queryset = queryset.filter(skin_type__name__icontains=skin_type)
+            except (ValueError, TypeError):
+                pass
+        if concern:
+            try:
+                queryset = queryset.filter(concern__name__icontains=concern)
+            except (ValueError, TypeError):
+                pass
+        if combo:
+            try:
+                queryset = queryset.filter(combo__name__icontains=combo)
             except (ValueError, TypeError):
                 pass
         # Apply ordering based on multiple parameters
@@ -638,6 +656,42 @@ class BrandViewSet(viewsets.ModelViewSet):
 class UseCaseViewSet(viewsets.ModelViewSet):
     queryset = UseCase.objects.all()
     serializer_class = UseCaseSerializer
+
+class SkinTypeViewSet(viewsets.ModelViewSet):
+    queryset = SkinType.objects.all()
+    serializer_class = None
+    
+    def get_serializer_class(self):
+        from rest_framework import serializers
+        class SkinTypeSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = SkinType
+                fields = ['id', 'name']
+        return SkinTypeSerializer
+
+class ConcernViewSet(viewsets.ModelViewSet):
+    queryset = Concern.objects.all()
+    serializer_class = None
+    
+    def get_serializer_class(self):
+        from rest_framework import serializers
+        class ConcernSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = Concern
+                fields = ['id', 'name']
+        return ConcernSerializer
+
+class ComboViewSet(viewsets.ModelViewSet):
+    queryset = Combo.objects.all()
+    serializer_class = None
+    
+    def get_serializer_class(self):
+        from rest_framework import serializers
+        class ComboSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = Combo
+                fields = ['id', 'name', 'discount']
+        return ComboSerializer
 
 
 class RecommendationsView(APIView):

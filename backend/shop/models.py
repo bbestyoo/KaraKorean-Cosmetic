@@ -31,6 +31,9 @@ class Product(models.Model):
     best_seller = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
     usecases = models.ManyToManyField('UseCase', blank=True, related_name='products')
+    skin_type = models.ManyToManyField('SkinType', blank=True, related_name='products')
+    combo = models.ManyToManyField('Combo', blank=True, related_name='products')
+    concern = models.ManyToManyField('Concern', blank=True, related_name='concern');
 
     def __str__(self):
         return self.name
@@ -142,4 +145,26 @@ class UseCase(models.Model):
 
     def __str__(self):
         return self.name
-    
+
+class SkinType(models.Model):
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Skin Type'
+        verbose_name_plural = 'Skin Types'
+
+    def __str__(self):
+        return self.name
+
+class Combo(models.Model):
+    name = models.CharField(max_length=100)
+    discount = models.FloatField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class Concern(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name

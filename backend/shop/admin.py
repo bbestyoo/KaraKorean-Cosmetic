@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute, Variant, Size, UseCase
+from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute, Variant, Size, UseCase, Concern, SkinType, Combo
 from import_export.admin import ImportExportModelAdmin
 from .resources import ProductResource, ProductAttributeResource, ProductImageResource, BrandResource, SeriesResource, CategoryResource, SubCategoryResource
 # Register your models here.
@@ -54,6 +54,18 @@ class UseCaseAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     model = UseCase
     resource_class = ProductAttributeResource
 
+class SkinTypeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    model = SkinType 
+    resource_class = ProductAttributeResource
+
+class ComboAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    model = Combo 
+    resource_class = ProductAttributeResource
+
+class ConcernAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    model = Concern 
+    resource_class = ProductAttributeResource
+
 class ProductAttributeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     model = ProductAttribute
     resource_class = ProductAttributeResource
@@ -79,3 +91,6 @@ admin.site.register(Series,SeriesAdmin)
 admin.site.register(Category,CategoryAdmin)
 admin.site.register(SubCategory,SubCategoryAdmin)
 admin.site.register(ProductAttribute, ProductAttributeAdmin)
+admin.site.register(SkinType, SkinTypeAdmin)
+admin.site.register(Combo, ComboAdmin)
+admin.site.register(Concern, ConcernAdmin)
