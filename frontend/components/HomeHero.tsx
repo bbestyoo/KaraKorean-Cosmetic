@@ -38,7 +38,7 @@ export function HomeHero({ children }: HomeHeroProps) {
 
           {/* Hero model — fills full viewport height, bottom-anchored */}
           <Image
-            src="/images/heromodel.png"
+            src="/images/heromodel.webp"
             alt="Hero image"
             width={800}
             height={1800}

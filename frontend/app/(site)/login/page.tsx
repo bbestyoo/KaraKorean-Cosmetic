@@ -198,7 +198,7 @@ export default function LoginPage() {
       {/* ── Right panel ── */}
       <div className="auth-image-panel">
         <Image
-          src="/korean-auth-hero.png"
+          src="/korean-auth-hero.webp"
           alt="Korean beauty model with cherry blossoms"
           fill
           className="auth-hero-img"

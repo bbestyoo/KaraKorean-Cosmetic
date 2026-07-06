@@ -7,19 +7,19 @@ const cards = [
   {
     title: "AntiAging",
     subtitle: "Browse Products",
-    image: "/images/model1.png",
+    image: "/images/model1.webp",
     link: "/shop/toner",
   },
   {
     title: "Pigmentation",
     subtitle: "Browse Products",
-    image: "/images/model2.png",
+    image: "/images/model2.webp",
     link: "/shop/ampoule",
   },
   {
     title: "Acne Control",
     subtitle: "Browse Products",
-    image: "/images/model3.png",
+    image: "/images/model3.webp",
     link: "/shop/essence",
   },
 ];

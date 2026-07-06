@@ -253,7 +253,7 @@ export function SiteHeader() {
           <div className="flex items-center">
             <Link href="/">
               <Image
-                src="/images/logos/karalogo.png"
+                src="/images/logos/karalogo.webp"
                 alt="Kara KOREAN BEAUTY STORE"
                 width={250}
                 height={90}

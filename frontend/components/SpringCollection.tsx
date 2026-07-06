@@ -21,10 +21,9 @@ export default function SpringCollection() {
             >
               <div className="absolute inset-0">
                 <Image
-                  src="images/karaimages/bojproduct.png" // Black and white fashion portrait
+                  src="images/karaimages/bojproduct.webp" // Black and white fashion portrait
                   alt="Spring Collection Model"
                   fill
-                  unoptimized
                   className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 cursor-pointer "
                 />
               </div>
@@ -61,10 +60,9 @@ export default function SpringCollection() {
                 className="group relative h-full w-full block overflow-hidden"
               >
                 <Image
-                  src="images/karaimages/bojmodel.png" // Sneakers stacked
+                  src="images/karaimages/bojmodel.webp" // Sneakers stacked
                   alt="Spring Collection Sneakers"
                   fill
-                  unoptimized
                   className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 cursor-pointer"
                 />
               </Link>

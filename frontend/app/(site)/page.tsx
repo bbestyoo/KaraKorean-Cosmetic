@@ -27,7 +27,7 @@ export default function Home() {
   "
           >
             <Image
-              src="/images/newheromodel.png"
+              src="/images/newheromodel.webp"
               alt="Hero image"
               fill
               priority
@@ -121,7 +121,7 @@ export default function Home() {
           {/* Model image in the center */}
           <div className="relative h-full aspect-[3/4] -mt-13 z-0">
             <Image
-              src="/images/crophero.png"
+              src="/images/crophero.webp"
               alt="Hero model"
               fill
               priority

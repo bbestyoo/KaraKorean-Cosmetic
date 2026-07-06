@@ -192,7 +192,7 @@ export default function AccountPage() {
         <aside className="md:col-span-1 bg-white border rounded-lg p-6 shadow-sm">
           <div className="flex flex-col items-center">
             <div className="relative w-28 h-28 rounded-full overflow-hidden bg-gray-100">
-              <Image src="/images/model1.png" alt="User avatar" fill className="object-cover" />
+              <Image src="/images/model1.webp" alt="User avatar" fill className="object-cover" />
             </div>
             <h3 className="mt-4 text-lg font-semibold text-center">
               {loadingProfile ? (

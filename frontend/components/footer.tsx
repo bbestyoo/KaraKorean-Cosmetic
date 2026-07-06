@@ -27,7 +27,7 @@ export default function Footer() {
             </Link>
           ))} */}
           <Image
-            src="/images/logos/11.png"
+            src="/images/logos/11.webp"
             alt="Kara KOREAN BEAUTY STORE"
             width={250}
             height={90}

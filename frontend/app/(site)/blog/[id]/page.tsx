@@ -55,7 +55,7 @@ const generatePost = (id: string): BlogPost => {
     image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=1200&auto=format&fit=crop",
     readTime: "5 min read",
     author: "Kara Editor",
-    authorAvatar: "/images/model1.png",
+    authorAvatar: "/images/model1.webp",
     rating: 4.7,
     reviewsCount: 140,
     location: "Unknown",

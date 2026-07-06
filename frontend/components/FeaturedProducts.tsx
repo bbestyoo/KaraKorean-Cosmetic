@@ -132,7 +132,6 @@ export default function FeaturedProducts() {
                         src={product.images?.[0]?.image || '/images/placeholder.png'}
                         alt={product.name}
                         fill
-                        unoptimized
                         className="object-contain bg-white mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>

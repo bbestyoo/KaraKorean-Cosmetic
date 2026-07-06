@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-      // Disable Vercel's paid Image Optimization - use DigitalOcean CDN instead for free
+      // DigitalOcean CDN handles optimization already
       unoptimized: true,
       remotePatterns: [
         {
