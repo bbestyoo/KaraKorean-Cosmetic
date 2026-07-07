@@ -263,12 +263,12 @@ export function SiteHeader() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex md:gap-5 lg:gap-8 xl:gap-5 2xl:gap-14 items-center absolute left-1/6 xl:left-1/7 2xl:left-1/6 text-[#5c6e69]">
+          <nav className="hidden xl:flex md:gap-5 lg:gap-8 xl:gap-5 items-center absolute left-1/6 xl:left-1/7 2xl:left-1/5 2xl:gap-[1.9vw] text-[#5c6e69]">
             {NAV_LINKS.map(({ label, href }) => {
               // Insert dropdowns after "Products"
               if (label === "Products") {
                 return (
-                  <div key={href} className="flex items-center gap-5 lg:gap-8 xl:gap-5 2xl:gap-10">
+                  <div key={href} className="flex items-center gap-5 lg:gap-8 xl:gap-5 2xl:gap-[1.6vw]">
                     <Link
                       href={href}
                       className={cn(
