@@ -29,7 +29,7 @@ export default function NewnessSection() {
             DESIRE SERIES
           </h2>
           <p className="text-sm md:text-base text-neutral-500 font-sans max-w-[200px] text-right mt-2 mr-2 leading-snug">
-            12 cosmetics for your beauty
+            Cosmetics for your beauty
           </p>
         </RevealOnScroll>
       </div>
@@ -48,7 +48,7 @@ export default function NewnessSection() {
               className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md"
             >
               <Image
-                src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=800&auto=format&fit=crop"
+                src="/images/karacollection6.webp"
                 alt="Natural beauty"
                 fill
                 unoptimized
@@ -72,8 +72,8 @@ export default function NewnessSection() {
               className="w-full max-w-[360px] aspect-[3/4] relative overflow-hidden mb-4 group cursor-pointer shadow-md"
             >
               <Image
-                src="https://images.unsplash.com/photo-1629198688000-71f23e745b6e?q=80&w=600&auto=format&fit=crop"
-                alt="Capture Day Creme"
+                src="/images/karacollection1.jpg"
+                alt="Tone Brightening Set Capsoule"
                 fill
                 unoptimized
                 className="object-cover transition-all duration-700 group-hover:scale-105"
@@ -84,7 +84,7 @@ export default function NewnessSection() {
                 </span>
               </div>
             </Link>
-            <p className="text-xs font-bold tracking-widest uppercase text-[#5c6e69]">Capture Day Creme</p>
+            <p className="text-xs font-bold tracking-widest uppercase text-[#5c6e69]">Tone Brightening Set Capsoule</p>
           </RevealOnScroll>
 
           {/* Right top white tube image (top stacked in far-right 25% column) */}
@@ -97,8 +97,8 @@ export default function NewnessSection() {
               className="w-full max-w-[340px] aspect-[4/5] relative overflow-hidden mb-4 group cursor-pointer shadow-md"
             >
               <Image
-                src="https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=600&auto=format&fit=crop"
-                alt="Capture Le Serum"
+                src="/images/karacollection9.jpg"
+                alt="The Vita-A Retinal Shot Tightening Booster"
                 fill
                 unoptimized
                 className="object-cover transition-all duration-700 group-hover:scale-105"
@@ -109,7 +109,7 @@ export default function NewnessSection() {
                 </span>
               </div>
             </Link>
-            <p className="text-xs font-bold tracking-widest uppercase text-[#5c6e69]">Capture Le Sérum</p>
+            <p className="text-xs font-bold tracking-widest uppercase text-[#5c6e69]">The Vita-A Retinal Shot Tightening Booster</p>
           </RevealOnScroll>
 
           {/* Bottom right cropped image (bottom stacked in far-right 25% column) */}
@@ -122,7 +122,7 @@ export default function NewnessSection() {
               className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md"
             >
               <Image
-                src="https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=600&auto=format&fit=crop"
+                src="images/karacollection4.webp"
                 alt="Cosmetic detail"
                 fill
                 unoptimized
