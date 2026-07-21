@@ -155,8 +155,7 @@ class CheckoutAPIView(APIView):
             logger.error(traceback.format_exc())  # ← full traceback
             order.delete()
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        # # Clear user's cart if authenticated
-        if user:
+        if user.is_authenticated:
             Cart.objects.filter(user=user).delete()
         
         # Return order info
