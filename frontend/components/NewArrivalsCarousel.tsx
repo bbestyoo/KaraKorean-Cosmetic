@@ -11,8 +11,8 @@ interface Product {
   id: string;
   name: string;
   brand: string;
-  price: string;
-  oldPrice?: string;
+  price: number;
+  oldPrice?: number;
   image: string;
   link?: string;
 }
@@ -80,8 +80,8 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
             id: item.product_id ?? String(item.id ?? item.pk ?? index),
             name: item.name ?? item.title ?? item.product_name ?? 'Product',
             brand: item.brand ?? item.brand_name ?? item.category_name ?? '',
-            price: `Rs. ${Number(item.price ?? 0).toLocaleString()}`,
-            oldPrice: item.old_price !== undefined ? `Rs. ${Number(item.old_price).toLocaleString()}` : undefined,
+            price: Number(item.price ?? 0),
+            oldPrice: item.old_price !== undefined ? Number(item.old_price) : undefined,
             image,
             link: `/products/${item.product_id ?? item.id ?? ''}`,
           } as Product;
@@ -128,16 +128,11 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
 
   const { addItem } = useCart();
 
-  const parsePrice = (priceStr: string) => {
-    const digits = priceStr.replace(/[^\d.]/g, '');
-    return Number(digits) || 0;
-  };
-
   const handleAddToBag = (product: Product) => {
     addItem({
       product_id: String(product.id),
       name: product.name,
-      price: parsePrice(product.price),
+      price: product.price,
       size: 'One Size',
       quantity: 1,
       image: product.image,
@@ -201,7 +196,7 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
               {currentProduct.name}
             </p>
             <p className="font-sans text-[#0f3b2b] text-[0.6rem] font-semibold normal-case">
-              {currentProduct.price}
+              Rs. {currentProduct.price.toLocaleString()}
             </p>
             <button
               type="button"
@@ -289,10 +284,10 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
           </div>
           <div>
             <p className="font-sans text-[#0f3b2b] text-xs sm:text-lg font-semibold normal-case truncate">
-              {currentProduct.price}
+              Rs. {currentProduct.price.toLocaleString()}
             </p>
             <p className="hidden md:block font-sans line-through text-[#0f3b2b]/60 text-sm normal-case mt-0.5">
-              {currentProduct.oldPrice}
+              {currentProduct.oldPrice !== undefined ? `Rs. ${currentProduct.oldPrice.toLocaleString()}` : ''}
             </p>
           </div>
           <button
