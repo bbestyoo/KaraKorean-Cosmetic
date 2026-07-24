@@ -2,8 +2,11 @@ import threading
 import requests
 from django.conf import settings
 from datetime import datetime, timedelta
+import logging
 
 from .models import OrderItem
+
+logger = logging.getLogger(__name__)
 
 
 def send_brevo_email(to_email, subject, html_content):
@@ -23,8 +26,16 @@ def send_brevo_email(to_email, subject, html_content):
         "htmlContent": html_content
     }
 
-    response = requests.post(url, json=payload, headers=headers)
-    return response.status_code, response.text
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        if response.status_code not in (200, 201):
+            logger.error("Brevo API error for %s: status=%s body=%s", to_email, response.status_code, response.text)
+        else:
+            logger.info("Email sent to %s (subject: %s)", to_email, subject)
+        return response.status_code, response.text
+    except requests.exceptions.RequestException as e:
+        logger.error("Brevo API request failed for %s: %s", to_email, str(e))
+        return None, str(e)
 
 
 def send_order_confirmation(order):
@@ -33,6 +44,7 @@ def send_order_confirmation(order):
         try:
             delivery = getattr(order, 'delivery', None)
             if not delivery:
+                logger.warning("No delivery found for order %s, skipping email", order.id)
                 return
 
             order_items = OrderItem.objects.filter(order=order)
@@ -193,12 +205,16 @@ def send_order_confirmation(order):
             """
 
             if delivery.email:
-                send_brevo_email(delivery.email, customer_subject, customer_html)
+                status, resp = send_brevo_email(delivery.email, customer_subject, customer_html)
+                logger.info("Customer email result: status=%s", status)
+            else:
+                logger.warning("No email on delivery for order %s, skipping customer email", order.id)
 
-            send_brevo_email("karakoreanstore@gmail.com", admin_subject, admin_html)
+            status, resp = send_brevo_email("karakoreanstore@gmail.com", admin_subject, admin_html)
+            logger.info("Admin email result: status=%s", status)
 
         except Exception as e:
-            print(f"Error sending order confirmation: {str(e)}")
+            logger.exception("Error sending order confirmation for order %s: %s", order.id, str(e))
 
     thread = threading.Thread(target=send_emails, daemon=True)
     thread.start()
