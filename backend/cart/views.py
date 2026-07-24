@@ -124,6 +124,7 @@ class CheckoutAPIView(APIView):
                 'full_name': data.get('fullName'),
                 'email': data.get('email', ''),
                 'shipping_address': data.get('shippingAddress'),
+                'shipping_method': data.get('shippingMethod', ''),
                 'payment_method': data.get('paymentMethod', 'COD'),
                 'shipping_cost': shipping_cost,
                 'subtotal': subtotal,

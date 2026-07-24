@@ -128,6 +128,7 @@ def send_order_confirmation(order):
                   </table>
                   <h3>Shipping Address</h3>
                   <p>{delivery.full_name}<br>{delivery.shipping_address}<br>{delivery.phone_number}</p>
+                  {'<p><strong>Shipping Method:</strong> ' + delivery.shipping_method + '</p>' if delivery.shipping_method else ''}
                   <p>We'll notify you once your order has been dispatched.</p>
                   <p>Best regards,<br><strong>Kara Korean Beauty Store</strong></p>
                 </div>
@@ -189,6 +190,7 @@ def send_order_confirmation(order):
                     <tr><td>Phone</td><td>{delivery.phone_number}</td></tr>
                     <tr><td>Address</td><td>{delivery.shipping_address}</td></tr>
                     <tr><td>Payment</td><td>{delivery.payment_method}</td></tr>
+                    <tr><td>Shipping Method</td><td>{delivery.shipping_method or 'N/A'}</td></tr>
                     <tr><td>Subtotal</td><td>Rs. {delivery.subtotal}</td></tr>
                     <tr><td>Shipping</td><td>Rs. {delivery.shipping_cost}</td></tr>
                     <tr><td>Discount</td><td>-Rs. {delivery.discount}</td></tr>

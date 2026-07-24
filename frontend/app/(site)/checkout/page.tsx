@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Lock, Mail, MapPin, CreditCard } from 'lucide-react';
+import { ChevronLeft, Lock, Mail, MapPin, CreditCard, Truck } from 'lucide-react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -32,6 +32,15 @@ interface CouponResult {
   code?: string;
 }
 
+type ShippingTier = 'kathmandu_pokhara' | 'tier2' | 'tier3' | 'remote';
+
+const SHIPPING_METHODS: { id: ShippingTier; label: string; description: string; price: number }[] = [
+  { id: 'kathmandu_pokhara', label: 'Home Delivery — Kathmandu & Pokhara Valley', description: 'Standard delivery within valley', price: 99 },
+  { id: 'tier2', label: 'Home Delivery — Tier 2 Cities', description: 'Delivery to major cities', price: 135 },
+  { id: 'tier3', label: 'Home Delivery — Tier 3 Cities', description: 'Delivery to smaller cities', price: 160 },
+  { id: 'remote', label: 'Delivery — Remote Areas', description: 'Delivery to remote areas', price: 220 },
+];
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
@@ -39,6 +48,7 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'qr'>('cod');
   const [transactionId, setTransactionId] = useState('');
+  const [shippingTier, setShippingTier] = useState<ShippingTier>('kathmandu_pokhara');
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
@@ -116,7 +126,7 @@ export default function CheckoutPage() {
   };
 
   const subtotal = getTotalPrice();
-  const shippingCost = subtotal > 5000 ? 0 : 120;
+  const shippingCost = SHIPPING_METHODS.find(m => m.id === shippingTier)?.price ?? 99;
 
   // Compute discount from coupon
   const discountAmount = (() => {
@@ -190,6 +200,7 @@ export default function CheckoutPage() {
         shippingAddress: formData.shippingAddress,
         subtotal: subtotal - discountAmount,
         shippingCost,
+        shippingMethod: SHIPPING_METHODS.find(m => m.id === shippingTier)?.label ?? '',
         discountAmount,
         total,
         couponCode: couponResult ? couponResult.code : undefined,
@@ -395,6 +406,50 @@ export default function CheckoutPage() {
                       />
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Shipping Method */}
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <Truck size={20} className="text-red-500" />
+                  Shipping Method
+                </h2>
+
+                <div className="space-y-3">
+                  {SHIPPING_METHODS.map((method) => (
+                    <div
+                      key={method.id}
+                      onClick={() => setShippingTier(method.id)}
+                      className={`bg-white border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                        shippingTier === method.id
+                          ? 'border-[#0f3b2b] ring-1 ring-[#0f3b2b]/20'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex items-center h-6">
+                          <input
+                            type="radio"
+                            id={`shipping-${method.id}`}
+                            name="shippingMethod"
+                            checked={shippingTier === method.id}
+                            onChange={() => setShippingTier(method.id)}
+                            className="w-4 h-4 accent-[#0f3b2b] cursor-pointer"
+                          />
+                        </div>
+                        <div className="flex-1 flex items-center justify-between">
+                          <div>
+                            <label htmlFor={`shipping-${method.id}`} className="font-semibold text-gray-900 cursor-pointer">
+                              {method.label}
+                            </label>
+                            <p className="text-sm text-gray-600 mt-1">{method.description}</p>
+                          </div>
+                          <span className="font-bold text-gray-900 ml-4">Rs {method.price.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -628,7 +683,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span>{shippingCost === 0 ? 'FREE' : `NPR ${shippingCost}`}</span>
+                  <span>NPR {shippingCost}</span>
                 </div>
                 {couponResult && discountAmount > 0 && (
                   <div className="flex justify-between text-green-600 font-medium">
@@ -637,9 +692,6 @@ export default function CheckoutPage() {
                     </span>
                     <span>- NPR {discountAmount.toLocaleString()}</span>
                   </div>
-                )}
-                {subtotal > 0 && subtotal <= 5000 && (
-                  <p className="text-xs text-gray-500 mt-2">Free delivery on orders above NPR 5000</p>
                 )}
               </div>
 

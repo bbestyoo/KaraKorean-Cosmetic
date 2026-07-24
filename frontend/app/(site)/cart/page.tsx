@@ -4,10 +4,21 @@ import { useRouter } from 'next/navigation';
 import { Trash2, Plus, Minus } from 'lucide-react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
+import { useState } from 'react';
+
+type ShippingTier = 'kathmandu_pokhara' | 'tier2' | 'tier3' | 'remote';
+
+const SHIPPING_METHODS: { id: ShippingTier; label: string; price: number }[] = [
+  { id: 'kathmandu_pokhara', label: 'Kathmandu & Pokhara Valley', price: 99 },
+  { id: 'tier2', label: 'Tier 2 Cities', price: 135 },
+  { id: 'tier3', label: 'Tier 3 Cities', price: 160 },
+  { id: 'remote', label: 'Remote Areas', price: 220 },
+];
 
 export default function CartPage() {
   const router = useRouter();
   const { items, removeItem, updateQuantity, getTotalPrice } = useCart();
+  const [shippingTier, setShippingTier] = useState<ShippingTier>('kathmandu_pokhara');
 
   if (items.length === 0) {
     return (
@@ -28,7 +39,7 @@ export default function CartPage() {
   }
 
   const subtotal = getTotalPrice();
-  const shippingCost = subtotal > 5000 ? 0 : 120;
+  const shippingCost = SHIPPING_METHODS.find(m => m.id === shippingTier)?.price ?? 99;
   const total = subtotal + shippingCost;
 
   return (
@@ -130,8 +141,24 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span>{shippingCost === 0 ? 'Free' : `NPR ${shippingCost}`}</span>
+                  <span>NPR {shippingCost}</span>
                 </div>
+              </div>
+
+              {/* Shipping Method Selector */}
+              <div className="border-b pb-4">
+                <p className="text-sm font-semibold text-gray-900 mb-2">Shipping Method</p>
+                <select
+                  value={shippingTier}
+                  onChange={(e) => setShippingTier(e.target.value as ShippingTier)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0f3b2b]/40"
+                >
+                  {SHIPPING_METHODS.map((method) => (
+                    <option key={method.id} value={method.id}>
+                      {method.label} — Rs {method.price.toFixed(2)}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex justify-between items-center text-xl font-bold text-gray-900">

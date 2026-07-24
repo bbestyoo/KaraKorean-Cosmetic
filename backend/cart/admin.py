@@ -17,6 +17,7 @@ class OrderAdmin(admin.ModelAdmin):
         'status',
         'delivery__payment_status',
         'delivery__payment_method',
+        'delivery__shipping_method',
         'created_at',
     ]
     search_fields = ['delivery__full_name', 'delivery__email', 'id']
@@ -172,6 +173,8 @@ class OrderAdmin(admin.ModelAdmin):
                 ('Subtotal', '', f'Rs. {d.subtotal:,.0f}'),
                 ('Shipping', '', f'Rs. {d.shipping_cost:,.0f}'),
             ] + (
+                [('Shipping Method', d.shipping_method)] if d.shipping_method else []
+            ) + (
                 [('Discount', '', f'-Rs. {d.discount:,.0f}')] if d.discount else []
             ) + [
                 ('Total', total_style, f'Rs. {d.payment_amount:,.0f}'),

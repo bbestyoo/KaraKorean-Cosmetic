@@ -42,6 +42,7 @@ class Delivery(models.Model):
     full_name = models.CharField(max_length=100)    
     email = models.EmailField(null=True, blank=True)
     shipping_address = models.CharField(max_length=255)
+    shipping_method = models.CharField(max_length=100, blank=True, default='')
     payment_method = models.CharField(max_length=50, default='COD')
     shipping_cost = models.FloatField(default=0)
     subtotal = models.FloatField(default=0)

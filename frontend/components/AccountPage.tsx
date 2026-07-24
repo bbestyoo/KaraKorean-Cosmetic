@@ -95,7 +95,7 @@ export default function AccountPage() {
         body: JSON.stringify({
           name: profile.name,
           email: profile.email,
-          phone: profile.phone,
+          phone_number: profile.phone,
           address: profile.address,
           city: profile.city,
         }),
