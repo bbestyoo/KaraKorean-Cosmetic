@@ -18,8 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='/admin/')),
     path('admin/', admin.site.urls),
     path('shop/', include('shop.urls')),
     path('blog/', include('blog.urls')),
@@ -27,7 +29,11 @@ urlpatterns = [
     path('cart/', include('cart.urls'))
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-#added to custom media static files
+
+admin.site.site_header = "Kara Korean Beauty Admin"
+admin.site.site_title = "Kara Korean Beauty"
+admin.site.index_title = "Welcome to Kara Korean Beauty Admin"
+admin.site.site_url = "https://karakoreanbeauty.com"
 
 
 if settings.DEBUG:
