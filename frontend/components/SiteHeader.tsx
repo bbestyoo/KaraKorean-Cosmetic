@@ -23,6 +23,34 @@ const NAV_LINKS = [
   { label: "Contact", href: "/contact" },
 ];
 
+function formatDropdownLabel(value: string) {
+  return value
+    .trim()
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .map((word) => {
+      if (!word) return word;
+
+      if (/^[A-Z0-9&.-]+$/.test(word) && !/[a-z]/.test(word)) {
+        return word;
+      }
+
+      return word
+        .split("-")
+        .map((segment) => {
+          if (!segment) return segment;
+
+          if (/^[A-Z0-9&.]+$/.test(segment) && !/[a-z]/.test(segment)) {
+            return segment;
+          }
+
+          return segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase();
+        })
+        .join("-");
+    })
+    .join(" ");
+}
+
 // ── Hover Mega-Dropdown ──────────────────────────────────────────────────────
 function NavDropdown({
   label,
@@ -45,6 +73,14 @@ function NavDropdown({
     timerRef.current = setTimeout(() => setOpen(false), 120);
   };
 
+  const sortedItems = [...items].sort((a, b) => a.localeCompare(b));
+  const accentLabel = label === "Brands" ? "Top K-Beauty Brands" : `Browse by ${label}`;
+  const featuredTitle = label === "Brands" ? "Curated Brand Edit" : "Shop With Intention";
+  const featuredCopy =
+    label === "Brands"
+      ? "Discover the names our customers return to for glow, repair, and daily ritual essentials."
+      : "Find the right category faster with a cleaner, more considered browsing experience.";
+
   return (
     <div
       className="relative"
@@ -53,7 +89,7 @@ function NavDropdown({
     >
       <button
         className={cn(
-          "relative pb-1 text-sm 2xl:text-sm text-xs font-bold tracking-[0.15em] uppercase transition-colors hover:text-black group flex items-center gap-1",
+          "relative pb-1 text-sm 2xl:text-sm text-xs font-bold tracking-[0.16em] uppercase transition-colors hover:text-black group flex items-center gap-1",
           open ? "text-black" : "text-[#5c6e69]"
         )}
       >
@@ -73,46 +109,82 @@ function NavDropdown({
       {/* Dropdown panel */}
       <div
         className={cn(
-          "absolute left-1/2 -translate-x-1/2 top-full pt-4 z-50 transition-all duration-200 origin-top",
-          open ? "opacity-100 scale-y-100 pointer-events-auto" : "opacity-0 scale-y-95 pointer-events-none"
+          "absolute left-1/2 -translate-x-1/2 top-full pt-4 z-50 transition-all duration-[250ms] origin-top",
+          open
+            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+            : "opacity-0 translate-y-2 scale-[0.98] pointer-events-none"
         )}
-        style={{ minWidth: "420px" }}
+        style={{ width: "min(920px, calc(100vw - 3rem))" }}
       >
-        {/* Arrow tip */}
-        <div className="mx-auto w-3 h-3 rotate-45 bg-white border-l border-t border-[#c9a46b]/20 mb-[-6px] ml-[calc(50%-6px)]" />
         <div
-          className="rounded-2xl p-5 shadow-2xl"
+          className="overflow-hidden rounded-[28px] p-5 lg:p-6 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.28)]"
           style={{
-            background: "rgba(255,255,255,0.97)",
-            backdropFilter: "blur(20px) saturate(160%)",
-            border: "1px solid rgba(201,164,107,0.18)",
-            boxShadow: "0 12px 40px -8px rgba(0,0,0,0.14), 0 2px 10px -2px rgba(201,164,107,0.1)",
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(251,248,243,0.98) 100%)",
+            backdropFilter: "blur(22px) saturate(145%)",
+            WebkitBackdropFilter: "blur(22px) saturate(145%)",
+            border: "1px solid rgba(201,164,107,0.14)",
           }}
         >
-          {/* Header */}
-          <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-[#c9a46b] mb-3 px-1">
-            Browse by {label}
-          </p>
-          {/* Grid */}
-          <div className="grid grid-cols-3 gap-1.5">
-            {[...items].sort((a, b) => a.localeCompare(b)).map((item) => (
-              <Link
-                key={item}
-                href={buildHref(item)}
-                className="px-3 py-2 text-[11px] font-semibold tracking-wide text-neutral-700 rounded-lg hover:bg-[#0f3b2b] hover:text-white transition-all duration-150 truncate"
-              >
-                {item}
-              </Link>
-            ))}
-          </div>
-          {/* View all link */}
-          <div className="mt-4 pt-3 border-t border-neutral-100">
-            <Link
-              href={`/products`}
-              className="text-[11px] font-semibold tracking-widest uppercase text-[#5c6e69] hover:text-[#0f3b2b] transition-colors"
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-6">
+            <div className="min-w-0">
+              <div className="mb-4 flex items-center gap-3 px-1">
+                <span className="h-2 w-2 rounded-full bg-[#d47aa7] shadow-[0_0_0_6px_rgba(212,122,167,0.12)]" />
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#d47aa7]">
+                    {accentLabel}
+                  </p>
+                  <p className="mt-1 text-xs text-[#7b7a74]">
+                    Premium browsing with a cleaner, calmer presentation.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid max-h-[56vh] grid-cols-2 gap-x-4 gap-y-1.5 overflow-y-auto pr-1 sm:grid-cols-3 xl:grid-cols-4">
+                {sortedItems.map((item) => (
+                  <Link
+                    key={item}
+                    href={buildHref(item)}
+                    className="group flex items-center rounded-2xl px-3 py-2.5 text-[12px] font-medium text-[#4d5854] transition-all duration-200 hover:-translate-y-[1px] hover:bg-[#0f3b2b] hover:text-white"
+                  >
+                    <span className="truncate">{formatDropdownLabel(item)}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <aside
+              className="hidden lg:flex flex-col justify-between rounded-[24px] p-5"
+              style={{
+                background: "linear-gradient(160deg, rgba(15,59,43,0.95) 0%, rgba(92,110,105,0.92) 100%)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)",
+              }}
             >
-              View all products →
-            </Link>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/70">
+                  Featured
+                </p>
+                <h3 className="mt-3 font-playfair text-[1.7rem] leading-[1.02] text-white">
+                  {featuredTitle}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-white/80">
+                  {featuredCopy}
+                </p>
+              </div>
+
+              <div className="mt-6 rounded-[20px] border border-white/12 bg-white/10 p-4 backdrop-blur-sm">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/65">
+                  Explore everything
+                </p>
+                <Link
+                  href="/products"
+                  className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0f3b2b] transition-transform duration-200 hover:-translate-y-[1px]"
+                >
+                  View all products
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            </aside>
           </div>
         </div>
       </div>

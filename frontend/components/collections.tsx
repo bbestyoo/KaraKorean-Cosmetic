@@ -12,7 +12,7 @@ export default function Collections() {
           <RevealOnScroll direction="left" delay={100} className="relative h-full w-full bg-gray-100  overflow-hidden">
             <Link
               href={(() => {
-                const parts = '/shop/serums'.split('/').filter(Boolean);
+                const parts = '/shop/serum'.split('/').filter(Boolean);
                 const category = parts.length ? parts[parts.length - 1] : '';
                 return `/products${category ? `?category=${encodeURIComponent(category)}` : ''}`;
               })()}
@@ -45,7 +45,7 @@ export default function Collections() {
           {/* Tile 1: Moisturizers */}
           <Link
             href={(() => {
-              const parts = '/shop/moisturizers'.split('/').filter(Boolean);
+              const parts = '/shop/moisturizer'.split('/').filter(Boolean);
               const category = parts.length ? parts[parts.length - 1] : '';
               return `/products${category ? `?category=${encodeURIComponent(category)}` : ''}`;
             })()}
@@ -75,7 +75,7 @@ export default function Collections() {
             {/* Hydration */}
             <Link
               href={(() => {
-                const parts = '/shop/hydration'.split('/').filter(Boolean);
+                const parts = '/shop/cream'.split('/').filter(Boolean);
                 const category = parts.length ? parts[parts.length - 1] : '';
                 return `/products${category ? `?category=${encodeURIComponent(category)}` : ''}`;
               })()}
@@ -90,7 +90,7 @@ export default function Collections() {
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-500" />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
                 <h3 className="text-white text-sm sm:text-2xl md:text-3xl lg:text-2xl font-bold uppercase tracking-widest mb-2 md:mb-4 drop-shadow-lg">
-                  Hydration
+                  Creams
                 </h3>
                 <span className="bg-white/90 text-black px-3 py-1.5 md:px-8 md:py-3 text-[0.55rem] md:text-sm font-semibold uppercase tracking-widest hover:bg-white transition-colors shadow-lg">
                   SHOP LOOKBOOK
@@ -100,7 +100,7 @@ export default function Collections() {
             {/* Accessories */}
             <Link
               href={(() => {
-                const parts = '/shop/accessories'.split('/').filter(Boolean);
+                const parts = '/shop/sunscreen'.split('/').filter(Boolean);
                 const category = parts.length ? parts[parts.length - 1] : '';
                 return `/products${category ? `?category=${encodeURIComponent(category)}` : ''}`;
               })()}
@@ -115,7 +115,7 @@ export default function Collections() {
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-500" />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
                 <h3 className="text-white text-sm sm:text-2xl md:text-3xl lg:text-2xl font-bold uppercase tracking-widest mb-2 md:mb-4 drop-shadow-lg">
-                  ACCESSORIES
+                  Sunscreens
                 </h3>
                 <span className="bg-white/90 text-black px-3 py-1.5 md:px-8 md:py-3 text-[0.55rem] md:text-sm font-semibold uppercase tracking-widest hover:bg-white transition-colors shadow-lg">
                   SHOP LOOKBOOK

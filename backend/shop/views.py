@@ -46,6 +46,7 @@ class GetProduct(APIView):
         min_rating = request.query_params.get('min_rating')
         min_price = request.query_params.get('min_price')
         max_price = request.query_params.get('max_price')
+        search_query = request.query_params.get('search', '').strip()
         usecase = request.query_params.get('usecase')
         featured = request.query_params.get('featured')
         trending = request.query_params.get('trending')
@@ -79,6 +80,15 @@ class GetProduct(APIView):
                 queryset = queryset.filter(price__lte=float(max_price))
             except (ValueError, TypeError):
                 pass
+        if search_query:
+            queryset = queryset.filter(
+                Q(product_id__icontains=search_query) |
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(brand__name__icontains=search_query) |
+                Q(category__name__icontains=search_query) |
+                Q(sub_category__name__icontains=search_query)
+            )
         if brand:
             try:
                 queryset = queryset.filter(brand__name__icontains=brand)

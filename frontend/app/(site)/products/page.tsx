@@ -168,6 +168,7 @@ function ProductsContent() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [error, setError] = useState('');
 
   // Filters state
@@ -253,6 +254,7 @@ function ProductsContent() {
       try {
         setLoading(true);
         setError('');
+        setProducts([]);
 
         const sp = new URLSearchParams(searchParamsString);
         const categoryParam = sp.get('category');
@@ -325,6 +327,7 @@ function ProductsContent() {
       } finally {
         if (isMounted) {
           setLoading(false);
+          setHasLoadedOnce(true);
         }
       }
     };
@@ -511,23 +514,6 @@ function ProductsContent() {
             {searchQuery ? `Search Results for "${searchQuery}"` : 'Korean Beauty Shop'}
           </h1>
 
-          {loading && products.length === 0 && (
-            <div className="py-24 text-center text-sm text-gray-500">
-              Loading products...
-            </div>
-          )}
-
-          {!loading && error && products.length === 0 && (
-            <div className="py-24 text-center">
-              <p className="text-gray-500 text-sm mb-4">{error}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
-              >
-                Retry
-              </button>
-            </div>
-          )}
 
           {/* ── ACTIVE FILTERS ── */}
           {(selectedCategory !== 'All' || selectedBrand !== 'All' || selectedPriceRange !== 'All Prices' || searchQuery) && (
@@ -578,6 +564,23 @@ function ProductsContent() {
             </div>
           )}
 
+            
+          {loading && (
+            <div className="py-24 text-center text-sm text-gray-500">
+              Loading products...
+            </div>
+          )}
+          {!loading && error && products.length === 0 && (
+            <div className="py-24 text-center">
+              <p className="text-gray-500 text-sm mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-[11px] uppercase tracking-widest border border-gray-300 px-6 py-2.5 hover:border-gray-800 hover:text-black transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          )}
           {/* ── PRODUCT GRID ── */}
           {paginatedProducts.length > 0 ? (
             <>
@@ -714,7 +717,7 @@ function ProductsContent() {
                 </button>
               </div>
             </>
-          ) : (
+          ) : hasLoadedOnce ? (
             <div className="py-32 text-center">
               <p className="text-gray-400 text-sm mb-4">No products found.</p>
               <button
@@ -724,7 +727,7 @@ function ProductsContent() {
                 Clear Filters
               </button>
             </div>
-          )}
+          ) : null}
         </div>
       </main>
     </>
