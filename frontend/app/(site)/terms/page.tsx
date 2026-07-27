@@ -1,8 +1,18 @@
 import React from "react";
+import { Metadata } from "next";
 
-export const metadata = {
-  title: "Terms and Conditions - Kara Korean Beauty Store",
-  description: "Terms and Conditions governing the use of Kara Korean Beauty Store services and website.",
+export const metadata: Metadata = {
+  title: "Terms and Conditions | Kara Korean Beauty Store",
+  description:
+    "Terms and Conditions governing the use of Kara Korean Beauty Store services, orders, and website in Nepal.",
+  alternates: {
+    canonical: "https://karakoreanbeauty.com/terms",
+  },
+  openGraph: {
+    title: "Terms and Conditions | Kara Korean Beauty Store",
+    description: "Read the terms and conditions for using Kara Korean Beauty Store services.",
+    url: "https://karakoreanbeauty.com/terms",
+  },
 };
 
 export default function TermsPage() {

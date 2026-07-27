@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /cart
+Disallow: /checkout
+Disallow: /login
+Disallow: /signup
+Disallow: /account
+Disallow: /wishlist
+Disallow: /order-confirmation
+Disallow: /callback
+Disallow: /api
+
+Sitemap: https://karakoreanbeauty.com/sitemap.xml

@@ -1,8 +1,18 @@
 import React from "react";
+import { Metadata } from "next";
 
-export const metadata = {
-  title: "FAQs - Kara Korean Beauty Store",
-  description: "Frequently Asked Questions about orders, shipping, and skincare products at Kara Korean Beauty Store.",
+export const metadata: Metadata = {
+  title: "FAQs | Kara Korean Beauty Store",
+  description:
+    "Frequently Asked Questions about orders, shipping, returns, and authentic Korean skincare products at Kara Korean Beauty Store.",
+  alternates: {
+    canonical: "https://karakoreanbeauty.com/faq",
+  },
+  openGraph: {
+    title: "FAQs | Kara Korean Beauty Store",
+    description: "Find answers about shipping, returns, product authenticity, and more at Kara Korean Beauty.",
+    url: "https://karakoreanbeauty.com/faq",
+  },
 };
 
 const faqs = [
@@ -29,29 +39,48 @@ const faqs = [
 ];
 
 export default function FAQPage() {
-  return (
-    <main className="min-h-screen bg-[#f7f6f2] py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl sm:text-5xl font-serif text-[#0f3b2b] text-center mb-4">
-          Frequently Asked Questions
-        </h1>
-        <p className="text-center text-neutral-600 mb-12 font-sans tracking-wide">
-          Have questions? We have answers. If you don't find what you are looking for, feel free to contact us.
-        </p>
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
 
-        <div className="space-y-6">
-          {faqs.map((faq, index) => (
-            <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-neutral-100">
-              <h3 className="text-lg font-bold text-[#0f3b2b] font-sans mb-2">
-                {faq.question}
-              </h3>
-              <p className="text-[#6b766f] font-sans text-sm leading-relaxed">
-                {faq.answer}
-              </p>
-            </div>
-          ))}
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <main className="min-h-screen bg-[#f7f6f2] py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl font-serif text-[#0f3b2b] text-center mb-4">
+            Frequently Asked Questions
+          </h1>
+          <p className="text-center text-neutral-600 mb-12 font-sans tracking-wide">
+            Have questions? We have answers. If you don't find what you are looking for, feel free to contact us.
+          </p>
+
+          <div className="space-y-6">
+            {faqs.map((faq, index) => (
+              <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-neutral-100">
+                <h3 className="text-lg font-bold text-[#0f3b2b] font-sans mb-2">
+                  {faq.question}
+                </h3>
+                <p className="text-[#6b766f] font-sans text-sm leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
