@@ -173,7 +173,7 @@ class OrderAdmin(admin.ModelAdmin):
                 ('Subtotal', '', f'Rs. {d.subtotal:,.0f}'),
                 ('Shipping', '', f'Rs. {d.shipping_cost:,.0f}'),
             ] + (
-                [('Shipping Method', d.shipping_method)] if d.shipping_method else []
+                [('Shipping Method', '', d.shipping_method)] if d.shipping_method else []
             ) + (
                 [('Discount', '', f'-Rs. {d.discount:,.0f}')] if d.discount else []
             ) + [
