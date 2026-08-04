@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   description:
     "Explore Korean beauty tips, skincare routines, ingredient guides, and the latest K-beauty trends on the Kara Korean Beauty blog.",
   alternates: {
-    canonical: "https://karakoreanbeauty.com/blog",
+    canonical: "https://www.karakoreanbeauty.com/blog",
   },
   openGraph: {
     title: "Blog | Kara Korean Beauty",
     description: "Korean beauty tips, skincare routines, ingredient guides, and the latest K-beauty trends.",
-    url: "https://karakoreanbeauty.com/blog",
+    url: "https://www.karakoreanbeauty.com/blog",
     type: "website",
   },
 };

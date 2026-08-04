@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://karakoreanbeauty.com";
+const BASE_URL = "https://www.karakoreanbeauty.com";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.karakoreanbeauty.com/shop";
 
 interface SitemapProduct {

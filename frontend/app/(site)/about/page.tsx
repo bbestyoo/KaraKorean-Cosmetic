@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   description:
     "Learn about Kara Korean Beauty — Nepal's trusted destination for authentic Korean skincare. Founded in 2023, we curate the best K-beauty brands for you.",
   alternates: {
-    canonical: "https://karakoreanbeauty.com/about",
+    canonical: "https://www.karakoreanbeauty.com/about",
   },
   openGraph: {
     title: "About Kara Korean Beauty | Our K-Beauty Story",
     description: "Nepal's trusted destination for authentic Korean skincare. Learn about our mission and the brands we carry.",
-    url: "https://karakoreanbeauty.com/about",
+    url: "https://www.karakoreanbeauty.com/about",
   },
 };
 

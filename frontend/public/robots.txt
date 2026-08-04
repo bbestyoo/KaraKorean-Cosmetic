@@ -12,4 +12,4 @@ Disallow: /order-confirmation
 Disallow: /callback
 Disallow: /api
 
-Sitemap: https://karakoreanbeauty.com/sitemap.xml
+Sitemap: https://www.karakoreanbeauty.com/sitemap.xml

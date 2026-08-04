@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   description:
     "Frequently Asked Questions about orders, shipping, returns, and authentic Korean skincare products at Kara Korean Beauty Store.",
   alternates: {
-    canonical: "https://karakoreanbeauty.com/faq",
+    canonical: "https://www.karakoreanbeauty.com/faq",
   },
   openGraph: {
     title: "FAQs | Kara Korean Beauty Store",
     description: "Find answers about shipping, returns, product authenticity, and more at Kara Korean Beauty.",
-    url: "https://karakoreanbeauty.com/faq",
+    url: "https://www.karakoreanbeauty.com/faq",
   },
 };
 

@@ -128,7 +128,7 @@ export async function generateMetadata({
   const imageUrl = post.image || '/images/logos/karalogo.jpg';
   const absoluteImageUrl = imageUrl.startsWith('http')
     ? imageUrl
-    : `https://karakoreanbeauty.com${imageUrl}`;
+    : `https://www.karakoreanbeauty.com${imageUrl}`;
 
   return {
     title: post.title,
@@ -145,7 +145,7 @@ export async function generateMetadata({
     openGraph: {
       title: post.title,
       description,
-      url: `https://karakoreanbeauty.com/blog/${post.id}`,
+      url: `https://www.karakoreanbeauty.com/blog/${post.id}`,
       siteName: 'Kara Korean Beauty',
       images: [
         {
@@ -164,7 +164,7 @@ export async function generateMetadata({
       images: [absoluteImageUrl],
     },
     alternates: {
-      canonical: `https://karakoreanbeauty.com/blog/${post.id}`,
+      canonical: `https://www.karakoreanbeauty.com/blog/${post.id}`,
     },
   };
 }
@@ -194,10 +194,10 @@ export default async function SingleBlogPage({
       name: 'Kara Korean Beauty',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://karakoreanbeauty.com/images/logos/karalogo.jpg',
+        url: 'https://www.karakoreanbeauty.com/images/logos/karalogo.jpg',
       },
     },
-    url: `https://karakoreanbeauty.com/blog/${finalPost.id}`,
+    url: `https://www.karakoreanbeauty.com/blog/${finalPost.id}`,
   };
 
   return (

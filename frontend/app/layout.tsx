@@ -24,7 +24,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://karakoreanbeauty.com"),
+  metadataBase: new URL("https://www.karakoreanbeauty.com"),
   title: {
     default: "Kara — Korean Beauty Store | Authentic K-Beauty in Nepal",
     template: "%s | Kara Korean Beauty",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Kara — Korean Beauty Store | Authentic K-Beauty in Nepal",
     description: "Kara brings authentic Korean skincare and beauty products to Kathmandu and across Nepal. Shop curated K-beauty brands with local delivery.",
-    url: "https://karakoreanbeauty.com",
+    url: "https://www.karakoreanbeauty.com",
     siteName: "Kara Korean Beauty",
     images: [
       {
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     apple: '/images/logos/karalogo.jpg',
   },
   alternates: {
-    canonical: "https://karakoreanbeauty.com",
+    canonical: "https://www.karakoreanbeauty.com",
   },
 };
 
@@ -89,8 +89,8 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Kara Korean Beauty',
-    url: 'https://karakoreanbeauty.com',
-    logo: 'https://karakoreanbeauty.com/images/logos/karalogo.jpg',
+    url: 'https://www.karakoreanbeauty.com',
+    logo: 'https://www.karakoreanbeauty.com/images/logos/karalogo.jpg',
     description:
       'Authentic Korean skincare and beauty products delivered to Kathmandu and across Nepal.',
     address: {

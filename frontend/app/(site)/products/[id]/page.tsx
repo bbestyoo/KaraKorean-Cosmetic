@@ -94,7 +94,7 @@ export async function generateMetadata({
   const imageUrl = product.images?.[0]?.image || '/images/logos/karalogo.jpg';
   const absoluteImageUrl = imageUrl.startsWith('http')
     ? imageUrl
-    : `https://karakoreanbeauty.com${imageUrl}`;
+    : `https://www.karakoreanbeauty.com${imageUrl}`;
 
   return {
     title: product.name,
@@ -111,7 +111,7 @@ export async function generateMetadata({
     openGraph: {
       title: product.name,
       description,
-      url: `https://karakoreanbeauty.com/products/${product.product_id}`,
+      url: `https://www.karakoreanbeauty.com/products/${product.product_id}`,
       siteName: 'Kara Korean Beauty',
       images: [
         {
@@ -130,7 +130,7 @@ export async function generateMetadata({
       images: [absoluteImageUrl],
     },
     alternates: {
-      canonical: `https://karakoreanbeauty.com/products/${product.product_id}`,
+      canonical: `https://www.karakoreanbeauty.com/products/${product.product_id}`,
     },
   };
 }
@@ -170,7 +170,7 @@ export default async function ProductPage({
       availability: product.stock > 0
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
-      url: `https://karakoreanbeauty.com/products/${product.product_id}`,
+      url: `https://www.karakoreanbeauty.com/products/${product.product_id}`,
     },
     url: `https://karakoreanbeauty.com/products/${product.product_id}`,
   };
