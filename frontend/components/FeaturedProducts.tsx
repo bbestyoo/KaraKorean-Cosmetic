@@ -41,6 +41,7 @@ function normalizeProduct(product: any) {
     category: product.category_name ?? product.category ?? 'Uncategorized',
     price: typeof product.price === 'number' ? product.price : Number(String(product.price ?? 0)),
     old_price: product.old_price !== undefined ? (typeof product.old_price === 'number' ? product.old_price : Number(String(product.old_price))) : undefined,
+    in_stock: product.in_stock !== false,
     images,
   };
 }
@@ -118,6 +119,7 @@ export default function FeaturedProducts() {
                             old_price: numericOldPrice,
                             image: product.images?.[0]?.image,
                             category_name: product.category,
+                            in_stock: product.in_stock !== false,
                           });
                         }}
                         className="text-white hover:text-red-500 transition-colors"
@@ -150,6 +152,7 @@ export default function FeaturedProducts() {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            if (product.in_stock === false) return;
                             addItem({
                               product_id: product.product_id || `featured-${index}`,
                               name: product.name,
@@ -159,8 +162,10 @@ export default function FeaturedProducts() {
                               image: product.images?.[0]?.image || '/images/placeholder.png',
                             });
                           }}
-                          className="bg-[#0f3b2b] text-white p-3 rounded-full hover:bg-black hover:scale-105 transition-all"
-                          aria-label={`Add ${product.name} to cart`}
+                          disabled={product.in_stock === false}
+                          aria-disabled={product.in_stock === false}
+                          aria-label={product.in_stock === false ? `Add ${product.name} to cart` : 'Add to cart'}
+                          className={`${product.in_stock === false ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' : 'bg-[#0f3b2b] text-white hover:bg-black hover:scale-105'} p-3 rounded-full transition-all`}
                         >
                           <ShoppingCart className="w-4 h-4 cursor-pointer" />
                         </button>

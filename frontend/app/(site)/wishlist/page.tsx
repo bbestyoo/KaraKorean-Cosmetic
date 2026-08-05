@@ -345,6 +345,7 @@ function WishlistContent() {
                   </Link>
                   <button
                     onClick={() => {
+                      if (item.in_stock === false) return;
                       addItem({
                         product_id: item.product_id,
                         name: item.name,
@@ -354,10 +355,15 @@ function WishlistContent() {
                         quantity: 1,
                       });
                     }}
-                    className="py-3 text-center text-[10px] tracking-widest text-[#0f3b2b] hover:bg-[#0f3b2b] hover:text-white font-bold uppercase transition-all flex items-center justify-center gap-1.5"
+                    disabled={item.in_stock === false}
+                    aria-disabled={item.in_stock === false}
+                    className={`py-3 text-center text-[10px] tracking-widest font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${item.in_stock === false
+                      ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
+                      : 'text-[#0f3b2b] hover:bg-[#0f3b2b] hover:text-white'
+                      }`}
                   >
                     <ShoppingBag size={10} />
-                    Add To Cart
+                    {item.in_stock === false ? 'Out Of Stock' : 'Add To Cart'}
                   </button>
                 </div>
               </div>
@@ -418,6 +424,7 @@ function WishlistContent() {
                   </Link>
                   <button
                     onClick={() => {
+                      if (item.in_stock === false) return;
                       addItem({
                         product_id: item.product_id,
                         name: item.name,
@@ -427,10 +434,15 @@ function WishlistContent() {
                         quantity: 1,
                       });
                     }}
-                    className="py-3 text-center text-[10px] tracking-widest text-[#0f3b2b] hover:bg-[#0f3b2b] hover:text-white font-bold uppercase transition-all flex items-center justify-center gap-1.5"
+                    disabled={item.in_stock === false}
+                    aria-disabled={item.in_stock === false}
+                    className={`py-3 text-center text-[10px] tracking-widest font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${item.in_stock === false
+                      ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
+                      : 'text-[#0f3b2b] hover:bg-[#0f3b2b] hover:text-white'
+                      }`}
                   >
                     <ShoppingBag size={10} />
-                    Add To Cart
+                    {item.in_stock === false ? 'Out Of Stock' : 'Add To Cart'}
                   </button>
                 </div>
               </div>

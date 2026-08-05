@@ -52,6 +52,7 @@ export interface Product {
   old_price: number | null;
   before_deal_price: number | null;
   stock: number;
+  in_stock: boolean;
   images: ProductImage[];
   ratings: Rating;
   variants: Variant[];
@@ -136,6 +137,8 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
   }, [selectedSize, product?.sizes]);
 
   const handleAddToCart = () => {
+    if (!product || !product.in_stock) return;
+
     if (!selectedSize) {
       setShowValidationErrors(true);
       return;
@@ -216,13 +219,19 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
 
           {/* Add to Cart Button */}
           <div>
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              className="w-full max-w-[320px] cursor-pointer border border-[#0f3b2b] bg-[#0f3b2b] py-4.5 text-sm font-semibold tracking-widest text-white uppercase transition-all duration-300 hover:bg-transparent hover:text-[#0f3b2b] rounded-md shadow-md"
-            >
-              Add to cart
-            </button>
+            {!product.in_stock ? (
+              <div className="w-full max-w-[320px] border border-neutral-300 bg-neutral-100 py-4.5 text-sm font-semibold tracking-widest text-neutral-500 uppercase rounded-md text-center">
+                Out of stock
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="w-full max-w-[320px] cursor-pointer border border-[#0f3b2b] bg-[#0f3b2b] py-4.5 text-sm font-semibold tracking-widest text-white uppercase transition-all duration-300 hover:bg-transparent hover:text-[#0f3b2b] rounded-md shadow-md"
+              >
+                Add to cart
+              </button>
+            )}
           </div>
 
           {/* Selectors */}

@@ -14,6 +14,7 @@ interface Product {
   price: number;
   oldPrice?: number;
   image: string;
+  inStock?: boolean;
   link?: string;
 }
 
@@ -83,6 +84,7 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
             price: Number(item.price ?? 0),
             oldPrice: item.old_price !== undefined ? Number(item.old_price) : undefined,
             image,
+            inStock: item.in_stock !== false,
             link: `/products/${item.product_id ?? item.id ?? ''}`,
           } as Product;
         });
@@ -129,6 +131,7 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
   const { addItem } = useCart();
 
   const handleAddToBag = (product: Product) => {
+    if (product.inStock === false) return;
     addItem({
       product_id: String(product.id),
       name: product.name,
@@ -204,10 +207,12 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
                 e.stopPropagation();
                 handleAddToBag(currentProduct);
               }}
-              className="bg-[#0f3b2b] cursor-pointer text-[#f7f6f2] text-[0.5rem] tracking-[0.15em] font-sans px-2 py-1 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm"
+              disabled={currentProduct.inStock === false}
+              aria-disabled={currentProduct.inStock === false}
+              className={`${currentProduct.inStock === false ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' : 'bg-[#0f3b2b] cursor-pointer text-[#f7f6f2] hover:bg-[#1a5c42]'} text-[0.5rem] tracking-[0.15em] font-sans px-2 py-1 transition-colors duration-300 self-start rounded-sm`}
               aria-label={`Add ${currentProduct.name} to bag`}
             >
-              ADD TO BAG
+              {currentProduct.inStock === false ? 'OUT OF STOCK' : 'ADD TO BAG'}
             </button>
           </div>
         </div>
@@ -296,10 +301,12 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
               e.stopPropagation();
               handleAddToBag(currentProduct);
             }}
-            className="bg-[#0f3b2b] cursor-pointer text-[#f7f6f2] text-[10px] sm:text-xs tracking-[0.2em] font-sans  p-1 px-2 sm:px-4 sm:py-2 hover:bg-[#1a5c42] transition-colors duration-300 self-start rounded-sm shadow-sm curosr-pointer"
+            disabled={currentProduct.inStock === false}
+            aria-disabled={currentProduct.inStock === false}
+            className={`${currentProduct.inStock === false ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' : 'bg-[#0f3b2b] cursor-pointer text-[#f7f6f2] hover:bg-[#1a5c42]'} text-[10px] sm:text-xs tracking-[0.2em] font-sans p-1 px-2 sm:px-4 sm:py-2 transition-colors duration-300 self-start rounded-sm shadow-sm`}
             aria-label={`Add ${currentProduct.name} to bag`}
           >
-            ADD TO BAG
+            {currentProduct.inStock === false ? 'OUT OF STOCK' : 'ADD TO BAG'}
           </button>
         </div>
       </div>

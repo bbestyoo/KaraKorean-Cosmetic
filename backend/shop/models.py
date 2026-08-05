@@ -30,6 +30,7 @@ class Product(models.Model):
     trending = models.BooleanField(default=False)
     best_seller = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
+    in_stock = models.BooleanField(default=True)
     usecases = models.ManyToManyField('UseCase', blank=True, related_name='products')
     skin_type = models.ManyToManyField('SkinType', blank=True, related_name='products')
     combo = models.ManyToManyField('Combo', blank=True, related_name='products')

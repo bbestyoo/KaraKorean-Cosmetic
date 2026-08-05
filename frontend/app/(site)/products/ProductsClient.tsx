@@ -42,6 +42,7 @@ interface ApiProduct {
   brand?: string | { name?: string } | null;
   brandName?: string | null;
   images?: Array<{ image: string }>;
+  in_stock?: boolean;
 }
 
 export interface Product {
@@ -51,6 +52,7 @@ export interface Product {
   old_price?: number | null;
   category_name: string;
   brand: string;
+  in_stock: boolean;
   images: Array<{ image: string }>;
 }
 
@@ -77,6 +79,7 @@ function normalizeProduct(product: ApiProduct): Product {
       product.old_price === null || product.old_price === undefined ? null : Number(product.old_price),
     category_name: categoryValue,
     brand: product.brandName || brandValue || 'Unknown',
+    in_stock: product.in_stock !== false,
     images: Array.isArray(product.images)
       ? product.images.map((image) => ({ image: resolveImageUrl(image.image) }))
       : [],
@@ -630,6 +633,7 @@ function ProductsContent({
                             old_price: product.old_price || undefined,
                             image: product.images[0]?.image || '/images/placeholder.png',
                             category_name: product.category_name,
+                            in_stock: product.in_stock !== false,
                           });
                         }}
                         className="p-2 rounded-full bg-white shadow-sm  cursor-pointer hover:scale-105 transition-all text-neutral-900"
@@ -643,6 +647,7 @@ function ProductsContent({
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          if (product.in_stock === false) return;
                           addItem({
                             product_id: product.product_id,
                             name: product.name,
@@ -652,7 +657,11 @@ function ProductsContent({
                             image: product.images[0]?.image || '/images/placeholder.png',
                           });
                         }}
-                        className="p-2 rounded-full bg-white  shadow-sm hover:scale-105 transition-all text-neutral-900 cursor-pointer"
+                        disabled={product.in_stock === false}
+                        aria-disabled={product.in_stock === false}
+                        aria-label={product.in_stock === false ? 'Out of stock' : 'Add to cart'}
+                        title={product.in_stock === false ? 'Out of stock' : 'Add to cart'}
+                        className={`p-2 rounded-full bg-white shadow-sm transition-all text-neutral-900 ${product.in_stock === false ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:scale-105'}`}
                       >
                         <ShoppingBag
                           size={20}

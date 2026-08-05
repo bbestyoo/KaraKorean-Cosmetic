@@ -15,6 +15,7 @@ interface ProductCardProps {
     price: number;
     old_price?: number;
     category_name: string;
+    in_stock?: boolean;
     images: Array<{ image: string }>;
     ratings?: {
       stats: {
@@ -40,6 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const totalRatings = product.ratings?.stats?.total_ratings || 0;
 
   const mainImage = product.images?.[0]?.image || '/placeholder.png';
+  const isInStock = product.in_stock !== false;
 
   return (
     <Link href={`/products/${product.product_id}`}>
@@ -78,6 +80,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   old_price: product.old_price,
                   image: mainImage,
                   category_name: product.category_name,
+                  in_stock: isInStock,
                 });
               }}
               className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
@@ -91,6 +94,7 @@ export function ProductCard({ product }: ProductCardProps) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (!isInStock) return;
                 addItem({
                   product_id: product.product_id,
                   name: product.name,
@@ -100,7 +104,11 @@ export function ProductCard({ product }: ProductCardProps) {
                   image: mainImage,
                 });
               }}
-              className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
+              disabled={!isInStock}
+              aria-disabled={!isInStock}
+              aria-label={isInStock ? 'Add to cart' : 'Out of stock'}
+              title={isInStock ? 'Add to cart' : 'Out of stock'}
+              className={`p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900 ${isInStock ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}
             >
               <ShoppingBag
                 size={18}

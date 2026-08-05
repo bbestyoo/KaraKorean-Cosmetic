@@ -167,7 +167,7 @@ export default async function ProductPage({
       '@type': 'Offer',
       priceCurrency: 'NPR',
       price: product.price,
-      availability: product.stock > 0
+      availability: product.in_stock
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
       url: `https://www.karakoreanbeauty.com/products/${product.product_id}`,

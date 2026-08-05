@@ -9,6 +9,7 @@ export interface WishlistItem {
   old_price?: number;
   image: string;
   category_name?: string;
+  in_stock?: boolean;
 }
 
 interface WishlistContextType {

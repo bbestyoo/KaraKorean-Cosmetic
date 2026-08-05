@@ -23,7 +23,7 @@ class ProductResource(resources.ModelResource):
     class Meta:
         model = Product
         import_id_fields = ['product_id']  # <-- important!
-        fields = ('product_id', 'name', 'category', 'brand', 'series', 'price', 'description', 'published_date')
+        fields = ('product_id', 'name', 'category', 'brand', 'series', 'price', 'description', 'published_date', 'in_stock')
 
 class ProductImageResource(resources.ModelResource):
     # Using ForeignKeyWidget for mapping the related Product model

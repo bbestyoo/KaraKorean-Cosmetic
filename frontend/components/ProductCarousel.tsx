@@ -13,6 +13,7 @@ interface Product {
   old_price?: number;
   category_name: string;
   images: Array<{ image: string }>;
+  in_stock?: boolean;
 }
 
 interface ProductCarouselProps {

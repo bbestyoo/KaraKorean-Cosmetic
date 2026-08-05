@@ -25,6 +25,7 @@ interface Product {
   deal?: boolean;
   trending?: boolean;
   featured?: boolean;
+  in_stock?: boolean;
 }
 
 interface RecommendationsData {

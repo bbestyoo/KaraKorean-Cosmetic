@@ -30,6 +30,7 @@ interface ServerProduct {
   category?: string | { name?: string } | null;
   brand?: string | { name?: string } | null;
   brandName?: string | null;
+  in_stock?: boolean;
   images?: Array<{ image: string }>;
 }
 
@@ -57,6 +58,7 @@ function normalizeProduct(product: ServerProduct) {
       product.brandName ||
       (typeof product.brand === 'string' ? product.brand : product.brand?.name) ||
       'Unknown',
+    in_stock: product.in_stock !== false,
     images: Array.isArray(product.images)
       ? product.images.map((image) => ({ image: resolveImageUrl(image.image) }))
       : [],

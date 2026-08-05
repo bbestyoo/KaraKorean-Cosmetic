@@ -40,6 +40,7 @@ interface ProductFormData {
   trending: boolean;
   best_seller: boolean;
   featured: boolean;
+  in_stock: boolean;
 }
 
 interface ColorData {
@@ -110,6 +111,7 @@ interface APIProduct {
   trending?: boolean;
   best_seller?: boolean;
   featured?: boolean;
+  in_stock?: boolean;
   colors?: APIColor[];
   sizes?: APISize[];
   size_color_stocks?: APIStock[];
@@ -152,6 +154,7 @@ export default function EditProduct() {
     trending: false,
     best_seller: false,
     featured: false,
+    in_stock: true,
   });
 
   // Track original data to detect changes
@@ -218,6 +221,7 @@ export default function EditProduct() {
             trending: product.trending || false,
             best_seller: product.best_seller || false,
             featured: product.featured || false,
+            in_stock: product.in_stock ?? true,
           });
 
           // Load colors
@@ -291,6 +295,7 @@ export default function EditProduct() {
             trending: product.trending || false,
             best_seller: product.best_seller || false,
             featured: product.featured || false,
+            in_stock: product.in_stock ?? true,
           };
           setOriginalFormData(originalData);
           // Colors and sizes data loaded separately above
@@ -961,6 +966,15 @@ export default function EditProduct() {
                         className="w-4 h-4"
                       />
                       <span className="text-sm text-gray-700">Featured</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.in_stock}
+                        onChange={(e) => handleInputChange('in_stock', e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-gray-700">In Stock</span>
                     </label>
                   </div>
                 </div>

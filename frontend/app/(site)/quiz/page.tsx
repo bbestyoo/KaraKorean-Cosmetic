@@ -44,6 +44,7 @@ interface ApiProduct {
   images?: Array<{ image: string }>;
   brand?: string | { name?: string } | null;
   brandName?: string | null;
+  in_stock?: boolean;
 }
 
 interface Product {
@@ -52,6 +53,7 @@ interface Product {
   price: number;
   old_price?: number | null;
   category_name: string;
+  in_stock: boolean;
   images: Array<{ image: string }>;
 }
 
@@ -64,6 +66,7 @@ function normalizeProduct(product: ApiProduct): Product {
     old_price:
       product.old_price === null || product.old_price === undefined ? null : Number(product.old_price),
     category_name: categoryValue,
+    in_stock: product.in_stock !== false,
     images: Array.isArray(product.images)
       ? product.images.map((image) => ({ image: resolveImageUrl(image.image) }))
       : [],
@@ -342,6 +345,7 @@ export default function QuizPage() {
                             old_price: product.old_price || undefined,
                             image: product.images[0]?.image || '/images/placeholder.png',
                             category_name: product.category_name,
+                            in_stock: product.in_stock !== false,
                           });
                         }}
                         className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
@@ -355,6 +359,7 @@ export default function QuizPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          if (product.in_stock === false) return;
                           addItem({
                             product_id: product.product_id,
                             name: product.name,
@@ -364,9 +369,13 @@ export default function QuizPage() {
                             image: product.images[0]?.image || '/images/placeholder.png',
                           });
                         }}
-                        className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
+                        disabled={product.in_stock === false}
+                        aria-disabled={product.in_stock === false}
+                        aria-label={product.in_stock === false ? 'Out of stock' : 'Add to cart'}
+                        title={product.in_stock === false ? 'Out of stock' : 'Add to cart'}
+                        className={`p-2 rounded-full bg-white shadow-sm transition-all text-neutral-900 ${product.in_stock === false ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:scale-105'}`}
                       >
-                        <ShoppingBag size={20} className="text-neutral-900 hover:text-[#c9a46b] transition-colors" />
+                        <ShoppingBag size={20} className={`${product.in_stock === false ? 'text-neutral-400' : 'text-neutral-900 hover:text-[#c9a46b]'} transition-colors`} />
                       </button>
                     </div>
 

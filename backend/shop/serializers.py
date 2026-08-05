@@ -86,7 +86,7 @@ class GetProductSerializer(serializers.ModelSerializer):
     sizes = SizeSerializer(many=True, read_only=True)
     class Meta:
         model = Product
-        fields = ['product_id','name','category','usecases','price','old_price', 'before_deal_price','images','ratings','variants','sizes']
+        fields = ['product_id','name','category','usecases','price','old_price', 'before_deal_price','images','ratings','variants','sizes','in_stock']
 
     def get_ratings(self,obj):
         request = self.context.get('request')

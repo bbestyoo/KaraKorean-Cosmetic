@@ -40,6 +40,7 @@ interface ProductFormData {
   trending: boolean;
   best_seller: boolean;
   featured: boolean;
+  in_stock: boolean;
 }
 
 interface ColorData {
@@ -99,6 +100,7 @@ export default function AddProduct() {
     trending: false,
     best_seller: false,
     featured: false,
+    in_stock: true,
   });
 
   const [loading, setLoading] = useState(false);
@@ -251,6 +253,7 @@ export default function AddProduct() {
           trending: formData.trending,
           best_seller: formData.best_seller,
           featured: formData.featured,
+          in_stock: formData.in_stock,
         }),
       });
 
@@ -926,6 +929,16 @@ export default function AddProduct() {
                         className="w-4 h-4 rounded border-gray-300"
                       />
                       <span className="text-sm font-medium text-gray-900">Featured</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="in_stock"
+                        checked={formData.in_stock}
+                        onChange={handleChange}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                      <span className="text-sm font-medium text-gray-900">In Stock</span>
                     </label>
                   </div>
                 </div>
