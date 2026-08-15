@@ -1,12 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-      // DigitalOcean CDN handles optimization already
-      unoptimized: true,
       remotePatterns: [
         {
           protocol: 'https',
           hostname: 'digitech-ecommerce.blr1.cdn.digitaloceanspaces.com',
+          port: '',
+          pathname: '/**',
+        },
+        {
+          protocol: 'https',
+          hostname: 'cdn.karakoreanbeauty.com',
+          port: '',
+          pathname: '/**',
+        },
+        {
+          protocol: 'https',
+          hostname: 'images.unsplash.com',
           port: '',
           pathname: '/**',
         },

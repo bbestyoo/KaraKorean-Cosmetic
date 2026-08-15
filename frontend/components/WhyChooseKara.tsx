@@ -45,7 +45,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             {/* Slide 1 */}
             <div className={`flex-[0_0_100%] min-w-0   relative w-full ${isMobile ? "h-48 sm:h-64" : "w-full "}`}>
               <Image
-                src="/images/banner/5.jpeg"
+                src="/images/banner/5.webp"
                 alt="Banner 1"
                 priority
                 width={640}
@@ -55,9 +55,8 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             </div>
             <div className={`flex-[0_0_100%] min-w-0   relative w-full ${isMobile ? "h-48 sm:h-64" : "w-full "}`}>
               <Image
-                src="/images/banner/1.jpeg"
+                src="/images/banner/1.webp"
                 alt="Banner 1"
-                priority
                 width={640}
                 height={360}
                 className={` ${isMobile ? "rounded-none object-contain" : "block w-full h-auto rounded-xl object-contain"}`}
@@ -68,7 +67,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             {/* Slide 2 */}
             <div className={`flex-[0_0_100%] min-w-0   relative w-full ${isMobile ? "h-48 sm:h-64" : "w-full "}`}>
               <Image
-                src="/images/banner/2.jpeg"
+                src="/images/banner/2.webp"
                 alt="Banner 2"
                 className={`${isMobile ? "rounded-none object-contain" : "block w-full h-auto rounded-xl object-contain"}`}
                 width={640}
@@ -79,7 +78,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             {/* Slide 3 */}
             <div className={`flex-[0_0_100%] min-w-0   relative w-full ${isMobile ? "h-48 sm:h-64" : "w-full "}`}>
               <Image
-                src="/images/banner/3.jpeg"
+                src="/images/banner/3.webp"
                 alt="Banner 3"
                 className={` ${isMobile ? "rounded-none  object-contain" : "block w-full h-auto rounded-xl object-contain"}`}
                 width={640}
@@ -90,7 +89,7 @@ export default function WhyChooseKara({ hideHeading = false, isMobile = false }:
             {/* Slide 4 */}
             <div className={`flex-[0_0_100%] min-w-0   relative w-full ${isMobile ? "h-48 sm:h-64" : "w-full "}`}>
               <Image
-                src="/images/banner/4.jpeg"
+                src="/images/banner/4.webp"
                 alt="Banner 4"
                 className={` ${isMobile ? "rounded-none object-contain " : "block w-full h-auto rounded-xl object-contain"}`}
                 width={640}

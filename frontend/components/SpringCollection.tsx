@@ -14,16 +14,17 @@ export default function SpringCollection() {
           <RevealOnScroll direction="right" delay={100} className="relative h-[45vw] md:h-full w-full overflow-hidden group">
             <Link
               href={(() => {
-                const category = toCategory("Spring Collection Model");
+                const category = toCategory("Sunscreen");
                 return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
               })()}
               className="group relative h-full w-full block overflow-hidden"
             >
               <div className="absolute inset-0">
                 <Image
-                  src="images/boj-sunscreen.png" // Black and white fashion portrait
-                  alt="Spring Collection Model"
+                  src="/images/boj-sunscreen.webp" // Black and white fashion portrait
+                  alt="BOJ Sunscreen"
                   fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 cursor-pointer "
                 />
               </div>
@@ -36,6 +37,7 @@ export default function SpringCollection() {
               Spring<br />Collection
             </h2>
             <p className="text-sm md:text-base text-neutral-500 mb-6 md:mb-10 max-w-sm mx-auto leading-relaxed">
+            Will be auto hidden after collections are added.
               Body text content goes here. This is where the main content will be displayed.
             </p>
             <Link
@@ -54,15 +56,16 @@ export default function SpringCollection() {
             <div className="absolute inset-0">
               <Link
                 href={(() => {
-                  const category = toCategory("Spring Collection Sneakers");
+                  const category = toCategory("Serum");
                   return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
                 })()}
                 className="group relative h-full w-full block overflow-hidden"
               >
                 <Image
-                  src="images/anua-serum.webp" // Sneakers stacked
-                  alt="Spring Collection Sneakers"
+                  src="/images/anua-serum.webp" // Sneakers stacked
+                  alt="Anua Serum"
                   fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 cursor-pointer"
                 />
               </Link>

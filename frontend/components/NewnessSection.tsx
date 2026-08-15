@@ -51,7 +51,7 @@ export default function NewnessSection() {
                 src="/images/karacollection6.webp"
                 alt="Natural beauty"
                 fill
-                unoptimized
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover transition-all duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-[#0f3b2b]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -75,7 +75,7 @@ export default function NewnessSection() {
                 src="/images/karacollection1.jpg"
                 alt="Tone Brightening Set Capsoule"
                 fill
-                unoptimized
+                sizes="(max-width: 768px) 100vw, 360px"
                 className="object-cover transition-all duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-[#0f3b2b]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -97,10 +97,10 @@ export default function NewnessSection() {
               className="w-full max-w-[340px] aspect-[4/5] relative overflow-hidden mb-4 group cursor-pointer shadow-md"
             >
               <Image
-                src="/images/karacollection9.jpg"
+                src="/images/karacollection9.webp"
                 alt="The Vita-A Retinal Shot Tightening Booster"
                 fill
-                unoptimized
+                sizes="(max-width: 768px) 100vw, 340px"
                 className="object-cover transition-all duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-[#0f3b2b]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -122,10 +122,10 @@ export default function NewnessSection() {
               className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md"
             >
               <Image
-                src="images/karacollection4.webp"
+                src="/images/karacollection4.webp"
                 alt="Cosmetic detail"
                 fill
-                unoptimized
+                sizes="(max-width: 768px) 100vw, 25vw"
                 className="object-cover transition-all duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-[#0f3b2b]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">

@@ -19,7 +19,7 @@ async function fetchProductIds(): Promise<string[]> {
 
     while (page <= totalPages) {
       const res = await fetch(`${API_BASE_URL}/api/?page=${page}`, {
-        next: { revalidate: 3600 },
+        next: { revalidate: 3600, tags: ['product'] },
       });
       if (!res.ok) break;
       const data = await res.json();

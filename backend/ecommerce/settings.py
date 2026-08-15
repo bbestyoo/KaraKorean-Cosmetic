@@ -340,6 +340,12 @@ FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN')
 FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID')
 
 
+# On-demand ISR revalidation. Must match the frontend's REVALIDATE_SECRET.
+# FRONTEND_URL (defined above) is the base URL of the Next.js site that
+# receives the revalidation request.
+REVALIDATE_SECRET = os.environ.get('REVALIDATE_SECRET')
+
+
 DEBUG = True
 
 MEDIA_URL = "/media/"

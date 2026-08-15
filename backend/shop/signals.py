@@ -1,8 +1,22 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Product
+from .models import (
+    Product,
+    Variant,
+    Size,
+    ProductImage,
+    ProductAttribute,
+    Rating,
+    Category,
+    SubCategory,
+    Brand,
+    UseCase,
+    SkinType,
+    Combo,
+    Concern,
+)
+from .revalidation import revalidate_frontend
 import requests
-from django.http import JsonResponse
 from django.conf import settings
 import sys
 
@@ -33,3 +47,42 @@ def post_to_fb(sender, instance, created, **kwargs):
         except Exception as e:
             print("Facebook API error:", e)
 
+
+def _skip_revalidation():
+    return 'loaddata' in sys.argv or 'migrate' in sys.argv
+
+
+# Every product page fetch is tagged `product`, so invalidating that single tag
+# refreshes the listing page, the sitemap and every product detail page (lazily,
+# on the next request). We also pass the affected product paths explicitly.
+@receiver([post_save, post_delete], sender=Product)
+def revalidate_product(sender, instance, **kwargs):
+    if _skip_revalidation():
+        return
+    revalidate_frontend(
+        tags=['product'],
+        paths=['/products'],
+        product_ids=[instance.product_id],
+    )
+
+
+# Models that belong to a single product. Their FK points at Product whose PK is
+# product_id, so instance.product_id is the product's slug.
+@receiver([post_save, post_delete], sender=[Variant, Size, ProductImage, ProductAttribute, Rating])
+def revalidate_product_child(sender, instance, **kwargs):
+    if _skip_revalidation():
+        return
+    revalidate_frontend(
+        tags=['product'],
+        paths=['/products'],
+        product_ids=[instance.product_id],
+    )
+
+
+# Models that affect every product (renaming a category or brand changes the
+# listing and all detail pages). A single tag invalidation handles it.
+@receiver([post_save, post_delete], sender=[Category, SubCategory, Brand, UseCase, SkinType, Combo, Concern])
+def revalidate_all_products(sender, instance, **kwargs):
+    if _skip_revalidation():
+        return
+    revalidate_frontend(tags=['product'], paths=['/products'])

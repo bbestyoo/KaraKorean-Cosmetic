@@ -49,6 +49,7 @@ export default function BestSellers() {
                   src={card.image}
                   alt={card.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-contain md:object-cover transition-all duration-700 ease-in-out grayscale group-hover:grayscale-0 group-hover:scale-110"
                 />
               </div>

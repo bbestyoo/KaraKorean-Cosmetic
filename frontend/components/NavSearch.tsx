@@ -215,7 +215,7 @@ export function NavSearch() {
                         src={resolveImageUrl(product.image)}
                         alt={product.name}
                         fill
-                        unoptimized
+                        sizes="64px"
                         className="object-contain p-1 group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>

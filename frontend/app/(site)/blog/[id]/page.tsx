@@ -70,7 +70,7 @@ async function getBlogPost(id: string): Promise<BlogPost | null> {
       image: resolveImageUrl(raw.image),
       readTime: `${Math.max(1, Math.ceil(wordCount / 200))} min read`,
       author: raw.author || 'Admin',
-      authorAvatar: '/images/model1.png',
+      authorAvatar: '/images/model1.webp',
       rating: 4.8,
       reviewsCount: 0,
       location: '',

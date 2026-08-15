@@ -68,7 +68,7 @@ function normalizeProduct(product: ServerProduct) {
 async function fetchInitialProducts() {
   try {
     const res = await fetch(`${API_BASE_URL}/api/?page=1&page_size=${ITEMS_PER_PAGE}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600, tags: ['product'] },
     });
     if (!res.ok) return { products: [], totalPages: 1 };
     const data = await res.json();

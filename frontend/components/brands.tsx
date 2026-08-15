@@ -3,14 +3,14 @@
 import Link from 'next/link';
 
 const brands = [
-    { src: '/images/logos/anua.png', alt: 'Anua' },
-    { src: '/images/logos/boj.png', alt: 'BOJ' },
-    { src: '/images/logos/isntree.png', alt: 'Isntree' },
-    { src: '/images/logos/cosrx.png', alt: 'COSRX' },
-    { src: '/images/logos/medicube.png', alt: 'Medicube' },
-    { src: '/images/logos/roundlab.png', alt: 'Roundlab' },
-    { src: '/images/logos/skin1004.png', alt: 'Skin1004' },
-    { src: '/images/logos/somebymi.png', alt: 'Some By Mi' },
+    { src: '/images/logos/anua.webp', alt: 'Anua' },
+    { src: '/images/logos/boj.webp', alt: 'BOJ' },
+    { src: '/images/logos/isntree.webp', alt: 'Isntree' },
+    { src: '/images/logos/cosrx.webp', alt: 'COSRX' },
+    { src: '/images/logos/medicube.webp', alt: 'Medicube' },
+    { src: '/images/logos/roundlab.webp', alt: 'Roundlab' },
+    { src: '/images/logos/skin1004.webp', alt: 'Skin1004' },
+    { src: '/images/logos/somebymi.webp', alt: 'Some By Mi' },
 ];
 
 const slugify = (str: string) =>

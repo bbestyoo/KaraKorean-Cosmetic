@@ -23,6 +23,7 @@ export default function Collections() {
                   src="/images/karaimages/image2.webp"
                   alt="Main Collection"
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
@@ -56,6 +57,7 @@ export default function Collections() {
                 src="/images/karaimages/image3.webp"
                 alt="Accessories"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
             </div>
@@ -85,6 +87,7 @@ export default function Collections() {
                 src="/images/karaimages/image4.webp"
                 alt="Collection Items"
                 fill
+                sizes="(max-width: 768px) 100vw, 25vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-500" />
@@ -110,6 +113,7 @@ export default function Collections() {
                 src="/images/karaimages/image5.webp"
                 alt="More Items"
                 fill
+                sizes="(max-width: 768px) 100vw, 25vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-500" />

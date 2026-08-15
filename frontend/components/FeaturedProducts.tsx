@@ -134,6 +134,7 @@ export default function FeaturedProducts() {
                         src={product.images?.[0]?.image || '/images/placeholder.png'}
                         alt={product.name}
                         fill
+                        sizes="(max-width: 640px) 80vw, (max-width: 1024px) 50vw, 25vw"
                         className="object-contain bg-white mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>

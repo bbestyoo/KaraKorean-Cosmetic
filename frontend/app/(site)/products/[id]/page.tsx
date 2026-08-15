@@ -34,7 +34,7 @@ function normalizeProduct(product: ApiProduct): Product {
 async function getProduct(id: string): Promise<Product | null> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/${id}/`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600, tags: ['product'] },
     });
     if (!res.ok) return null;
     const data: ApiProduct = await res.json();
@@ -52,7 +52,7 @@ export async function generateStaticParams() {
 
     while (page <= totalPages) {
       const res = await fetch(`${API_BASE_URL}/api/?page=${page}`, {
-        next: { revalidate: 3600 },
+        next: { revalidate: 3600, tags: ['product'] },
       });
       if (!res.ok) break;
       const data = await res.json();
