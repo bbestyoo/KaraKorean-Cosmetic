@@ -184,6 +184,11 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'shop': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     },
 }
 

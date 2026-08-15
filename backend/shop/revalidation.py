@@ -49,5 +49,12 @@ def revalidate_frontend(*, tags=None, paths=None, product_ids=None):
                 response.status_code,
                 response.text[:200],
             )
+        else:
+            logger.info(
+                'Revalidation sent to %s for tags=%s paths=%s',
+                site_url,
+                tags,
+                paths,
+            )
     except Exception:
         logger.exception('Failed to revalidate frontend at %s', site_url)
