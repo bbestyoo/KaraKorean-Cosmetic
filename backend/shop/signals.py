@@ -15,7 +15,7 @@ from .models import (
     Combo,
     Concern,
 )
-from .revalidation import revalidate_frontend
+from .revalidation import revalidate_frontend, _log
 import requests
 from django.conf import settings
 import sys
@@ -27,12 +27,10 @@ def post_to_fb(sender, instance, created, **kwargs):
         return
 
     if created:
-        print("HERE")
+        _log("[ISR] post_to_fb triggered for new product")
         message = f"The wait is now over for {instance.name}. The product is now available on our website. Click below to check it out now!"
         page_access_token = settings.FACEBOOK_PAGE_ACCESS_TOKEN
-        print(page_access_token)
         page_id = settings.FACEBOOK_PAGE_ID
-        print(page_id)
 
         url = f"https://graph.facebook.com/{page_id}/feed"
         payload = {
@@ -43,9 +41,9 @@ def post_to_fb(sender, instance, created, **kwargs):
 
         try:
             res = requests.post(url, data=payload)
-            print(res.json())
+            _log(f"[FB] Response: {res.json()}")
         except Exception as e:
-            print("Facebook API error:", e)
+            _log(f"[FB] Facebook API error: {e}")
 
 
 def _skip_revalidation():
@@ -56,7 +54,7 @@ def _handle_product_signal(instance, action):
     if _skip_revalidation():
         return
     product_id = getattr(instance, 'product_id', None)
-    print(f"[ISR] {action} for product={product_id}")
+    _log(f"[ISR] {action} for product={product_id}")
     revalidate_frontend(
         tags=['product'],
         paths=['/products'],
@@ -68,7 +66,7 @@ def _handle_global_signal(instance, action):
     if _skip_revalidation():
         return
     model_name = instance.__class__.__name__
-    print(f"[ISR] {action} on {model_name} id={instance.pk} — revalidating all products")
+    _log(f"[ISR] {action} on {model_name} id={instance.pk} — revalidating all products")
     revalidate_frontend(tags=['product'], paths=['/products'])
 
 

@@ -11,7 +11,7 @@ interface RevalidateBody {
  *
  * The Django backend calls this whenever a product (or a related model such as
  * category, brand, image, size, rating, etc.) changes so that ISR-cached pages
- * are invalidated immediately instead of waiting for the time-based revalidate.
+ * are invalidated immediately instead of waiting for the time-based revalidate window.
  *
  * Auth: the caller must send `X-Revalidate-Secret: <REVALIDATE_SECRET>`.
  */
@@ -42,8 +42,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  tags.forEach((tag) => revalidateTag(tag, 'max'));
-  paths.forEach((path) => revalidatePath(path));
+  // Invalidate fetch-level cache by tag (covers data fetches across pages)
+  for (const tag of tags) {
+    revalidateTag(tag, 'default');
+  }
 
-  return NextResponse.json({ revalidated: { tags, paths }, now: Date.now() });
+  // Invalidate route-level cache for each path.
+  // For dynamic product pages, revalidatePath with type 'page' is what actually
+  // clears the rendered HTML + layout so the next visitor gets a fresh render.
+  for (const path of paths) {
+    revalidatePath(path, 'page');
+  }
+
+  return NextResponse.json({
+    revalidated: { tags, paths },
+    now: Date.now(),
+  });
 }
