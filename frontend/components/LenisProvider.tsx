@@ -14,40 +14,55 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isAdminRoute) return;
 
-    const lenis = new Lenis({
-      duration: 0.8,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
-      smoothWheel: true,
-    });
-    lenisRef.current = lenis;
-
     let frameId = 0;
     let resizeFrameId = 0;
+    let resizeObserver: ResizeObserver | null = null;
+    let lenis: Lenis | null = null;
+    let cancelled = false;
 
     const scheduleResize = () => {
+      if (!lenis) return;
       if (resizeFrameId) return;
 
       resizeFrameId = window.requestAnimationFrame(() => {
         resizeFrameId = 0;
-        lenis.resize();
+        lenis?.resize();
       });
     };
 
-    // Handle frame updates
-    function raf(time: number) {
-      lenis.raf(time);
+    const init = () => {
+      if (cancelled) return;
+
+      lenis = new Lenis({
+        duration: 0.8,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      });
+      lenisRef.current = lenis;
+
+      function raf(time: number) {
+        lenis?.raf(time);
+        frameId = window.requestAnimationFrame(raf);
+      }
       frameId = window.requestAnimationFrame(raf);
-    }
-    frameId = window.requestAnimationFrame(raf);
 
-    const resizeObserver = new ResizeObserver(scheduleResize);
-    resizeObserver.observe(document.documentElement);
+      resizeObserver = new ResizeObserver(scheduleResize);
+      resizeObserver.observe(document.documentElement);
 
-    window.addEventListener("resize", scheduleResize);
-    window.addEventListener("load", scheduleResize);
-    scheduleResize();
+      window.addEventListener("resize", scheduleResize);
+      window.addEventListener("load", scheduleResize);
+      scheduleResize();
+    };
+
+    const idle =
+      (window as unknown as { requestIdleCallback?: (cb: () => void) => number })
+        .requestIdleCallback ??
+      ((cb: () => void) => window.setTimeout(cb, 250));
+
+    idle(init);
 
     return () => {
+      cancelled = true;
       if (frameId) {
         window.cancelAnimationFrame(frameId);
       }
@@ -55,10 +70,10 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         window.cancelAnimationFrame(resizeFrameId);
       }
 
-      resizeObserver.disconnect();
+      resizeObserver?.disconnect();
       window.removeEventListener("resize", scheduleResize);
       window.removeEventListener("load", scheduleResize);
-      lenis.destroy();
+      lenis?.destroy();
       lenisRef.current = null;
     };
   }, [isAdminRoute]);

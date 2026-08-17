@@ -1,13 +1,13 @@
 import BestSellers from "@/components/best-sellers";
 import Brands from "../../components/brands";
+import Collections from "@/components/collections";
+import FeaturedProductsDeferred from "@/components/FeaturedProductsDeferred";
 import Image from "next/image";
 import Link from "next/link";
-import Collections from "@/components/collections";
-import FeaturedProducts from "@/components/FeaturedProducts";
 import NewnessSection from "@/components/NewnessSection";
-import SpringCollection from "@/components/SpringCollection";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import NewArrivalsCarousel from "@/components/NewArrivalsCarousel";
+import SpringCollection from "@/components/SpringCollection";
 import WhyChooseKara from "@/components/WhyChooseKara";
 import { Heart } from "lucide-react";
 
@@ -144,7 +144,7 @@ export default function Home() {
       <BestSellers />
       {/* Collections Section */}
       <div className=" py-10 mt-0 md:py-20 mdLmt-10">
-        <FeaturedProducts />
+        <FeaturedProductsDeferred />
       </div>
       <Collections />
       <NewnessSection />

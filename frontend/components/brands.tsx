@@ -1,16 +1,14 @@
-"use client";
-
 import Link from 'next/link';
 
 const brands = [
-    { src: '/images/logos/anua.webp', alt: 'Anua' },
-    { src: '/images/logos/boj.webp', alt: 'BOJ' },
-    { src: '/images/logos/isntree.webp', alt: 'Isntree' },
-    { src: '/images/logos/cosrx.webp', alt: 'COSRX' },
-    { src: '/images/logos/medicube.webp', alt: 'Medicube' },
-    { src: '/images/logos/roundlab.webp', alt: 'Roundlab' },
-    { src: '/images/logos/skin1004.webp', alt: 'Skin1004' },
-    { src: '/images/logos/somebymi.webp', alt: 'Some By Mi' },
+    { src: '/images/logos/anua.webp', alt: 'Anua', width: 500, height: 421 },
+    { src: '/images/logos/boj.webp', alt: 'BOJ', width: 150, height: 150 },
+    { src: '/images/logos/isntree.webp', alt: 'Isntree', width: 500, height: 285 },
+    { src: '/images/logos/cosrx.webp', alt: 'COSRX', width: 462, height: 254 },
+    { src: '/images/logos/medicube.webp', alt: 'Medicube', width: 225, height: 83 },
+    { src: '/images/logos/roundlab.webp', alt: 'Roundlab', width: 300, height: 98 },
+    { src: '/images/logos/skin1004.webp', alt: 'Skin1004', width: 1024, height: 450 },
+    { src: '/images/logos/somebymi.webp', alt: 'Some By Mi', width: 640, height: 236 },
 ];
 
 const slugify = (str: string) =>
@@ -55,6 +53,8 @@ export default function Brands() {
                                     <img
                                         src={brand.src}
                                         alt={brand.alt}
+                                        width={brand.width}
+                                        height={brand.height}
                                         className="brand-img cursor-pointer h-14 mb-3 sm:mb-0  sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
                                     />
                                 </Link>
@@ -70,6 +70,8 @@ export default function Brands() {
                                     <img
                                         src={brand.src}
                                         alt={brand.alt}
+                                        width={brand.width}
+                                        height={brand.height}
                                         className="brand-img cursor-pointer h-14 mb-3 sm:mb-0 sm:h-20 w-auto object-contain opacity-70 hover:opacity-100"
                                     />
                                 </Link>
