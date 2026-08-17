@@ -33,16 +33,15 @@ export default function SpringCollection() {
           {/* Middle Column - Text Content */}
           <RevealOnScroll direction="up" delay={300} className="flex flex-col items-center justify-center text-center px-4 md:px-8 py-8 md:py-0">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#1a1a1a] mb-4 md:mb-6 uppercase">
-              Spring<br />Collection
+              Summer<br />Essentials
             </h2>
             <p className="text-sm md:text-base text-neutral-500 mb-6 md:mb-10 max-w-sm mx-auto leading-relaxed">
-            Will be auto hidden after collections are added.
-              Body text content goes here. This is where the main content will be displayed.
+              Glow like never before this summer with our specially curated summer essentials.
             </p>
             <Link
               href={(() => {
                 const category = toCategory("Spring Collection");
-                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+                return `/products`;
               })()}
               className="border border-[#1a1a1a] text-[#1a1a1a] px-10 py-3 text-sm font-semibold tracking-widest uppercase hover:bg-[#0f3b2b] hover:text-white transition-colors duration-300 inline-block text-center"
             >

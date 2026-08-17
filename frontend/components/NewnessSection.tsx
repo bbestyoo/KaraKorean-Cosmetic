@@ -42,13 +42,13 @@ export default function NewnessSection() {
             <Link
               href={(() => {
                 const category = toCategory("Natural beauty");
-                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+                return `/products/anua-heartleaf-cleansing-foam-150-ml-1`;
               })()}
               className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md"
             >
               <Image
-                src="/images/karacollection6.webp"
-                alt="Natural beauty"
+                src="/images/anuaproducts.webp"
+                alt="Anua Products"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover transition-all duration-700 group-hover:scale-105"
@@ -66,12 +66,12 @@ export default function NewnessSection() {
             <Link
               href={(() => {
                 const category = toCategory("Capture Day Creme");
-                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+                return `/products/tone-brightening-capsule-ampoule`;
               })()}
               className="w-full max-w-[360px] aspect-[3/4] relative overflow-hidden mb-4 group cursor-pointer shadow-md"
             >
               <Image
-                src="/images/karacollection1.jpg"
+                src="/images/tone-brightening-capsule-ampoule.webp"
                 alt="Tone Brightening Set Capsoule"
                 fill
                 sizes="(max-width: 768px) 100vw, 360px"
@@ -91,12 +91,12 @@ export default function NewnessSection() {
             <Link
               href={(() => {
                 const category = toCategory("Capture Le Serum");
-                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+                return `/products/the-vita-a-retinal-shot-tightening-booster`;
               })()}
               className="w-full max-w-[340px] aspect-[4/5] relative overflow-hidden mb-4 group cursor-pointer shadow-md"
             >
               <Image
-                src="/images/karacollection9.webp"
+                src="/images/the-vita-a-retinal-shot-tightening-booster.webp"
                 alt="The Vita-A Retinal Shot Tightening Booster"
                 fill
                 sizes="(max-width: 768px) 100vw, 340px"
@@ -116,13 +116,13 @@ export default function NewnessSection() {
             <Link
               href={(() => {
                 const category = toCategory("Cosmetic detail");
-                return `/products${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+                return `/products/seoul-1988-retinal-liposome-2black-ginseng-serum-2`;
               })()}
               className="w-full h-full block relative overflow-hidden group cursor-pointer shadow-md"
             >
               <Image
-                src="/images/karacollection4.webp"
-                alt="Cosmetic detail"
+                src="/images/seoul-1988-retinal-liposome-2black-ginseng-serum.webp"
+                alt="Seoul-1988-retinal-liposome-2black-ginseng-serum"
                 fill
                 sizes="(max-width: 768px) 100vw, 25vw"
                 className="object-cover transition-all duration-700 group-hover:scale-105"
