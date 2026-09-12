@@ -12,15 +12,18 @@ function resolveImageUrl(image?: string | null): string {
   return new URL(normalizedPath, API_ORIGIN).toString();
 }
 
-interface ApiProduct extends Omit<Product, 'category' | 'images'> {
+interface ApiProduct extends Omit<Product, 'category' | 'images' | 'in_stock' | 'stock_count'> {
   category?: string | null;
   images?: Array<{ image: string }>;
   description?: string | null;
+  stock_count?: number;
 }
 
 function normalizeProduct(product: ApiProduct): Product {
   return {
     ...product,
+    stock_count: product.stock_count ?? 0,
+    in_stock: Number(product.stock_count ?? 0) > 0,
     category: product.category || 'Uncategorized',
     images: Array.isArray(product.images)
       ? product.images.map((img) => ({

@@ -51,7 +51,7 @@ export interface Product {
   price: number;
   old_price: number | null;
   before_deal_price: number | null;
-  stock: number;
+  stock_count: number;
   in_stock: boolean;
   images: ProductImage[];
   ratings: Rating;
@@ -78,13 +78,51 @@ const POLICY_SECTIONS = [
 ] as const;
 
 export default function ProductPageClient({ initialProduct }: { initialProduct: Product }) {
-  const [product] = useState<Product>(initialProduct);
+  const [product, setProduct] = useState<Product>(initialProduct);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [mainImage, setMainImage] = useState<string>(initialProduct.images?.[0]?.image || '');
   const [quantity, setQuantity] = useState(1);
   const [openPolicy, setOpenPolicy] = useState<string | null>(null);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const { addItem } = useCart();
+
+  // Refresh live stock after mount so size/count changes show without a hard
+  // refresh (bypasses Next's fetch/router caches, which can serve stale data).
+  useEffect(() => {
+    let cancelled = false;
+    const API_BASE_URL =
+      process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.karakoreanbeauty.com/shop';
+
+    const refreshStock = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/${initialProduct.product_id}/`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        setProduct((prev) => {
+          if (!prev) return prev;
+          const freshSizes = Array.isArray(data?.sizes) ? data.sizes : [];
+          const stock_count = Number(data?.stock_count ?? prev.stock_count);
+          return {
+            ...prev,
+            stock_count,
+            in_stock: stock_count > 0,
+            sizes: prev.sizes.map((s) => {
+              const fresh = freshSizes.find((f: { name?: string; stock?: number }) => f.name === s.name);
+              return fresh ? { ...s, stock: Number(fresh.stock ?? s.stock) } : s;
+            }),
+          };
+        });
+      } catch {
+        // Keep server-rendered stock if the refresh fails
+      }
+    };
+    refreshStock();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialProduct.product_id]);
 
   useEffect(() => {
     if (!product) {
@@ -110,11 +148,12 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
 
   const getSelectedSizeStock = () => {
     if (!product) return Infinity;
+    const productStock = product.stock_count ?? Infinity;
     if (product.sizes && selectedSize) {
       const s = product.sizes.find((s) => s.name === selectedSize);
-      return s?.stock ?? product.stock ?? Infinity;
+      return s?.stock ?? productStock;
     }
-    return product.stock ?? Infinity;
+    return productStock;
   };
 
   const handleIncrement = () => {
@@ -139,8 +178,12 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
   const handleAddToCart = () => {
     if (!product || !product.in_stock) return;
 
-    if (!selectedSize) {
+    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
       setShowValidationErrors(true);
+      return;
+    }
+
+    if (getSelectedSizeStock() < quantity) {
       return;
     }
 
@@ -149,7 +192,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
         product_id: product.product_id,
         name: product.name,
         price: getFinalPrice(),
-        size: selectedSize,
+        size: selectedSize || '',
         quantity,
         image: mainImage,
       });
@@ -237,12 +280,12 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
           {/* Selectors */}
           <div className="space-y-8 pt-4">
             {/* Size */}
-            <div className="grid grid-cols-[100px_1fr] items-start gap-6">
-              <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Size:</span>
-              <div className="w-full max-w-[420px]">
-                <div className="flex flex-wrap gap-2">
-                  {product.sizes && product.sizes.length > 0 ? (
-                    product.sizes.map((size) => {
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="grid grid-cols-[100px_1fr] items-start gap-6">
+                <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Size:</span>
+                <div className="w-full max-w-[420px]">
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((size) => {
                       const disabled = size.stock <= 0;
                       const selected = selectedSize === size.name;
                       return (
@@ -258,22 +301,11 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
                           {size.name}{disabled ? ' — out of stock' : ''}
                         </button>
                       );
-                    })
-                  ) : (
-                    ['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setSelectedSize(s)}
-                        className={`px-3 cursor-pointer py-2 border rounded-md text-sm font-medium ${selectedSize === s ? 'bg-[#0f3b2b] text-white border-[#0f3b2b]' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-100'}`}
-                      >
-                        {s}
-                      </button>
-                    ))
-                  )}
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Quantity */}
             <div className="grid grid-cols-[100px_1fr] items-center gap-6 pt-2">
@@ -299,7 +331,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
               </div>
             </div>
 
-            {showValidationErrors && !selectedSize && (
+            {showValidationErrors && product.sizes && product.sizes.length > 0 && !selectedSize && (
               <p className="text-sm text-red-600 mt-2">Please select a size.</p>
             )}
 

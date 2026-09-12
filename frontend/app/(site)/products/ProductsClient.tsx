@@ -42,7 +42,7 @@ interface ApiProduct {
   brand?: string | { name?: string } | null;
   brandName?: string | null;
   images?: Array<{ image: string }>;
-  in_stock?: boolean;
+  stock_count?: number;
 }
 
 export interface Product {
@@ -79,7 +79,7 @@ function normalizeProduct(product: ApiProduct): Product {
       product.old_price === null || product.old_price === undefined ? null : Number(product.old_price),
     category_name: categoryValue,
     brand: product.brandName || brandValue || 'Unknown',
-    in_stock: product.in_stock !== false,
+    in_stock: Number(product.stock_count ?? 0) > 0,
     images: Array.isArray(product.images)
       ? product.images.map((image) => ({ image: resolveImageUrl(image.image) }))
       : [],
@@ -633,7 +633,7 @@ function ProductsContent({
                             old_price: product.old_price || undefined,
                             image: product.images[0]?.image || '/images/placeholder.png',
                             category_name: product.category_name,
-                            in_stock: product.in_stock !== false,
+                            in_stock: product.in_stock,
                           });
                         }}
                         className="p-2 rounded-full bg-white shadow-sm  cursor-pointer hover:scale-105 transition-all text-neutral-900"

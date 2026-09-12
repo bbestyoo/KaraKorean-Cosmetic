@@ -84,7 +84,7 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
             price: Number(item.price ?? 0),
             oldPrice: item.old_price !== undefined ? Number(item.old_price) : undefined,
             image,
-            inStock: item.in_stock !== false,
+            inStock: Number(item.stock_count ?? 0) > 0,
             link: `/products/${item.product_id ?? item.id ?? ''}`,
           } as Product;
         });

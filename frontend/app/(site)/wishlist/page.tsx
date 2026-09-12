@@ -42,10 +42,39 @@ function WishlistContent() {
 
   // Shared items parsed from URL query parameter
   const [sharedItems, setSharedItems] = useState<WishlistItem[]>([]);
+  // Live stock status keyed by product_id, refreshed from the API so persisted
+  // wishlists show up-to-date availability after orders are placed
+  const [stockMap, setStockMap] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setIsHydrated(true);
 
+    const controller = new AbortController();
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/shop';
+
+    const refreshStock = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/?page=1&page_size=1000`, { signal: controller.signal });
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = data.results ?? data;
+        if (!Array.isArray(list)) return;
+        const map: Record<string, boolean> = {};
+        list.forEach((p: any) => {
+          const id = p.product_id ?? p.pk;
+          if (id != null) map[String(id)] = Number(p.stock_count ?? 0) > 0;
+        });
+        setStockMap(map);
+      } catch {
+        // Ignore fetch errors; fall back to stored in_stock snapshot
+      }
+    };
+    refreshStock();
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
     const sharedIds = searchParams.get('shared');
     if (sharedIds) {
       const ids = sharedIds.split(',');
@@ -145,6 +174,13 @@ function WishlistContent() {
     setTimeout(() => setShowShareToast(false), 3000);
     // Clear query parameter/state
     setSharedItems([]);
+  };
+
+  // Use live stock status when available, otherwise fall back to the stored snapshot
+  const getItemStock = (item: WishlistItem): boolean => {
+    const fresh = stockMap[item.product_id];
+    if (fresh !== undefined) return fresh;
+    return item.in_stock !== false;
   };
 
   return (
@@ -345,7 +381,7 @@ function WishlistContent() {
                   </Link>
                   <button
                     onClick={() => {
-                      if (item.in_stock === false) return;
+                      if (!getItemStock(item)) return;
                       addItem({
                         product_id: item.product_id,
                         name: item.name,
@@ -355,15 +391,15 @@ function WishlistContent() {
                         quantity: 1,
                       });
                     }}
-                    disabled={item.in_stock === false}
-                    aria-disabled={item.in_stock === false}
-                    className={`py-3 text-center text-[10px] tracking-widest font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${item.in_stock === false
+                    disabled={!getItemStock(item)}
+                    aria-disabled={!getItemStock(item)}
+                    className={`py-3 text-center text-[10px] tracking-widest font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${!getItemStock(item)
                       ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
                       : 'text-[#0f3b2b] hover:bg-[#0f3b2b] hover:text-white'
                       }`}
                   >
                     <ShoppingBag size={10} />
-                    {item.in_stock === false ? 'Out Of Stock' : 'Add To Cart'}
+                    {getItemStock(item) ? 'Add To Cart' : 'Out Of Stock'}
                   </button>
                 </div>
               </div>
@@ -424,7 +460,7 @@ function WishlistContent() {
                   </Link>
                   <button
                     onClick={() => {
-                      if (item.in_stock === false) return;
+                      if (!getItemStock(item)) return;
                       addItem({
                         product_id: item.product_id,
                         name: item.name,
@@ -434,15 +470,15 @@ function WishlistContent() {
                         quantity: 1,
                       });
                     }}
-                    disabled={item.in_stock === false}
-                    aria-disabled={item.in_stock === false}
-                    className={`py-3 text-center text-[10px] tracking-widest font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${item.in_stock === false
+                    disabled={!getItemStock(item)}
+                    aria-disabled={!getItemStock(item)}
+                    className={`py-3 text-center text-[10px] tracking-widest font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${!getItemStock(item)
                       ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
                       : 'text-[#0f3b2b] hover:bg-[#0f3b2b] hover:text-white'
                       }`}
                   >
                     <ShoppingBag size={10} />
-                    {item.in_stock === false ? 'Out Of Stock' : 'Add To Cart'}
+                    {getItemStock(item) ? 'Add To Cart' : 'Out Of Stock'}
                   </button>
                 </div>
               </div>

@@ -41,7 +41,7 @@ function normalizeProduct(product: any) {
     category: product.category_name ?? product.category ?? 'Uncategorized',
     price: typeof product.price === 'number' ? product.price : Number(String(product.price ?? 0)),
     old_price: product.old_price !== undefined ? (typeof product.old_price === 'number' ? product.old_price : Number(String(product.old_price))) : undefined,
-    in_stock: product.in_stock !== false,
+    in_stock: Number(product.stock_count ?? 0) > 0,
     images,
   };
 }
@@ -119,7 +119,7 @@ export default function FeaturedProducts() {
                             old_price: numericOldPrice,
                             image: product.images?.[0]?.image,
                             category_name: product.category,
-                            in_stock: product.in_stock !== false,
+                            in_stock: product.in_stock,
                           });
                         }}
                         className="text-white hover:text-red-500 transition-colors"

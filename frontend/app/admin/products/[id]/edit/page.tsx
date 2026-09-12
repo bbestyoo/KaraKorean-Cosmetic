@@ -40,7 +40,7 @@ interface ProductFormData {
   trending: boolean;
   best_seller: boolean;
   featured: boolean;
-  in_stock: boolean;
+  stock_count: number;
 }
 
 interface ColorData {
@@ -53,6 +53,7 @@ interface ColorData {
 interface SizeData {
   id: string;
   name: string;
+  stock: number;
 }
 
 interface StockData {
@@ -76,6 +77,7 @@ interface APIColor {
 interface APISize {
   id: number;
   name: string;
+  stock: number;
 }
 
 interface APIStock {
@@ -111,7 +113,7 @@ interface APIProduct {
   trending?: boolean;
   best_seller?: boolean;
   featured?: boolean;
-  in_stock?: boolean;
+  stock_count?: number;
   colors?: APIColor[];
   sizes?: APISize[];
   size_color_stocks?: APIStock[];
@@ -154,7 +156,7 @@ export default function EditProduct() {
     trending: false,
     best_seller: false,
     featured: false,
-    in_stock: true,
+    stock_count: 0,
   });
 
   // Track original data to detect changes
@@ -221,7 +223,7 @@ export default function EditProduct() {
             trending: product.trending || false,
             best_seller: product.best_seller || false,
             featured: product.featured || false,
-            in_stock: product.in_stock ?? true,
+            stock_count: product.stock_count ?? 0,
           });
 
           // Load colors
@@ -254,6 +256,7 @@ export default function EditProduct() {
               product.sizes.map((size: APISize) => ({
                 id: size.id.toString(),
                 name: size.name,
+                stock: size.stock ?? 0,
               }))
             );
           }
@@ -295,7 +298,7 @@ export default function EditProduct() {
             trending: product.trending || false,
             best_seller: product.best_seller || false,
             featured: product.featured || false,
-            in_stock: product.in_stock ?? true,
+            stock_count: product.stock_count ?? 0,
           };
           setOriginalFormData(originalData);
           // Colors and sizes data loaded separately above
@@ -578,10 +581,15 @@ export default function EditProduct() {
     const size: SizeData = {
       id: Math.random().toString(36).substr(2, 9),
       name: newSize,
+      stock: 0,
     };
 
     setSizes(prev => [...prev, size]);
     setNewSize('');
+  };
+
+  const updateSizeStock = (sizeId: string, stock: number) => {
+    setSizes(prev => prev.map(s => (s.id === sizeId ? { ...s, stock: Math.max(0, stock) } : s)));
   };
 
   const removeSize = (sizeId: string) => {
@@ -645,6 +653,7 @@ export default function EditProduct() {
             body: JSON.stringify({
               name: size.name,
               product: productId,
+              stock: size.stock,
             }),
           });
 
@@ -655,10 +664,33 @@ export default function EditProduct() {
 
           const sizeData = await response.json();
           sizeIds[size.id] = sizeData.id;
+        } else {
+          await fetch(`${API_ORIGIN}/shop/size/${size.id}/`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Token ${token}`,
+            },
+            body: JSON.stringify({
+              name: size.name,
+              stock: size.stock,
+            }),
+          });
         }
       }
 
       setCreatedSizeIds(sizeIds);
+
+      const totalStock = sizes.reduce((sum, size) => sum + size.stock, 0);
+      await fetch(`${API_ORIGIN}/shop/api/${productId}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
+        },
+        body: JSON.stringify({ stock_count: totalStock }),
+      });
+
       setSuccess('Product updated successfully!');
       router.push('/admin/products');
     } catch (err) {
@@ -967,15 +999,24 @@ export default function EditProduct() {
                       />
                       <span className="text-sm text-gray-700">Featured</span>
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.in_stock}
-                        onChange={(e) => handleInputChange('in_stock', e.target.checked)}
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm text-gray-700">In Stock</span>
-                    </label>
+                    {sizes.length === 0 && (
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="number"
+                          name="stock_count"
+                          min="0"
+                          value={formData.stock_count}
+                          onChange={(e) => handleInputChange('stock_count', parseInt(e.target.value) || 0)}
+                          className="w-20 px-2 py-1 border border-gray-300 rounded"
+                        />
+                        <span className="text-sm text-gray-700">Stock Count</span>
+                      </label>
+                    )}
+                    {sizes.length > 0 && (
+                      <p className="text-sm text-gray-500">
+                        Stock is managed per size in the Sizes step (total: {sizes.reduce((sum, s) => sum + s.stock, 0)}).
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -1119,15 +1160,32 @@ export default function EditProduct() {
                   {sizes.map(size => (
                     <div key={size.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
                       <span className="font-medium text-gray-900">{size.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeSize(size.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X size={18} />
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <label className="flex items-center gap-2 text-sm text-gray-600">
+                          Stock
+                          <input
+                            type="number"
+                            min="0"
+                            value={size.stock}
+                            onChange={(e) => updateSizeStock(size.id, parseInt(e.target.value) || 0)}
+                            className="w-20 px-2 py-1 border border-gray-300 rounded"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => removeSize(size.id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
                     </div>
                   ))}
+                  {sizes.length > 0 && (
+                    <p className="text-xs text-gray-500">
+                      Total stock across sizes: {sizes.reduce((sum, s) => sum + s.stock, 0)}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex gap-4">

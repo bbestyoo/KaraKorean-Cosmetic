@@ -40,7 +40,7 @@ interface ProductFormData {
   trending: boolean;
   best_seller: boolean;
   featured: boolean;
-  in_stock: boolean;
+  stock_count: number;
 }
 
 interface ColorData {
@@ -53,6 +53,7 @@ interface ColorData {
 interface SizeData {
   id: string;
   name: string;
+  stock: number;
 }
 
 interface StockData {
@@ -100,7 +101,7 @@ export default function AddProduct() {
     trending: false,
     best_seller: false,
     featured: false,
-    in_stock: true,
+    stock_count: 0,
   });
 
   const [loading, setLoading] = useState(false);
@@ -253,7 +254,7 @@ export default function AddProduct() {
           trending: formData.trending,
           best_seller: formData.best_seller,
           featured: formData.featured,
-          in_stock: formData.in_stock,
+          stock_count: formData.stock_count,
         }),
       });
 
@@ -449,10 +450,15 @@ export default function AddProduct() {
     const size: SizeData = {
       id: Math.random().toString(36).substr(2, 9),
       name: newSize,
+      stock: 0,
     };
 
     setSizes(prev => [...prev, size]);
     setNewSize('');
+  };
+
+  const updateSizeStock = (sizeId: string, stock: number) => {
+    setSizes(prev => prev.map(s => (s.id === sizeId ? { ...s, stock: Math.max(0, stock) } : s)));
   };
 
   const removeSize = (sizeId: string) => {
@@ -516,6 +522,7 @@ export default function AddProduct() {
             name: size.name,
             product: productId,
             price_adjustment: 0,
+            stock: size.stock,
           }),
         });
 
@@ -529,6 +536,17 @@ export default function AddProduct() {
       }
 
       setCreatedSizeIds(sizeIds);
+
+      const totalStock = sizes.reduce((sum, size) => sum + size.stock, 0);
+      await fetch(`${API_ORIGIN}/shop/api/${productId}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
+        },
+        body: JSON.stringify({ stock_count: totalStock }),
+      });
+
       setSuccess('Sizes created! Now upload images.');
       setStep('images');
     } catch (err) {
@@ -932,13 +950,14 @@ export default function AddProduct() {
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
-                        type="checkbox"
-                        name="in_stock"
-                        checked={formData.in_stock}
+                        type="number"
+                        name="stock_count"
+                        min="0"
+                        value={formData.stock_count}
                         onChange={handleChange}
-                        className="w-4 h-4 rounded border-gray-300"
+                        className="w-20 px-2 py-1 border border-gray-300 rounded"
                       />
-                      <span className="text-sm font-medium text-gray-900">In Stock</span>
+                      <span className="text-sm font-medium text-gray-900">Stock Count</span>
                     </label>
                   </div>
                 </div>
@@ -1071,13 +1090,13 @@ export default function AddProduct() {
                 <h2 className="text-2xl font-bold text-gray-900">Add Sizes</h2>
 
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
-                  <p className="text-sm">Add all sizes for this product. Images come next.</p>
+                  <p className="text-sm">Add all sizes for this product and set the stock available for each. Images come next.</p>
                 </div>
 
                 <div className="flex gap-3">
                   <input
                     type="text"
-                    placeholder="Size (e.g., S, M, L, XL)"
+                    placeholder="Size (e.g., 50ml, 100ml)"
                     value={newSize}
                     onChange={(e) => setNewSize(e.target.value)}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
@@ -1096,15 +1115,30 @@ export default function AddProduct() {
                     {sizes.map(size => (
                       <div key={size.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <span className="font-medium text-gray-900">{size.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeSize(size.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <X size={18} />
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <label className="flex items-center gap-2 text-sm text-gray-600">
+                            Stock
+                            <input
+                              type="number"
+                              min="0"
+                              value={size.stock}
+                              onChange={(e) => updateSizeStock(size.id, parseInt(e.target.value) || 0)}
+                              className="w-20 px-2 py-1 border border-gray-300 rounded"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => removeSize(size.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
                       </div>
                     ))}
+                    <p className="text-xs text-gray-500">
+                      Total stock across sizes: {sizes.reduce((sum, s) => sum + s.stock, 0)}
+                    </p>
                   </div>
                 )}
 

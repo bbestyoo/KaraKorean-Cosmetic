@@ -30,7 +30,7 @@ class Product(models.Model):
     trending = models.BooleanField(default=False)
     best_seller = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
-    in_stock = models.BooleanField(default=True)
+    stock_count = models.PositiveIntegerField(default=0)
     usecases = models.ManyToManyField('UseCase', blank=True, related_name='products')
     skin_type = models.ManyToManyField('SkinType', blank=True, related_name='products')
     combo = models.ManyToManyField('Combo', blank=True, related_name='products')
@@ -62,7 +62,7 @@ class Size(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sizes')
     name = models.CharField(max_length=50)  # e.g., XS, S, M, L, XL, XXL
     price_adjustment = models.FloatField(default=0)  # Additional cost for this size, if any
-    # stock = models.PositiveIntegerField(default=0)
+    stock = models.PositiveIntegerField(default=0)  # Stock for this specific size
 
     class Meta:
         unique_together = ['product', 'name']

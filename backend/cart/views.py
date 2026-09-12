@@ -10,7 +10,8 @@ from .utils import send_order_confirmation
 from shop.models import Product,  Size
 import datetime
 from rest_framework.pagination import PageNumberPagination
-from django.db.models import Q
+from django.db.models import Q, Sum
+from django.db import transaction
 
 
 class OrderPagination(PageNumberPagination):
@@ -53,28 +54,67 @@ class CheckoutAPIView(APIView):
         order = Order.objects.create(status="Pending")
        
         try:
-            for item in cart_items_data:
-                logger.error("PROCESSING ITEM: %s", item)
-                product = Product.objects.get(product_id=item.get('product_id'))
-                logger.error("PRODUCT FOUND: %s", product)
-                
-                size = None
-                if item.get('size'):
-                    size = Size.objects.filter(name=item.get('size')).first()
-                logger.error("SIZE: %s", size)
-                
-                OrderItem.objects.create(
-                    order=order,
-                    product=product,
-                    size=size,
-                    quantity=item.get('quantity', 1),
-                    price=item.get('price', 0)
-                )
-                logger.error("ITEM CREATED")
+            with transaction.atomic():
+                for item in cart_items_data:
+                    logger.error("PROCESSING ITEM: %s", item)
+                    product = Product.objects.select_for_update().get(product_id=item.get('product_id'))
+                    logger.error("PRODUCT FOUND: %s", product)
+
+                    quantity = int(item.get('quantity', 1) or 1)
+
+                    if quantity < 1:
+                        raise ValueError(f"Invalid quantity for {product.name}")
+
+                    requested_size = item.get('size') or None
+                    size = None
+
+                    if requested_size:
+                        size = Size.objects.select_for_update().filter(
+                            product=product, name=requested_size
+                        ).first()
+                        if not size:
+                            raise ValueError(
+                                f"Size '{requested_size}' is not available for {product.name}."
+                            )
+                        if size.stock < quantity:
+                            raise ValueError(
+                                f"Insufficient stock for {product.name} ({size.name}). "
+                                f"Only {size.stock} left."
+                            )
+                        size.stock -= quantity
+                        size.save(update_fields=['stock'])
+
+                        product.stock_count = (
+                            Size.objects.filter(product=product).aggregate(
+                                total=Sum('stock')
+                            )['total'] or 0
+                        )
+                        product.save(update_fields=['stock_count'])
+                    else:
+                        if product.stock_count < quantity:
+                            raise ValueError(
+                                f"Insufficient stock for {product.name}. Only {product.stock_count} left."
+                            )
+                        product.stock_count -= quantity
+                        product.save(update_fields=['stock_count'])
+
+                    logger.error("SIZE: %s", size)
+
+                    OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        size=size,
+                        quantity=quantity,
+                        price=item.get('price', 0)
+                    )
+                    logger.error("ITEM CREATED")
                 
         except Product.DoesNotExist:
             order.delete()
             return Response({'detail': 'Product not found'}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            order.delete()
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             import traceback
             logger.error("ORDER ITEM EXCEPTION: %s", str(e))

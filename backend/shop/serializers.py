@@ -75,7 +75,7 @@ class VariantSerializer(serializers.ModelSerializer):
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
-        fields = ['id', 'name', 'price_adjustment',  'product']
+        fields = ['id', 'name', 'price_adjustment', 'stock', 'product']
     
 class GetProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many = True, read_only = True)
@@ -86,7 +86,19 @@ class GetProductSerializer(serializers.ModelSerializer):
     sizes = SizeSerializer(many=True, read_only=True)
     class Meta:
         model = Product
-        fields = ['product_id','name','category','usecases','price','old_price', 'before_deal_price','images','ratings','variants','sizes','in_stock']
+        fields = ['product_id','name','category','usecases','price','old_price', 'before_deal_price','images','ratings','variants','sizes','stock_count']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['stock_count'] = self._effective_stock(data)
+        return data
+
+    @staticmethod
+    def _effective_stock(data):
+        sizes = data.get('sizes')
+        if sizes:
+            return sum(size.get('stock', 0) for size in sizes)
+        return data.get('stock_count', 0)
 
     def get_ratings(self,obj):
         request = self.context.get('request')
@@ -119,7 +131,6 @@ class ProductSerializer(serializers.ModelSerializer):
     usecases = serializers.SlugRelatedField(many=True, slug_field='name', queryset=UseCase.objects.all(), required=False)
     skin_type = serializers.SlugRelatedField(many=True, slug_field='name', queryset=SkinType.objects.all(), required=False)
     concern = serializers.SlugRelatedField(many=True, slug_field='name', queryset=Concern.objects.all(), required=False)
-    # stock = serializers.SerializerMethodField()
     attributes = ProductAttributeSerializer(many=True, read_only=True)
     variants = VariantSerializer(many=True, read_only=True)
     sizes = SizeSerializer(many=True, read_only=True)
@@ -127,6 +138,18 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['stock_count'] = self._effective_stock(data)
+        return data
+
+    @staticmethod
+    def _effective_stock(data):
+        sizes = data.get('sizes')
+        if sizes:
+            return sum(size.get('stock', 0) for size in sizes)
+        return data.get('stock_count', 0)
 
     def get_ratings(self,obj):
         request = self.context.get('request')
@@ -154,10 +177,6 @@ class ProductSerializer(serializers.ModelSerializer):
     
     def get_sub_category_name(self, obj):
         return obj.sub_category.name if obj.sub_category else None
-    
-    def get_stock(self, obj):
-        total_stock = Size.objects.filter(product_id=obj.product_id).aggregate(total=Sum('stock'))['total']
-        return total_stock if total_stock is not None else 0
 
 class UseCaseSerializer(serializers.ModelSerializer):
 
