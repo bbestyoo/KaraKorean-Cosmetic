@@ -169,3 +169,21 @@ class Concern(models.Model):
 
     def __str__(self):
         return self.name
+
+class Banner(models.Model):
+    name = models.CharField(max_length=200, help_text="Internal admin label for this banner")
+    text = models.TextField(help_text="The banner message shown to customers")
+    link_text = models.CharField(max_length=100, blank=True, null=True, help_text="Optional call-to-action label, e.g. 'Shop Now'")
+    link_url = models.CharField(max_length=500, blank=True, null=True, help_text="Optional link the CTA points to, e.g. /products")
+    is_active = models.BooleanField(default=True)
+    display_order = models.PositiveIntegerField(default=0, help_text="Lower numbers are shown first")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Banner'
+        verbose_name_plural = 'Banners'
+        ordering = ['display_order', 'name']
+
+    def __str__(self):
+        return self.name

@@ -14,6 +14,7 @@ from .models import (
     SkinType,
     Combo,
     Concern,
+    Banner,
 )
 from .revalidation import revalidate_frontend, _log
 import requests
@@ -118,3 +119,20 @@ def _make_global_delete_handler(model):
 for _model in _global_models:
     post_save.connect(_make_global_save_handler(_model), sender=_model)
     post_delete.connect(_make_global_delete_handler(_model), sender=_model)
+
+
+# ── Banner (affects every page's promo bar) ──────────────────────────────────
+def _handle_banner_signal(instance, action):
+    if _skip_revalidation():
+        return
+    _log(f"[ISR] {action} on Banner id={instance.pk} — revalidating home page")
+    revalidate_frontend(tags=['banner'], paths=['/'])
+
+
+@receiver(post_save, sender=Banner)
+def revalidate_banner_save(sender, instance, **kwargs):
+    _handle_banner_signal(instance, 'Banner saved')
+
+@receiver(post_delete, sender=Banner)
+def revalidate_banner_delete(sender, instance, **kwargs):
+    _handle_banner_signal(instance, 'Banner deleted')

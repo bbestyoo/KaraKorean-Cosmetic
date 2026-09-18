@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Comment, Repliess, ProductImage, Rating, ProductAttribute, Variant, Size, UseCase, SkinType, Concern
+from .models import Product, Comment, Repliess, ProductImage, Rating, ProductAttribute, Variant, Size, UseCase, SkinType, Concern, Banner
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
@@ -183,3 +183,8 @@ class UseCaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = UseCase
         fields = '__all__'
+
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = ['id', 'name', 'text', 'link_text', 'link_url', 'display_order']

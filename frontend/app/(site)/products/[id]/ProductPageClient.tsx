@@ -11,10 +11,35 @@ import DOMPurify from "dompurify";
 function safeSanitize(html: string): string {
   if (typeof window === 'undefined') return html;
   try {
-    return DOMPurify.sanitize(html);
+    return upgradeDescriptionHtml(DOMPurify.sanitize(html));
   } catch {
     return html;
   }
+}
+
+// Upgrade standalone all-caps section labels (e.g. "<p><strong>BENEFITS</strong></p>")
+// found in product descriptions into styled section headings.
+function upgradeDescriptionHtml(html: string): string {
+  return html.replace(
+    /<p>(\s*<strong>(?:\s*<u>)?[\s\S]*?(?:<\/u>)?\s*<\/strong>\s*)<\/p>/gi,
+    (match, inner: string) => {
+      if (!inner) return match;
+      const text = inner
+        .replace(/<\/?(?:strong|u)>/gi, '')
+        .replace(/&nbsp;/gi, ' ')
+        .trim();
+      const stripped = text.replace(/[;:]/g, '');
+      if (
+        stripped &&
+        stripped === stripped.toUpperCase() &&
+        /[A-Z]/.test(stripped) &&
+        stripped.length <= 40
+      ) {
+        return `<h3 class="product-desc-h">${stripped.replace(/\s+/g, ' ')}</h3>`;
+      }
+      return match;
+    }
+  );
 }
 
 interface ProductImage {
@@ -339,7 +364,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
             <div className=" items-start gap-6">
               <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Description:</span>
               <div
-                className="text-md text-neutral-700 mt-[10px]"
+                className="product-description text-md text-neutral-700 mt-[10px]"
                 dangerouslySetInnerHTML={{
                   __html: safeSanitize(product.description ?? "No description available."),
                 }}

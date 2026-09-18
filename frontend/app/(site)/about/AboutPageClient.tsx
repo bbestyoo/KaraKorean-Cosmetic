@@ -44,7 +44,7 @@ function Reveal({
 }
 
 // ─── Marquee strip ────────────────────────────────────────────────────────────
-const STRIP_TEXT = ['Korean Beauty · Est. 2023', 'Kara', 'Authentic K-Beauty', 'Kara', 'Crafted with Care', 'Kara'];
+const STRIP_TEXT = ['Korean Beauty · Est. 2019', 'Kara', 'Authentic K-Beauty', 'Kara', 'Crafted with Care', 'Kara'];
 
 export default function AboutPage() {
   return (
@@ -77,7 +77,7 @@ export default function AboutPage() {
           {/* Hero text */}
           <div className="relative h-full flex flex-col items-center justify-center text-white text-center px-6">
             <p className="text-[11px] tracking-[0.35em] uppercase mb-6 opacity-80 font-medium">
-              Est. 2023 · Kathmandu, Nepal
+              Est. 2019 · Kathmandu, Nepal
             </p>
             <h1
               className="text-6xl sm:text-8xl md:text-[9rem] font-black uppercase tracking-tight leading-none mb-6"
@@ -214,7 +214,7 @@ export default function AboutPage() {
               {
                 label: 'Our Story',
                 img: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop',
-                body: 'Founded in 2023, Kara started as a passion project between two friends obsessed with Korean skincare routines. What began as personal imports quickly grew into Nepal\'s most trusted K-beauty destination.',
+                body: 'Founded in 2019, Kara started as a passion project between two friends obsessed with Korean skincare routines. What began as personal imports quickly grew into Nepal\'s most trusted K-beauty destination.',
                 link: '/about',
               },
               {

@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from .models import Product, Comment, Size, ProductImage, Category, Brand, UseCase, Rating, SkinType, Concern, Combo
+from .models import Product, Comment, Size, ProductImage, Category, Brand, UseCase, Rating, SkinType, Concern, Combo, Banner
 from math import ceil
-from .serializers import ProductSerializer, CommentSerializer, ReplySerializer, RatingSerializer, GetProductSerializer, SizeSerializer, ProductImageSerializer, UseCaseSerializer
+from .serializers import ProductSerializer, CommentSerializer, ReplySerializer, RatingSerializer, GetProductSerializer, SizeSerializer, ProductImageSerializer, UseCaseSerializer, BannerSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import filters, viewsets
@@ -618,6 +618,13 @@ class TaggedProductsView(APIView):
         elif tag == 'latest':
             products = Product.objects.all().order_by('-published_date')[:12]
         serializer = ProductSerializer(products,many=True,context={'request': request})
+        return Response(serializer.data)
+
+
+class BannerView(APIView):
+    def get(self, request, format=None):
+        banners = Banner.objects.filter(is_active=True)
+        serializer = BannerSerializer(banners, many=True)
         return Response(serializer.data)
 
 

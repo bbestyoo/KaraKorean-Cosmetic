@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute, Variant, Size, UseCase, Concern, SkinType, Combo
+from .models import Product, Comment, Repliess, ProductImage, Rating, Brand,Series, Category, SubCategory, ProductAttribute, Variant, Size, UseCase, Concern, SkinType, Combo, Banner
 from import_export.admin import ImportExportModelAdmin
 from .resources import ProductResource, ProductAttributeResource, ProductImageResource, BrandResource, SeriesResource, CategoryResource, SubCategoryResource
 # Register your models here.
@@ -79,6 +79,12 @@ class ProductsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = ProductResource
 
 
+class BannerAdmin(admin.ModelAdmin):
+    list_display = ['name', 'is_active', 'display_order', 'updated_at']
+    list_editable = ['is_active', 'display_order']
+    list_filter = ['is_active']
+    search_fields = ['name', 'text']
+
 admin.site.register(Product,ProductsAdmin)
 admin.site.register(UseCase,UseCaseAdmin)
 admin.site.register(Comment)
@@ -94,3 +100,4 @@ admin.site.register(ProductAttribute, ProductAttributeAdmin)
 admin.site.register(SkinType, SkinTypeAdmin)
 admin.site.register(Combo, ComboAdmin)
 admin.site.register(Concern, ConcernAdmin)
+admin.site.register(Banner, BannerAdmin)

@@ -1,6 +1,74 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* ---- Product rich description (editorial) ---- */
+.product-description {
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.product-description > * + * {
+  margin-top: 0.75rem;
+}
+
+.product-description p {
+  margin-bottom: 0;
+}
+
+.product-description strong {
+  color: rgb(23 23 23);
+  font-weight: 600;
+}
+
+.product-description ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.product-description li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin: 0.15rem 0;
+  line-height: 1.7;
+}
+
+.product-description li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.62em;
+  width: 0.4rem;
+  height: 0.4rem;
+  transform: rotate(45deg);
+  background: rgb(15 59 43 / 0.55);
+}
+
+.product-description h3.product-desc-h {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0f3b2b;
+  margin: 1.75rem 0 0.75rem;
+}
+
+.product-description h3.product-desc-h::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(15 59 43 / 0.4), transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  .product-description strong {
+    color: rgb(229 229 229);
+  }
+}
+
 /* Lenis recommended CSS */
 html.lenis,
 html.lenis body {
