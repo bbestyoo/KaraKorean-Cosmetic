@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import ProductsClient from './ProductsClient';
+import type { ProductSizeLite } from '@/lib/cart';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.karakoreanbeauty.com/shop';
 const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
@@ -30,6 +31,7 @@ interface ServerProduct {
   category?: string | { name?: string } | null;
   brand?: string | { name?: string } | null;
   brandName?: string | null;
+  sizes?: ProductSizeLite[];
   stock_count?: number;
   images?: Array<{ image: string }>;
 }
@@ -42,6 +44,15 @@ function resolveImageUrl(image?: string | null): string {
 }
 
 function normalizeProduct(product: ServerProduct) {
+  const sizes: ProductSizeLite[] = Array.isArray(product.sizes)
+    ? product.sizes.map((s) => ({
+        id: s?.id,
+        name: String(s?.name ?? ''),
+        price: Number(s?.price ?? 0),
+        stock: Number(s?.stock ?? 0),
+      }))
+    : [];
+
   return {
     product_id: product.product_id,
     name: product.name,
@@ -58,10 +69,12 @@ function normalizeProduct(product: ServerProduct) {
       product.brandName ||
       (typeof product.brand === 'string' ? product.brand : product.brand?.name) ||
       'Unknown',
-    in_stock: Number(product.stock_count ?? 0) > 0,
+    // Size stock is the source of truth whenever the product has sizes.
+    in_stock: sizes.length > 0 ? sizes.some((s) => (s.stock ?? 0) > 0) : Number(product.stock_count ?? 0) > 0,
     images: Array.isArray(product.images)
       ? product.images.map((image) => ({ image: resolveImageUrl(image.image) }))
       : [],
+    sizes,
   };
 }
 

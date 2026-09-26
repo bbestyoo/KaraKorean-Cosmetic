@@ -3,11 +3,12 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Heart, Share2, LogIn, X, Clipboard, Check, ShoppingBag, Plus } from 'lucide-react';
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
 
 // Local resolution dictionary for mock products
 const PRODUCT_CATALOG: Record<string, { name: string; price: number; old_price?: number; image: string; category_name: string }> = {
@@ -29,6 +30,7 @@ function WishlistContent() {
   const { wishlist, addToWishlist, removeFromWishlist, clearWishlist } = useWishlist();
   const { isLoggedIn, login } = useAuth();
   const { addItem } = useCart();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [isHydrated, setIsHydrated] = useState(false);
@@ -181,6 +183,29 @@ function WishlistContent() {
     const fresh = stockMap[item.product_id];
     if (fresh !== undefined) return fresh;
     return item.in_stock !== false;
+  };
+
+  // Sized products need a size chosen on their detail page, which is also where
+  // that size's own price comes from.
+  const handleAddToCart = (item: WishlistItem) => {
+    if (!getItemStock(item)) return;
+    if (item.has_sizes) {
+      router.push(`/products/${item.product_id}`);
+      return;
+    }
+    addItem({
+      product_id: item.product_id,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      size: '',
+      quantity: 1,
+    });
+  };
+
+  const addToCartLabel = (item: WishlistItem) => {
+    if (!getItemStock(item)) return 'Out Of Stock';
+    return item.has_sizes ? 'Select Size' : 'Add To Cart';
   };
 
   return (
@@ -359,13 +384,18 @@ function WishlistContent() {
                     <h3 className="font-serif text-base text-[#0f3b2b] line-clamp-2 mb-2 font-normal leading-tight group-hover:text-black transition-colors">
                       {item.name}
                     </h3>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-xs font-semibold text-[#0f3b2b]">
-                        Rs. {item.price.toLocaleString()}
-                      </span>
-                      {item.old_price && (
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                      {getDiscountPercentage(item.price, item.old_price) > 0 && (
                         <span className="text-[10px] text-neutral-400 line-through">
-                          Rs. {item.old_price.toLocaleString()}
+                          {formatPrice(item.old_price)}
+                        </span>
+                      )}
+                      <span className="text-xs font-semibold text-[#0f3b2b]">
+                        {formatPrice(item.price)}
+                      </span>
+                      {getDiscountPercentage(item.price, item.old_price) > 0 && (
+                        <span className="text-[9px] font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1 py-0.5">
+                          {getDiscountPercentage(item.price, item.old_price)}% OFF
                         </span>
                       )}
                     </div>
@@ -380,17 +410,7 @@ function WishlistContent() {
                     View Details
                   </Link>
                   <button
-                    onClick={() => {
-                      if (!getItemStock(item)) return;
-                      addItem({
-                        product_id: item.product_id,
-                        name: item.name,
-                        price: item.price,
-                        image: item.image,
-                        size: '',
-                        quantity: 1,
-                      });
-                    }}
+                    onClick={() => handleAddToCart(item)}
                     disabled={!getItemStock(item)}
                     aria-disabled={!getItemStock(item)}
                     className={`py-3 text-center text-[10px] tracking-widest font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${!getItemStock(item)
@@ -399,7 +419,7 @@ function WishlistContent() {
                       }`}
                   >
                     <ShoppingBag size={10} />
-                    {getItemStock(item) ? 'Add To Cart' : 'Out Of Stock'}
+                    {addToCartLabel(item)}
                   </button>
                 </div>
               </div>
@@ -438,13 +458,18 @@ function WishlistContent() {
                     <h3 className="font-serif text-base text-[#0f3b2b] line-clamp-2 mb-2 font-normal leading-tight group-hover:text-black transition-colors">
                       {item.name}
                     </h3>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-xs font-semibold text-[#0f3b2b]">
-                        Rs. {item.price.toLocaleString()}
-                      </span>
-                      {item.old_price && (
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                      {getDiscountPercentage(item.price, item.old_price) > 0 && (
                         <span className="text-[10px] text-neutral-400 line-through">
-                          Rs. {item.old_price.toLocaleString()}
+                          {formatPrice(item.old_price)}
+                        </span>
+                      )}
+                      <span className="text-xs font-semibold text-[#0f3b2b]">
+                        {formatPrice(item.price)}
+                      </span>
+                      {getDiscountPercentage(item.price, item.old_price) > 0 && (
+                        <span className="text-[9px] font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1 py-0.5">
+                          {getDiscountPercentage(item.price, item.old_price)}% OFF
                         </span>
                       )}
                     </div>
@@ -459,17 +484,7 @@ function WishlistContent() {
                     View Details
                   </Link>
                   <button
-                    onClick={() => {
-                      if (!getItemStock(item)) return;
-                      addItem({
-                        product_id: item.product_id,
-                        name: item.name,
-                        price: item.price,
-                        image: item.image,
-                        size: '',
-                        quantity: 1,
-                      });
-                    }}
+                    onClick={() => handleAddToCart(item)}
                     disabled={!getItemStock(item)}
                     aria-disabled={!getItemStock(item)}
                     className={`py-3 text-center text-[10px] tracking-widest font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${!getItemStock(item)
@@ -478,7 +493,7 @@ function WishlistContent() {
                       }`}
                   >
                     <ShoppingBag size={10} />
-                    {getItemStock(item) ? 'Add To Cart' : 'Out Of Stock'}
+                    {addToCartLabel(item)}
                   </button>
                 </div>
               </div>

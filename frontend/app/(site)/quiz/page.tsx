@@ -3,9 +3,12 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, Heart, ShoppingBag } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
+import { hasSizes, type ProductSizeLite } from '@/lib/cart';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -44,6 +47,7 @@ interface ApiProduct {
   images?: Array<{ image: string }>;
   brand?: string | { name?: string } | null;
   brandName?: string | null;
+  sizes?: ProductSizeLite[];
   stock_count?: number;
 }
 
@@ -55,10 +59,19 @@ interface Product {
   category_name: string;
   in_stock: boolean;
   images: Array<{ image: string }>;
+  sizes: ProductSizeLite[];
 }
 
 function normalizeProduct(product: ApiProduct): Product {
   const categoryValue = product.category_name || 'Uncategorized';
+  const sizes: ProductSizeLite[] = Array.isArray(product.sizes)
+    ? product.sizes.map((s) => ({
+        id: s?.id,
+        name: String(s?.name ?? ''),
+        price: Number(s?.price ?? 0),
+        stock: Number(s?.stock ?? 0),
+      }))
+    : [];
   return {
     product_id: product.product_id,
     name: product.name,
@@ -66,10 +79,12 @@ function normalizeProduct(product: ApiProduct): Product {
     old_price:
       product.old_price === null || product.old_price === undefined ? null : Number(product.old_price),
     category_name: categoryValue,
-    in_stock: Number(product.stock_count ?? 0) > 0,
+    // Size stock is the source of truth whenever the product has sizes.
+    in_stock: sizes.length > 0 ? sizes.some((s) => s.stock > 0) : Number(product.stock_count ?? 0) > 0,
     images: Array.isArray(product.images)
       ? product.images.map((image) => ({ image: resolveImageUrl(image.image) }))
       : [],
+    sizes,
   };
 }
 
@@ -84,6 +99,7 @@ const SAGE_MID = '#000000';
 export default function QuizPage() {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addItem } = useCart();
+  const router = useRouter();
 
   // ── Dynamic options state ──────────────────────────────────────────────────
   const [skinTypes, setSkinTypes] = useState<Option[]>([]);
@@ -325,9 +341,9 @@ export default function QuizPage() {
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        {product.old_price && (
+                        {getDiscountPercentage(product.price, product.old_price) > 0 && (
                           <div className="absolute top-3 left-3 bg-black text-white text-[9px] uppercase tracking-widest px-2 py-1">
-                            Sale
+                            {getDiscountPercentage(product.price, product.old_price)}% Off
                           </div>
                         )}
                       </div>
@@ -346,6 +362,7 @@ export default function QuizPage() {
                             image: product.images[0]?.image || '/images/placeholder.png',
                             category_name: product.category_name,
                             in_stock: product.in_stock,
+                            has_sizes: hasSizes(product.sizes),
                           });
                         }}
                         className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
@@ -360,19 +377,24 @@ export default function QuizPage() {
                           e.preventDefault();
                           e.stopPropagation();
                           if (product.in_stock === false) return;
+                          // Sized products need a size chosen on the detail page.
+                          if (hasSizes(product.sizes)) {
+                            router.push(`/products/${product.product_id}`);
+                            return;
+                          }
                           addItem({
                             product_id: product.product_id,
                             name: product.name,
                             price: product.price,
-                            size: 'Standard',
+                            size: '',
                             quantity: 1,
                             image: product.images[0]?.image || '/images/placeholder.png',
                           });
                         }}
                         disabled={product.in_stock === false}
                         aria-disabled={product.in_stock === false}
-                        aria-label={product.in_stock === false ? 'Out of stock' : 'Add to cart'}
-                        title={product.in_stock === false ? 'Out of stock' : 'Add to cart'}
+                        aria-label={product.in_stock === false ? 'Out of stock' : hasSizes(product.sizes) ? 'Select size' : 'Add to cart'}
+                        title={product.in_stock === false ? 'Out of stock' : hasSizes(product.sizes) ? 'Select a size' : 'Add to cart'}
                         className={`p-2 rounded-full bg-white shadow-sm transition-all text-neutral-900 ${product.in_stock === false ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:scale-105'}`}
                       >
                         <ShoppingBag size={20} className={`${product.in_stock === false ? 'text-neutral-400' : 'text-neutral-900 hover:text-[#c9a46b]'} transition-colors`} />
@@ -383,13 +405,18 @@ export default function QuizPage() {
                       <p className="text-[12px] md:text-lg text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black group-hover:font-medium transition-colors">
                         {product.name}
                       </p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[13px] md:text-lg font-medium text-gray-800">
-                          Rs.&nbsp;{product.price.toLocaleString()}
-                        </span>
-                        {product.old_price && (
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {getDiscountPercentage(product.price, product.old_price) > 0 && (
                           <span className="text-[12px] text-[#ec7cfd] md:text-md font-medium line-through">
-                            Rs.&nbsp;{product.old_price.toLocaleString()}
+                            {formatPrice(product.old_price)}
+                          </span>
+                        )}
+                        <span className="text-[13px] md:text-lg font-medium text-gray-800">
+                          {formatPrice(product.price)}
+                        </span>
+                        {getDiscountPercentage(product.price, product.old_price) > 0 && (
+                          <span className="text-[10px] md:text-xs font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1.5 py-0.5">
+                            {getDiscountPercentage(product.price, product.old_price)}% OFF
                           </span>
                         )}
                       </div>

@@ -53,6 +53,7 @@ interface ColorData {
 interface SizeData {
   id: string;
   name: string;
+  price: number;
   stock: number;
 }
 
@@ -450,6 +451,7 @@ export default function AddProduct() {
     const size: SizeData = {
       id: Math.random().toString(36).substr(2, 9),
       name: newSize,
+      price: formData.price || 0,
       stock: 0,
     };
 
@@ -459,6 +461,10 @@ export default function AddProduct() {
 
   const updateSizeStock = (sizeId: string, stock: number) => {
     setSizes(prev => prev.map(s => (s.id === sizeId ? { ...s, stock: Math.max(0, stock) } : s)));
+  };
+
+  const updateSizePrice = (sizeId: string, price: number) => {
+    setSizes(prev => prev.map(s => (s.id === sizeId ? { ...s, price: Math.max(0, price) } : s)));
   };
 
   const removeSize = (sizeId: string) => {
@@ -521,7 +527,7 @@ export default function AddProduct() {
           body: JSON.stringify({
             name: size.name,
             product: productId,
-            price_adjustment: 0,
+            price: size.price,
             stock: size.stock,
           }),
         });
@@ -537,16 +543,8 @@ export default function AddProduct() {
 
       setCreatedSizeIds(sizeIds);
 
-      const totalStock = sizes.reduce((sum, size) => sum + size.stock, 0);
-      await fetch(`${API_ORIGIN}/shop/api/${productId}/`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${token}`,
-        },
-        body: JSON.stringify({ stock_count: totalStock }),
-      });
-
+      // stock_count is intentionally not written here: the backend derives it
+      // from the sizes (and ProductSerializer drops the field on write).
       setSuccess('Sizes created! Now upload images.');
       setStep('images');
     } catch (err) {
@@ -948,17 +946,23 @@ export default function AddProduct() {
                       />
                       <span className="text-sm font-medium text-gray-900">Featured</span>
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="number"
-                        name="stock_count"
-                        min="0"
-                        value={formData.stock_count}
-                        onChange={handleChange}
-                        className="w-20 px-2 py-1 border border-gray-300 rounded"
-                      />
-                      <span className="text-sm font-medium text-gray-900">Stock Count</span>
-                    </label>
+                    <div className="flex flex-col">
+                      <label className="flex items-center gap-3 cursor-not-allowed">
+                        <input
+                          type="number"
+                          name="stock_count"
+                          min="0"
+                          value={0}
+                          disabled
+                          readOnly
+                          className="w-20 px-2 py-1 border border-gray-300 rounded bg-gray-100 text-gray-400 cursor-not-allowed"
+                        />
+                        <span className="text-sm font-medium text-gray-500">Stock Count</span>
+                      </label>
+                      <span className="text-xs text-gray-500 mt-1 max-w-[280px]">
+                        Disabled — this product uses sizes, so total stock is the sum of the size stock set in the next step.
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -1090,7 +1094,7 @@ export default function AddProduct() {
                 <h2 className="text-2xl font-bold text-gray-900">Add Sizes</h2>
 
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
-                  <p className="text-sm">Add all sizes for this product and set the stock available for each. Images come next.</p>
+                  <p className="text-sm">Add all sizes for this product, set the price and the stock available for each. Once a product has sizes, its total stock is the sum of the sizes — the product-level stock count is ignored. Images come next.</p>
                 </div>
 
                 <div className="flex gap-3">
@@ -1113,9 +1117,19 @@ export default function AddProduct() {
                 {sizes.length > 0 && (
                   <div className="space-y-2">
                     {sizes.map(size => (
-                      <div key={size.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div key={size.id} className="flex flex-wrap items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <span className="font-medium text-gray-900">{size.name}</span>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <label className="flex items-center gap-2 text-sm text-gray-600">
+                            Price (Rs.)
+                            <input
+                              type="number"
+                              min="0"
+                              value={size.price}
+                              onChange={(e) => updateSizePrice(size.id, parseInt(e.target.value) || 0)}
+                              className="w-24 px-2 py-1 border border-gray-300 rounded"
+                            />
+                          </label>
                           <label className="flex items-center gap-2 text-sm text-gray-600">
                             Stock
                             <input

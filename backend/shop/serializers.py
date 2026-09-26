@@ -75,7 +75,7 @@ class VariantSerializer(serializers.ModelSerializer):
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
-        fields = ['id', 'name', 'price_adjustment', 'stock', 'product']
+        fields = ['id', 'name', 'price', 'stock', 'product']
     
 class GetProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many = True, read_only = True)
@@ -151,13 +151,22 @@ class ProductSerializer(serializers.ModelSerializer):
             return sum(size.get('stock', 0) for size in sizes)
         return data.get('stock_count', 0)
 
+    def to_internal_value(self, data):
+        # Per-size stock is the single source of truth for a product that has
+        # sizes, so a client-supplied stock_count must never overwrite it.
+        instance = getattr(self, 'instance', None)
+        if instance is not None and instance.sizes.exists():
+            data = data.copy()
+            data.pop('stock_count', None)
+        return super().to_internal_value(data)
+
     def get_ratings(self,obj):
         request = self.context.get('request')
         stats = {}
         ratings = Rating.objects.filter(product=obj)
         if ratings.exists():
             total_ratings = ratings.count()
-            #show how many stars ratings were rated acc to each star
+            #show how many stars ratings are rated acc to each star
             rating_dict = {1:0, 2:0, 3:0, 4:0, 5:0}
             for rating in ratings:
                 rating_dict[rating.rating] += 1

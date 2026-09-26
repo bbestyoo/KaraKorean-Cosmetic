@@ -4,6 +4,7 @@ import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { formatPrice } from '@/lib/pricing';
 
 export function CartSidebar() {
   const router = useRouter();
@@ -89,10 +90,15 @@ export function CartSidebar() {
                     </button>
                   </div>
 
-                  <div className="flex justify-between items-end">
-                    <p className="text-md font-medium text-gray-900 font-sans">
-                      Rs.{item.price.toFixed(2)}
-                    </p>
+                  <div className="flex justify-between items-end gap-4">
+                    <div>
+                      <p className="text-md font-medium text-gray-900 font-sans">
+                        {formatPrice(item.price)}
+                      </p>
+                      {item.size && (
+                        <p className="text-xs text-gray-500 mt-0.5">Size: {item.size}</p>
+                      )}
+                    </div>
 
                     <div className="flex flex-col items-center">
                       <span className="text-md mb-2 font-mono">Quantity</span>
@@ -139,7 +145,7 @@ export function CartSidebar() {
             <div className="flex justify-between items-center py-2 font-mono">
               <span className="text-lg text-gray-900">Total</span>
               <span className="text-xl font-medium text-gray-900">
-                Rs.{displayTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {formatPrice(displayTotal)}
               </span>
             </div>
 

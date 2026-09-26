@@ -5,6 +5,7 @@ import { Trash2, Plus, Minus } from 'lucide-react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useState } from 'react';
+import { formatPrice } from '@/lib/pricing';
 
 type ShippingTier = 'kathmandu_pokhara' | 'tier2' | 'tier3' | 'remote';
 
@@ -75,19 +76,17 @@ export default function CartPage() {
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg text-gray-900">{item.name}</h3>
                     <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
-                      <select
-                        value={item.size}
-                        onChange={() => { }}
-                        className="bg-white border border-gray-300 rounded px-2 py-1"
-                      >
-                        <option>{item.size}</option>
-                      </select>
+                      {item.size ? (
+                        <span className="inline-block bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                          Size: {item.size}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
 
                   {/* Quantity and Price */}
                   <div className="flex flex-col items-end gap-4">
-                    <p className="font-bold text-gray-900">NPR {item.price}</p>
+                    <p className="font-bold text-gray-900">{formatPrice(item.price)}</p>
                     <div className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-1">
                       <button
                         onClick={() =>
@@ -137,11 +136,11 @@ export default function CartPage() {
               <div className="space-y-3 border-b pb-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>NPR {subtotal.toLocaleString()}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span>NPR {shippingCost}</span>
+                  <span>{formatPrice(shippingCost)}</span>
                 </div>
               </div>
 
@@ -155,7 +154,7 @@ export default function CartPage() {
                 >
                   {SHIPPING_METHODS.map((method) => (
                     <option key={method.id} value={method.id}>
-                      {method.label} — Rs {method.price.toFixed(2)}
+                      {method.label} — {formatPrice(method.price)}
                     </option>
                   ))}
                 </select>
@@ -163,7 +162,7 @@ export default function CartPage() {
 
               <div className="flex justify-between items-center text-xl font-bold text-gray-900">
                 <span>Total</span>
-                <span className="text-green-600">NPR {total.toLocaleString()}</span>
+                <span className="text-green-600">{formatPrice(total)}</span>
               </div>
 
               <button

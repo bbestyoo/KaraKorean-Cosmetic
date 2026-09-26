@@ -10,6 +10,8 @@ export interface WishlistItem {
   image: string;
   category_name?: string;
   in_stock?: boolean;
+  /** True when the product has sizes, so it must be added from its detail page. */
+  has_sizes?: boolean;
 }
 
 interface WishlistContextType {

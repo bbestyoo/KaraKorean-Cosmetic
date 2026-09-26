@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import ProductPageClient from './ProductPageClient';
 import type { Product } from './ProductPageClient';
 
+type Size = Product['sizes'][number];
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.karakoreanbeauty.com/shop';
 const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, '');
 
@@ -20,10 +22,23 @@ interface ApiProduct extends Omit<Product, 'category' | 'images' | 'in_stock' | 
 }
 
 function normalizeProduct(product: ApiProduct): Product {
+  const sizes: Size[] = Array.isArray(product.sizes)
+    ? product.sizes.map((s) => ({
+        id: Number(s?.id ?? 0),
+        name: String(s?.name ?? ''),
+        price: Number(s?.price ?? 0),
+        stock: Number(s?.stock ?? 0),
+      }))
+    : [];
+
+  // Size stock is the source of truth whenever the product has sizes.
+  const sizeStock = sizes.reduce((sum, s) => sum + s.stock, 0);
+
   return {
     ...product,
-    stock_count: product.stock_count ?? 0,
-    in_stock: Number(product.stock_count ?? 0) > 0,
+    sizes,
+    stock_count: sizes.length > 0 ? sizeStock : (product.stock_count ?? 0),
+    in_stock: sizes.length > 0 ? sizes.some((s) => s.stock > 0) : Number(product.stock_count ?? 0) > 0,
     category: product.category || 'Uncategorized',
     images: Array.isArray(product.images)
       ? product.images.map((img) => ({
@@ -154,6 +169,34 @@ export default async function ProductPage({
     );
   }
 
+  // With sizes, every size is its own SKU priced on its own, so publish an
+  // AggregateOffer over the real per-size prices rather than the base price.
+  const sellableSizes = product.sizes.filter((s) => s.stock > 0);
+  const sizePrices = sellableSizes.map((s) => s.price).filter((p) => p > 0);
+
+  const offers =
+    sizePrices.length > 0
+      ? {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'NPR',
+          lowPrice: Math.min(...sizePrices),
+          highPrice: Math.max(...sizePrices),
+          offerCount: sizePrices.length,
+          availability: product.in_stock
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+          url: `https://www.karakoreanbeauty.com/products/${product.product_id}`,
+        }
+      : {
+          '@type': 'Offer',
+          priceCurrency: 'NPR',
+          price: product.price,
+          availability: product.in_stock
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+          url: `https://www.karakoreanbeauty.com/products/${product.product_id}`,
+        };
+
   const productJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -166,15 +209,7 @@ export default async function ProductPage({
       '@type': 'Brand',
       name: 'Kara Korean Beauty',
     },
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: 'NPR',
-      price: product.price,
-      availability: product.in_stock
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      url: `https://www.karakoreanbeauty.com/products/${product.product_id}`,
-    },
+    offers,
     url: `https://karakoreanbeauty.com/products/${product.product_id}`,
   };
 

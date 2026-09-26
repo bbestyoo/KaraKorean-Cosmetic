@@ -2,12 +2,15 @@
 import { Heart, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { RevealOnScroll } from "./RevealOnScroll";
 import useEmblaCarousel from "embla-carousel-react";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { useState, useEffect } from "react";
 import { useProductAPI } from "@/hooks/useProductAPI";
+import { formatPrice, getDiscountPercentage } from "@/lib/pricing";
+import { hasSizes, type ProductSizeLite } from "@/lib/cart";
 
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -34,6 +37,15 @@ function normalizeProduct(product: any) {
         ? [{ image: resolveImageUrl(product.image) }]
         : [];
 
+  const sizes: ProductSizeLite[] = Array.isArray(product.sizes)
+    ? product.sizes.map((s: any) => ({
+        id: s?.id,
+        name: String(s?.name ?? ''),
+        price: Number(s?.price ?? 0),
+        stock: Number(s?.stock ?? 0),
+      }))
+    : [];
+
   return {
     product_id: product.product_id ?? String(product.id ?? product.pk ?? ''),
     badge: product.badge || (product.featured ? 'FEATURED' : ''),
@@ -41,14 +53,17 @@ function normalizeProduct(product: any) {
     category: product.category_name ?? product.category ?? 'Uncategorized',
     price: typeof product.price === 'number' ? product.price : Number(String(product.price ?? 0)),
     old_price: product.old_price !== undefined ? (typeof product.old_price === 'number' ? product.old_price : Number(String(product.old_price))) : undefined,
-    in_stock: Number(product.stock_count ?? 0) > 0,
+    // Size stock is the source of truth whenever the product has sizes.
+    in_stock: sizes.length > 0 ? sizes.some((s) => s.stock > 0) : Number(product.stock_count ?? 0) > 0,
     images,
+    sizes,
   };
 }
 
 export default function FeaturedProducts() {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addItem } = useCart();
+  const router = useRouter();
   const [emblaRef] = useEmblaCarousel({ align: "start", loop: true });
   const { getProducts } = useProductAPI();
   const [products, setProducts] = useState<any[]>([]);
@@ -120,6 +135,7 @@ export default function FeaturedProducts() {
                             image: product.images?.[0]?.image,
                             category_name: product.category,
                             in_stock: product.in_stock,
+                            has_sizes: hasSizes(product.sizes),
                           });
                         }}
                         className="text-white hover:text-red-500 transition-colors"
@@ -143,10 +159,15 @@ export default function FeaturedProducts() {
                       <h3 className="font-semibold text-sm sm:text-lg truncate text-neutral-900 mb-1 leading-tight">{product.name}</h3>
                       <p className="text-[0.8rem] font-bold tracking-widest text-[#ec7cfd] uppercase mb-2 sm:mb-4 border-b border-neutral-300 border-dashed pb-2 sm:pb-4">{product.category}</p>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-base sm:text-xl font-medium text-neutral-900">Rs. {Number(product.price || 0).toLocaleString()}</span>
-                          {product.old_price !== undefined && !Number.isNaN(product.old_price) && (
-                            <span className="text-xl text-[#ec7cfd] line-through">Rs. {Number(product.old_price).toLocaleString()}</span>
+                        <div className="flex flex-wrap items-baseline gap-2">
+                          {getDiscountPercentage(product.price, product.old_price) > 0 && (
+                            <span className="text-xl text-[#ec7cfd] line-through">{formatPrice(product.old_price)}</span>
+                          )}
+                          <span className="text-base sm:text-xl font-medium text-neutral-900">{formatPrice(product.price)}</span>
+                          {getDiscountPercentage(product.price, product.old_price) > 0 && (
+                            <span className="text-[0.65rem] sm:text-xs font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1.5 py-0.5">
+                              {getDiscountPercentage(product.price, product.old_price)}% OFF
+                            </span>
                           )}
                         </div>
                         <button
@@ -154,18 +175,29 @@ export default function FeaturedProducts() {
                             e.preventDefault();
                             e.stopPropagation();
                             if (product.in_stock === false) return;
+                            // Sized products need a size chosen on the detail page.
+                            if (hasSizes(product.sizes)) {
+                              router.push(`/products/${product.product_id}`);
+                              return;
+                            }
                             addItem({
                               product_id: product.product_id || `featured-${index}`,
                               name: product.name,
                               price: Number(product.price) || 0,
-                              size: 'Standard',
+                              size: '',
                               quantity: 1,
                               image: product.images?.[0]?.image || '/images/placeholder.png',
                             });
                           }}
                           disabled={product.in_stock === false}
                           aria-disabled={product.in_stock === false}
-                          aria-label={product.in_stock === false ? `Add ${product.name} to cart` : 'Add to cart'}
+                          aria-label={
+                            product.in_stock === false
+                              ? `${product.name} is out of stock`
+                              : hasSizes(product.sizes)
+                                ? `Select a size for ${product.name}`
+                                : `Add ${product.name} to cart`
+                          }
                           className={`${product.in_stock === false ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' : 'bg-[#0f3b2b] text-white hover:bg-black hover:scale-105'} p-3 rounded-full transition-all`}
                         >
                           <ShoppingCart className="w-4 h-4 cursor-pointer" />

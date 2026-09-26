@@ -10,7 +10,7 @@ from .utils import send_order_confirmation
 from shop.models import Product,  Size
 import datetime
 from rest_framework.pagination import PageNumberPagination
-from django.db.models import Q, Sum
+from django.db.models import Q, F, Sum
 from django.db import transaction
 
 
@@ -83,20 +83,22 @@ class CheckoutAPIView(APIView):
                             )
                         size.stock -= quantity
                         size.save(update_fields=['stock'])
-
-                        product.stock_count = (
-                            Size.objects.filter(product=product).aggregate(
-                                total=Sum('stock')
-                            )['total'] or 0
-                        )
-                        product.save(update_fields=['stock_count'])
                     else:
+                        # A product with sizes cannot be bought without picking one.
+                        if product.sizes.exists():
+                            raise ValueError(
+                                f"Please select a size for {product.name}."
+                            )
                         if product.stock_count < quantity:
                             raise ValueError(
                                 f"Insufficient stock for {product.name}. Only {product.stock_count} left."
                             )
                         product.stock_count -= quantity
                         product.save(update_fields=['stock_count'])
+
+                    # Price is resolved server-side: the size's own price when a
+                    # size was chosen, otherwise the product's base price.
+                    unit_price = size.price if size else product.price
 
                     logger.error("SIZE: %s", size)
 
@@ -105,7 +107,7 @@ class CheckoutAPIView(APIView):
                         product=product,
                         size=size,
                         quantity=quantity,
-                        price=item.get('price', 0)
+                        price=unit_price
                     )
                     logger.error("ITEM CREATED")
                 
@@ -156,9 +158,20 @@ class CheckoutAPIView(APIView):
         
 
         try:
-            subtotal = float(data.get('subtotal', 0) or 0)
             shipping_cost = float(data.get('shippingCost', 0) or 0)
-            
+            discount = float(data.get('discountAmount', 0) or 0)
+
+            # Subtotal is recomputed from the stored order items, whose unit
+            # prices were resolved server-side from the chosen size, so a
+            # tampered client subtotal cannot change what was recorded.
+            subtotal = float(
+                OrderItem.objects.filter(order=order).aggregate(
+                    total=Sum(F('price') * F('quantity'))
+                )['total'] or 0
+            )
+            if discount > subtotal:
+                discount = subtotal
+
             delivery_data = {
                 'phone_number': data.get('phoneNumber'),
                 'full_name': data.get('fullName'),
@@ -168,8 +181,8 @@ class CheckoutAPIView(APIView):
                 'payment_method': data.get('paymentMethod', 'COD'),
                 'shipping_cost': shipping_cost,
                 'subtotal': subtotal,
-                'discount': data.get('discountAmount', 0),
-                'payment_amount': subtotal + shipping_cost,
+                'discount': discount,
+                'payment_amount': subtotal + shipping_cost - discount,
                 'payment_status': 'Pending',
                 'transaction_id': data.get('transactionId', None),
                 'coupon_code': data.get('couponCode', None)

@@ -6,6 +6,7 @@ import { ChevronLeft, Lock, Mail, MapPin, CreditCard, Truck } from 'lucide-react
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { formatPrice } from '@/lib/pricing';
 
 interface DeliveryFormData {
   fullName: string;
@@ -198,18 +199,17 @@ export default function CheckoutPage() {
         phoneNumber: formData.phoneNumber,
         email: formData.email,
         shippingAddress: formData.shippingAddress,
-        subtotal: subtotal - discountAmount,
         shippingCost,
         shippingMethod: SHIPPING_METHODS.find(m => m.id === shippingTier)?.label ?? '',
         discountAmount,
-        total,
         couponCode: couponResult ? couponResult.code : undefined,
         paymentMethod,
         transactionId: paymentMethod === 'qr' ? transactionId : undefined,
+        // Price is not sent: the server resolves it from the chosen size (or the
+        // product price when there are no sizes) and recomputes the subtotal.
         cartItems: items.map(item => ({
           product_id: item.product_id,
           quantity: item.quantity,
-          price: item.price,
           size: item.size,
         })),
       };
@@ -445,7 +445,7 @@ export default function CheckoutPage() {
                             </label>
                             <p className="text-sm text-gray-600 mt-1">{method.description}</p>
                           </div>
-                          <span className="font-bold text-gray-900 ml-4">Rs {method.price.toFixed(2)}</span>
+                          <span className="font-bold text-gray-900 ml-4">{formatPrice(method.price)}</span>
                         </div>
                       </div>
                     </div>
@@ -604,7 +604,7 @@ export default function CheckoutPage() {
                 disabled={isLoading}
                 className="w-full  text-white py-4 rounded-lg font-bold text-lg bg-[#0f3b2b] hover:bg-white hover:text-[#0f3b2b] cursor-pointer hover:border hover:border-[#0f3b2b] border border-black  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Processing...' : `Place Order - NPR ${total.toLocaleString()}`}
+                {isLoading ? 'Processing...' : `Place Order - ${formatPrice(total)}`}
               </button>
             </div>
           </div>
@@ -632,9 +632,9 @@ export default function CheckoutPage() {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">{item.name}</h3>
                       <p className="text-xs text-gray-600 mt-1">
-                        {item.size} | Qty: {item.quantity}
+                        {item.size ? `Size: ${item.size} | ` : ''}Qty: {item.quantity}
                       </p>
-                      <p className="text-sm font-bold text-gray-900 mt-2">NPR {item.price}</p>
+                      <p className="text-sm font-bold text-gray-900 mt-2">{formatPrice(item.price)}</p>
                     </div>
                   </div>
                 ))}
@@ -665,7 +665,7 @@ export default function CheckoutPage() {
                     ✓ Coupon <span className="font-bold">{couponResult.code}</span> applied —{' '}
                     {couponResult.percentage
                       ? `${couponResult.percentage}% off`
-                      : `NPR ${parseFloat(couponResult.amount || '0').toLocaleString()} off`}
+                      : `${formatPrice(parseFloat(couponResult.amount || '0'))} off`}
                   </p>
                 )}
                 {!couponResult && !couponError && (
@@ -679,18 +679,18 @@ export default function CheckoutPage() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>NPR {subtotal.toLocaleString()}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span>NPR {shippingCost}</span>
+                  <span>{formatPrice(shippingCost)}</span>
                 </div>
                 {couponResult && discountAmount > 0 && (
                   <div className="flex justify-between text-green-600 font-medium">
                     <span>
                       Discount{couponResult.percentage ? ` (${couponResult.percentage})` : ''}
                     </span>
-                    <span>- NPR {discountAmount.toLocaleString()}</span>
+                    <span>- {formatPrice(discountAmount)}</span>
                   </div>
                 )}
               </div>
@@ -698,7 +698,7 @@ export default function CheckoutPage() {
               {/* Total */}
               <div className="flex justify-between items-center text-xl font-bold text-gray-900 mb-6 pb-6 border-b border-gray-200">
                 <span>Total</span>
-                <span className="text-green-500">NPR {total.toLocaleString()}</span>
+                <span className="text-green-500">{formatPrice(total)}</span>
               </div>
 
               {/* Place Order Button */}

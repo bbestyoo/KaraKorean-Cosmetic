@@ -19,6 +19,7 @@ from .models import (
 from .revalidation import revalidate_frontend, _log
 import requests
 from django.conf import settings
+from django.db.models import Sum
 import sys
 
 
@@ -99,6 +100,35 @@ def _make_child_delete_handler(model):
 for _model in _child_models:
     post_save.connect(_make_child_save_handler(_model), sender=_model)
     post_delete.connect(_make_child_delete_handler(_model), sender=_model)
+
+
+# ── Size stock → Product.stock_count ─────────────────────────────────────────
+def _sync_product_stock_from_sizes(product):
+    """Keep Product.stock_count equal to the sum of its sizes' stock.
+
+    Makes per-size stock the single source of truth: the admin can no longer
+    leave the product-level count drifting away from the sizes.
+    """
+    if product is None:
+        return
+    total = Size.objects.filter(product=product).aggregate(total=Sum('stock'))['total'] or 0
+    if product.stock_count != total:
+        Product.objects.filter(pk=product.pk).update(stock_count=total)
+        product.stock_count = total
+
+
+@receiver(post_save, sender=Size)
+def sync_stock_on_size_save(sender, instance, **kwargs):
+    if 'loaddata' in sys.argv or 'migrate' in sys.argv:
+        return
+    _sync_product_stock_from_sizes(instance.product)
+
+
+@receiver(post_delete, sender=Size)
+def sync_stock_on_size_delete(sender, instance, **kwargs):
+    if 'loaddata' in sys.argv or 'migrate' in sys.argv:
+        return
+    _sync_product_stock_from_sizes(instance.product)
 
 
 # ── Global models (affect every product listing) ─────────────────────────────

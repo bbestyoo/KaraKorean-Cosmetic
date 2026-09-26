@@ -61,7 +61,7 @@ class Variant(models.Model):
 class Size(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sizes')
     name = models.CharField(max_length=50)  # e.g., XS, S, M, L, XL, XXL
-    price_adjustment = models.FloatField(default=0)  # Additional cost for this size, if any
+    price = models.PositiveIntegerField(default=0)  # Absolute selling price for this size
     stock = models.PositiveIntegerField(default=0)  # Stock for this specific size
 
     class Meta:

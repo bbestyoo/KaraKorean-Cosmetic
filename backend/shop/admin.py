@@ -15,7 +15,7 @@ class VariantAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class SizeInline(admin.TabularInline):
     model = Size
     extra = 1
-    fields = ['name', 'price_adjustment', 'stock']
+    fields = ['name', 'price', 'stock']
 
 class SizeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     model = Size
@@ -77,6 +77,15 @@ class AttributeInline(admin.TabularInline):
 class ProductsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     inlines = [SizeInline, ProductImageInline, RatingInLine, AttributeInline]
     resource_class = ProductResource
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        # A product with sizes tracks stock per size, so the product-level
+        # count is disabled (it is kept in sync automatically by a signal).
+        if db_field.name == 'stock_count' and request.resolver_match:
+            object_id = request.resolver_match.kwargs.get('object_id')
+            if object_id and Size.objects.filter(product_id=object_id).exists():
+                kwargs['disabled'] = True
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 
 class BannerAdmin(admin.ModelAdmin):

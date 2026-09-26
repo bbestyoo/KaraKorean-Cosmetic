@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
 
 interface ProductImage {
   image: string;
@@ -84,9 +85,7 @@ export const ProductRecommendations = ({ productId }: { productId: string }) => 
   };
 
   const ProductCard = ({ product }: { product: Product }) => {
-    const discount = product.old_price
-      ? Math.round(((product.old_price - product.price) / product.old_price) * 100)
-      : 0;
+    const discount = getDiscountPercentage(product.price, product.old_price);
 
     return (
       <Link href={`/products/${product.product_id}`}>
@@ -143,11 +142,16 @@ export const ProductRecommendations = ({ productId }: { productId: string }) => 
 
             {/* Price Section */}
             <div className="mt-2.5">
-              <div className="flex items-baseline gap-2">
-                <span className="text-lg font-bold text-red-600">NPR {product.price}</span>
-                {product.old_price && (
+              <div className="flex flex-wrap items-baseline gap-2">
+                {discount > 0 && (
                   <span className="text-xs text-gray-400 line-through">
-                    NPR {product.old_price}
+                    {formatPrice(product.old_price)}
+                  </span>
+                )}
+                <span className="text-lg font-bold text-red-600">{formatPrice(product.price)}</span>
+                {discount > 0 && (
+                  <span className="text-[10px] font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1.5 py-0.5">
+                    {discount}% OFF
                   </span>
                 )}
               </div>

@@ -6,6 +6,8 @@ import { useCart } from "@/context/CartContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useProductAPI } from "@/hooks/useProductAPI";
 import { useRouter } from "next/navigation";
+import { formatPrice, getDiscountPercentage } from "@/lib/pricing";
+import { hasSizes, type ProductSizeLite } from "@/lib/cart";
 
 interface Product {
   id: string;
@@ -13,6 +15,7 @@ interface Product {
   brand: string;
   price: number;
   oldPrice?: number;
+  sizes: ProductSizeLite[];
   image: string;
   inStock?: boolean;
   link?: string;
@@ -77,14 +80,25 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
 
           const image = images.length ? resolveImageUrl(images[0].image ?? images[0]) : '/images/placeholder.png';
 
+          const sizes: ProductSizeLite[] = Array.isArray(item.sizes)
+            ? item.sizes.map((s: any) => ({
+                id: s?.id,
+                name: String(s?.name ?? ''),
+                price: Number(s?.price ?? 0),
+                stock: Number(s?.stock ?? 0),
+              }))
+            : [];
+
           return {
             id: item.product_id ?? String(item.id ?? item.pk ?? index),
             name: item.name ?? item.title ?? item.product_name ?? 'Product',
             brand: item.brand ?? item.brand_name ?? item.category_name ?? '',
             price: Number(item.price ?? 0),
             oldPrice: item.old_price !== undefined ? Number(item.old_price) : undefined,
+            sizes,
             image,
-            inStock: Number(item.stock_count ?? 0) > 0,
+            // Size stock is the source of truth whenever the product has sizes.
+            inStock: sizes.length > 0 ? sizes.some((s) => s.stock > 0) : Number(item.stock_count ?? 0) > 0,
             link: `/products/${item.product_id ?? item.id ?? ''}`,
           } as Product;
         });
@@ -132,11 +146,16 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
 
   const handleAddToBag = (product: Product) => {
     if (product.inStock === false) return;
+    // Sized products need a size chosen on the detail page.
+    if (hasSizes(product.sizes)) {
+      router.push(product.link ?? `/products/${product.id}`);
+      return;
+    }
     addItem({
       product_id: String(product.id),
       name: product.name,
       price: product.price,
-      size: 'One Size',
+      size: '',
       quantity: 1,
       image: product.image,
     });
@@ -198,9 +217,21 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
             <p className="font-serif italic text-[#0f3b2b] text-xs leading-tight  line-clamp-2">
               {currentProduct.name}
             </p>
-            <p className="font-sans text-[#0f3b2b] text-[0.6rem] font-semibold normal-case">
-              Rs. {currentProduct.price.toLocaleString()}
-            </p>
+            <div className="flex items-baseline gap-1.5">
+              {getDiscountPercentage(currentProduct.price, currentProduct.oldPrice) > 0 && (
+                <span className="font-sans text-[#0f3b2b]/60 line-through text-[0.55rem]">
+                  {formatPrice(currentProduct.oldPrice)}
+                </span>
+              )}
+              <p className="font-sans text-[#0f3b2b] text-[0.6rem] font-semibold normal-case">
+                {formatPrice(currentProduct.price)}
+              </p>
+              {getDiscountPercentage(currentProduct.price, currentProduct.oldPrice) > 0 && (
+                <span className="font-sans text-[0.5rem] font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1">
+                  {getDiscountPercentage(currentProduct.price, currentProduct.oldPrice)}% OFF
+                </span>
+              )}
+            </div>
             <button
               type="button"
               onClick={(e) => {
@@ -288,12 +319,21 @@ export default function NewArrivalsCarousel({ compact = false }: NewArrivalsCaro
             </p>
           </div>
           <div>
-            <p className="font-sans text-[#0f3b2b] text-xs sm:text-lg font-semibold normal-case truncate">
-              Rs. {currentProduct.price.toLocaleString()}
-            </p>
-            <p className="hidden md:block font-sans line-through text-[#0f3b2b]/60 text-sm normal-case mt-0.5">
-              {currentProduct.oldPrice !== undefined ? `Rs. ${currentProduct.oldPrice.toLocaleString()}` : ''}
-            </p>
+            {getDiscountPercentage(currentProduct.price, currentProduct.oldPrice) > 0 && (
+              <p className="hidden md:block font-sans line-through text-[#0f3b2b]/60 text-sm normal-case">
+                {formatPrice(currentProduct.oldPrice)}
+              </p>
+            )}
+            <div className="flex items-baseline gap-2">
+              <p className="font-sans text-[#0f3b2b] text-xs sm:text-lg font-semibold normal-case truncate">
+                {formatPrice(currentProduct.price)}
+              </p>
+              {getDiscountPercentage(currentProduct.price, currentProduct.oldPrice) > 0 && (
+                <span className="text-[0.6rem] font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1.5 py-0.5">
+                  {getDiscountPercentage(currentProduct.price, currentProduct.oldPrice)}% OFF
+                </span>
+              )}
+            </div>
           </div>
           <button
             type="button"

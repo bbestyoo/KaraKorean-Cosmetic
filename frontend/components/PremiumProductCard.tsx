@@ -2,10 +2,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
+import { hasSizes, type ProductSizeLite } from '@/lib/cart';
 
 interface PremiumProductCardProps {
   product: {
@@ -15,6 +18,7 @@ interface PremiumProductCardProps {
     old_price?: number;
     category_name: string;
     in_stock?: boolean;
+    sizes?: ProductSizeLite[];
     images: Array<{ image: string }>;
   };
   variant?: 'default' | 'minimal';
@@ -23,13 +27,12 @@ interface PremiumProductCardProps {
 export function PremiumProductCard({ product }: PremiumProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addItem } = useCart();
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
 
   const isWishlisted = isInWishlist(product.product_id);
 
-  const discount = product.old_price
-    ? Math.round(((product.old_price - product.price) / product.old_price) * 100)
-    : 0;
+  const discount = getDiscountPercentage(product.price, product.old_price);
 
   const mainImage = product.images?.[0]?.image || '/placeholder.png';
   const secondImage = product.images?.[1]?.image || mainImage;
@@ -73,6 +76,7 @@ export function PremiumProductCard({ product }: PremiumProductCardProps) {
                 image: mainImage,
                 category_name: product.category_name,
                 in_stock: isInStock,
+                has_sizes: hasSizes(product.sizes),
               });
             }}
             className="p-2 rounded-full bg-white/90 shadow-sm hover:scale-105 transition-all text-neutral-900"
@@ -87,19 +91,24 @@ export function PremiumProductCard({ product }: PremiumProductCardProps) {
               e.preventDefault();
               e.stopPropagation();
               if (!isInStock) return;
+              // Sized products need a size chosen on the detail page.
+              if (hasSizes(product.sizes)) {
+                router.push(`/products/${product.product_id}`);
+                return;
+              }
               addItem({
                 product_id: product.product_id,
                 name: product.name,
                 price: product.price,
-                size: 'Standard',
+                size: '',
                 quantity: 1,
                 image: mainImage,
               });
             }}
             disabled={!isInStock}
             aria-disabled={!isInStock}
-            aria-label={isInStock ? 'Add to cart' : 'Out of stock'}
-            title={isInStock ? 'Add to cart' : 'Out of stock'}
+            aria-label={!isInStock ? 'Out of stock' : hasSizes(product.sizes) ? 'Select size' : 'Add to cart'}
+            title={!isInStock ? 'Out of stock' : hasSizes(product.sizes) ? 'Select a size' : 'Add to cart'}
             className={`p-2 rounded-full bg-white/90 shadow-sm hover:scale-105 transition-all text-neutral-900 ${isInStock ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}
           >
             <ShoppingBag
@@ -129,13 +138,18 @@ export function PremiumProductCard({ product }: PremiumProductCardProps) {
         <h3 className="font-serif text-lg text-neutral-900 leading-snug mb-1">
           {product.name}
         </h3>
-        <div className="flex items-center justify-center gap-3 text-xs tracking-widest uppercase">
-          <span className="font-medium text-neutral-900">
-            Rs. {product.price.toLocaleString()}
-          </span>
-          {product.old_price && (
+        <div className="flex flex-wrap items-center justify-center gap-3 text-xs tracking-widest uppercase">
+          {discount > 0 && (
             <span className="text-neutral-400 line-through">
-              {product.old_price.toLocaleString()}
+              {formatPrice(product.old_price)}
+            </span>
+          )}
+          <span className="font-medium text-neutral-900">
+            {formatPrice(product.price)}
+          </span>
+          {discount > 0 && (
+            <span className="font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1.5 py-0.5 normal-case">
+              {discount}% OFF
             </span>
           )}
         </div>

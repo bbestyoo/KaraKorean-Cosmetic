@@ -7,6 +7,8 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ChevronDown, ChevronLeft, ChevronRight, X, Heart, ShoppingBag } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
+import { hasSizes, type ProductSizeLite } from '@/lib/cart';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -42,6 +44,7 @@ interface ApiProduct {
   brand?: string | { name?: string } | null;
   brandName?: string | null;
   images?: Array<{ image: string }>;
+  sizes?: ProductSizeLite[];
   stock_count?: number;
 }
 
@@ -54,6 +57,7 @@ export interface Product {
   brand: string;
   in_stock: boolean;
   images: Array<{ image: string }>;
+  sizes: ProductSizeLite[];
 }
 
 function resolveImageUrl(image?: string | null) {
@@ -71,6 +75,15 @@ function normalizeProduct(product: ApiProduct): Product {
     (typeof product.category === 'string' ? product.category : product.category?.name) ||
     'Uncategorized';
 
+  const sizes: ProductSizeLite[] = Array.isArray(product.sizes)
+    ? product.sizes.map((s) => ({
+        id: s?.id,
+        name: String(s?.name ?? ''),
+        price: Number(s?.price ?? 0),
+        stock: Number(s?.stock ?? 0),
+      }))
+    : [];
+
   return {
     product_id: product.product_id,
     name: product.name,
@@ -79,10 +92,12 @@ function normalizeProduct(product: ApiProduct): Product {
       product.old_price === null || product.old_price === undefined ? null : Number(product.old_price),
     category_name: categoryValue,
     brand: product.brandName || brandValue || 'Unknown',
-    in_stock: Number(product.stock_count ?? 0) > 0,
+    // Size stock is the source of truth whenever the product has sizes.
+    in_stock: sizes.length > 0 ? sizes.some((s) => s.stock > 0) : Number(product.stock_count ?? 0) > 0,
     images: Array.isArray(product.images)
       ? product.images.map((image) => ({ image: resolveImageUrl(image.image) }))
       : [],
+    sizes,
   };
 }
 
@@ -612,9 +627,9 @@ function ProductsContent({
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        {product.old_price && (
+                        {getDiscountPercentage(product.price, product.old_price) > 0 && (
                           <div className="absolute top-3 left-3 bg-[#0f3b2b] text-white text-[9px] uppercase tracking-widest px-2 py-1">
-                            Sale
+                            {getDiscountPercentage(product.price, product.old_price)}% Off
                           </div>
                         )}
                       </div>
@@ -634,6 +649,7 @@ function ProductsContent({
                             image: product.images[0]?.image || '/images/placeholder.png',
                             category_name: product.category_name,
                             in_stock: product.in_stock,
+                            has_sizes: hasSizes(product.sizes),
                           });
                         }}
                         className="p-2 rounded-full bg-white shadow-sm  cursor-pointer hover:scale-105 transition-all text-neutral-900"
@@ -648,19 +664,37 @@ function ProductsContent({
                           e.preventDefault();
                           e.stopPropagation();
                           if (product.in_stock === false) return;
+                          // Sized products need a size chosen on the detail page,
+                          // which is also where that size's own price is picked.
+                          if (hasSizes(product.sizes)) {
+                            router.push(`/products/${product.product_id}`);
+                            return;
+                          }
                           addItem({
                             product_id: product.product_id,
                             name: product.name,
                             price: product.price,
-                            size: 'Standard',
+                            size: '',
                             quantity: 1,
                             image: product.images[0]?.image || '/images/placeholder.png',
                           });
                         }}
                         disabled={product.in_stock === false}
                         aria-disabled={product.in_stock === false}
-                        aria-label={product.in_stock === false ? 'Out of stock' : 'Add to cart'}
-                        title={product.in_stock === false ? 'Out of stock' : 'Add to cart'}
+                        aria-label={
+                          product.in_stock === false
+                            ? 'Out of stock'
+                            : hasSizes(product.sizes)
+                              ? 'Select size'
+                              : 'Add to cart'
+                        }
+                        title={
+                          product.in_stock === false
+                            ? 'Out of stock'
+                            : hasSizes(product.sizes)
+                              ? 'Select a size'
+                              : 'Add to cart'
+                        }
                         className={`p-2 rounded-full bg-white shadow-sm transition-all text-neutral-900 ${product.in_stock === false ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:scale-105'}`}
                       >
                         <ShoppingBag
@@ -675,13 +709,18 @@ function ProductsContent({
                       <p className="text-[12px] md:text-lg text-gray-700 leading-snug mb-1.5 font-light line-clamp-2 group-hover:text-black group-hover:font-medium transition-colors">
                         {product.name}
                       </p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[13px] md:text-lg font-medium text-gray-800">
-                          Rs.&nbsp;{product.price.toLocaleString()}
-                        </span>
-                        {product.old_price && (
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {getDiscountPercentage(product.price, product.old_price) > 0 && (
                           <span className="text-[12px] text-[#ec7cfd] md:text-md font-medium line-through">
-                            Rs.&nbsp;{product.old_price.toLocaleString()}
+                            {formatPrice(product.old_price)}
+                          </span>
+                        )}
+                        <span className="text-[13px] md:text-lg font-medium text-gray-800">
+                          {formatPrice(product.price)}
+                        </span>
+                        {getDiscountPercentage(product.price, product.old_price) > 0 && (
+                          <span className="text-[10px] md:text-xs font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1.5 py-0.5">
+                            {getDiscountPercentage(product.price, product.old_price)}% OFF
                           </span>
                         )}
                       </div>

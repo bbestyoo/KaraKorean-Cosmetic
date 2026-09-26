@@ -2,10 +2,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Star, Heart, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
+import { hasSizes, type ProductSizeLite } from '@/lib/cart';
 import { cursorTo } from 'readline';
 
 interface ProductCardProps {
@@ -16,6 +19,7 @@ interface ProductCardProps {
     old_price?: number;
     category_name: string;
     in_stock?: boolean;
+    sizes?: ProductSizeLite[];
     images: Array<{ image: string }>;
     ratings?: {
       stats: {
@@ -29,13 +33,12 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addItem } = useCart();
+  const router = useRouter();
   const [showSecondaryImage, setShowSecondaryImage] = useState(false);
 
   const isWishlisted = isInWishlist(product.product_id);
 
-  const discount = product.old_price
-    ? Math.round(((product.old_price - product.price) / product.old_price) * 100)
-    : 0;
+  const discount = getDiscountPercentage(product.price, product.old_price);
 
   const avgRating = product.ratings?.stats?.avg_rating || 0;
   const totalRatings = product.ratings?.stats?.total_ratings || 0;
@@ -81,6 +84,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   image: mainImage,
                   category_name: product.category_name,
                   in_stock: isInStock,
+                  has_sizes: hasSizes(product.sizes),
                 });
               }}
               className="p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900"
@@ -95,19 +99,24 @@ export function ProductCard({ product }: ProductCardProps) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (!isInStock) return;
+                // Sized products need a size chosen on the detail page.
+                if (hasSizes(product.sizes)) {
+                  router.push(`/products/${product.product_id}`);
+                  return;
+                }
                 addItem({
                   product_id: product.product_id,
                   name: product.name,
                   price: product.price,
-                  size: 'Standard',
+                  size: '',
                   quantity: 1,
                   image: mainImage,
                 });
               }}
               disabled={!isInStock}
               aria-disabled={!isInStock}
-              aria-label={isInStock ? 'Add to cart' : 'Out of stock'}
-              title={isInStock ? 'Add to cart' : 'Out of stock'}
+              aria-label={!isInStock ? 'Out of stock' : hasSizes(product.sizes) ? 'Select size' : 'Add to cart'}
+              title={!isInStock ? 'Out of stock' : hasSizes(product.sizes) ? 'Select a size' : 'Add to cart'}
               className={`p-2 rounded-full bg-white shadow-sm hover:scale-105 transition-all text-neutral-900 ${isInStock ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}`}
             >
               <ShoppingBag
@@ -147,13 +156,18 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
 
-          <div className="flex items-baseline gap-2 pt-1">
-            <span className="text-base font-light text-gray-900">
-              Rs. {product.price.toLocaleString()}
-            </span>
-            {product.old_price && (
+          <div className="flex flex-wrap items-baseline gap-2 pt-1">
+            {discount > 0 && (
               <span className="text-xs text-gray-500 line-through">
-                {product.old_price.toLocaleString()}
+                {formatPrice(product.old_price)}
+              </span>
+            )}
+            <span className="text-base font-light text-gray-900">
+              {formatPrice(product.price)}
+            </span>
+            {discount > 0 && (
+              <span className="text-[10px] font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1.5 py-0.5">
+                {discount}% OFF
               </span>
             )}
           </div>

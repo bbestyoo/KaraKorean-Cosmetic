@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { ChevronDown, Minus, Plus } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { ProductRecommendations } from '@/components/ProductRecommendations';
 import ProductReviews from '@/components/ProductReviews';
+import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
 import DOMPurify from "dompurify";
 
 function safeSanitize(html: string): string {
@@ -64,7 +65,7 @@ interface Variant {
 interface Size {
   id: number;
   name: string;
-  price_adjustment: number;
+  price: number;
   stock: number;
 }
 
@@ -109,6 +110,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
   const [quantity, setQuantity] = useState(1);
   const [openPolicy, setOpenPolicy] = useState<string | null>(null);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [stockError, setStockError] = useState(false);
   const { addItem } = useCart();
 
   // Refresh live stock after mount so size/count changes show without a hard
@@ -127,15 +129,26 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
         setProduct((prev) => {
           if (!prev) return prev;
           const freshSizes = Array.isArray(data?.sizes) ? data.sizes : [];
-          const stock_count = Number(data?.stock_count ?? prev.stock_count);
+          const sizes = prev.sizes.map((s) => {
+            const fresh = freshSizes.find(
+              (f: { name?: string; stock?: number; price?: number }) => f.name === s.name
+            );
+            if (!fresh) return s;
+            return {
+              ...s,
+              stock: Number(fresh.stock ?? s.stock),
+              price: Number(fresh.price ?? s.price),
+            };
+          });
+          // Per-size stock is the source of truth whenever the product has sizes.
+          const stock_count = sizes.length > 0
+            ? sizes.reduce((sum, s) => sum + s.stock, 0)
+            : Number(data?.stock_count ?? prev.stock_count);
           return {
             ...prev,
             stock_count,
             in_stock: stock_count > 0,
-            sizes: prev.sizes.map((s) => {
-              const fresh = freshSizes.find((f: { name?: string; stock?: number }) => f.name === s.name);
-              return fresh ? { ...s, stock: Number(fresh.stock ?? s.stock) } : s;
-            }),
+            sizes,
           };
         });
       } catch {
@@ -161,29 +174,41 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
     }
   }, [product]);
 
-  const getSizeAdjustment = () => {
-    if (!selectedSize || !product?.sizes) return 0;
-    const selectedSizeObj = product.sizes.find((s) => s.name === selectedSize);
-    return selectedSizeObj?.price_adjustment || 0;
-  };
+  const selectedSizeObj = useMemo(
+    () => (selectedSize ? product?.sizes?.find((s) => s.name === selectedSize) ?? null : null),
+    [selectedSize, product?.sizes]
+  );
 
+  // Each size carries its own absolute price; the product price is the fallback
+  // for products that have no sizes.
   const getFinalPrice = () => {
-    return product ? product.price + getSizeAdjustment() : 0;
+    if (!product) return 0;
+    if (product.sizes && product.sizes.length > 0) {
+      return selectedSizeObj?.price ?? 0;
+    }
+    return product.price;
   };
 
+  const getOriginalPrice = () => {
+    if (!product?.old_price) return null;
+    return product.old_price;
+  };
+
+  const discountPercentage = getDiscountPercentage(getFinalPrice(), getOriginalPrice());
+
+  // Size stock is the only stock source once a product has sizes.
   const getSelectedSizeStock = () => {
-    if (!product) return Infinity;
-    const productStock = product.stock_count ?? Infinity;
-    if (product.sizes && selectedSize) {
-      const s = product.sizes.find((s) => s.name === selectedSize);
-      return s?.stock ?? productStock;
+    if (!product) return 0;
+    if (product.sizes && product.sizes.length > 0) {
+      return selectedSizeObj?.stock ?? 0;
     }
-    return productStock;
+    return product.stock_count ?? 0;
   };
 
   const handleIncrement = () => {
     setQuantity((q) => {
       const stock = getSelectedSizeStock();
+      if (stock <= 0) return q;
       return Math.min(stock, q + 1);
     });
   };
@@ -195,22 +220,28 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
   useEffect(() => {
     if (!product) return;
     const stock = getSelectedSizeStock();
-    if (quantity > stock) {
-      setQuantity(Math.max(1, Math.min(stock, quantity)));
+    if (stock > 0 && quantity > stock) {
+      setQuantity(stock);
     }
   }, [selectedSize, product?.sizes]);
+
+  const hasSizes = Boolean(product?.sizes && product.sizes.length > 0);
+  const selectedSizeOutOfStock = hasSizes && selectedSizeObj?.stock === 0;
 
   const handleAddToCart = () => {
     if (!product || !product.in_stock) return;
 
-    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+    if (hasSizes && !selectedSize) {
       setShowValidationErrors(true);
       return;
     }
 
     if (getSelectedSizeStock() < quantity) {
+      setStockError(true);
       return;
     }
+
+    setStockError(false);
 
     if (product && mainImage) {
       addItem({
@@ -228,7 +259,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
             gtag?: (event: string, action: string, data: Record<string, unknown>) => void;
           }
         ).gtag?.('event', 'add_to_cart', {
-          currency: 'USD',
+          currency: 'NPR',
           value: getFinalPrice() * quantity,
           items: [
             {
@@ -237,6 +268,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
               price: getFinalPrice(),
               quantity,
               item_category: product.category,
+              item_variant: selectedSize || undefined,
             },
           ],
         });
@@ -275,14 +307,34 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
             <h1 className="text-3xl sm:text-4xl lg:text-[2.5rem] capitalize font-light tracking-wide text-neutral-900 leading-tight">
               {product.name}
             </h1>
-            <div className="flex items-baseline">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+              {discountPercentage > 0 && getOriginalPrice() !== null && (
+                <>
+                  <p
+                    className="text-base sm:text-lg text-[#ec7cfd] line-through"
+                    style={{ fontFamily: 'var(--font-playfair), serif' }}
+                  >
+                    {formatPrice(getOriginalPrice())}
+                  </p>
+                  <span className="text-xs font-semibold tracking-widest text-[#0f3b2b] bg-[#E9F3A4] px-2 py-0.5">
+                    {discountPercentage}% OFF
+                  </span>
+                </>
+              )}
               <p
                 className="text-2xl sm:text-3xl lg:text-[2rem] text-neutral-800"
                 style={{ fontFamily: 'var(--font-playfair), serif' }}
               >
-                Rs.&nbsp;{(getFinalPrice())}
+                {formatPrice(getFinalPrice())}
               </p>
             </div>
+            {hasSizes && (
+              <p className="text-xs text-neutral-500">
+                {selectedSize
+                  ? `Price for size ${selectedSize}`
+                  : 'Select a size to see its price and availability'}
+              </p>
+            )}
           </header>
 
           {/* Add to Cart Button */}
@@ -295,9 +347,14 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="w-full max-w-[320px] cursor-pointer border border-[#0f3b2b] bg-[#0f3b2b] py-4.5 text-sm font-semibold tracking-widest text-white uppercase transition-all duration-300 hover:bg-transparent hover:text-[#0f3b2b] rounded-md shadow-md"
+                disabled={selectedSizeOutOfStock}
+                className={`w-full max-w-[320px] border border-[#0f3b2b] py-4.5 text-sm font-semibold tracking-widest uppercase transition-all duration-300 rounded-md shadow-md ${
+                  selectedSizeOutOfStock
+                    ? 'cursor-not-allowed bg-neutral-200 text-neutral-400 border-neutral-200 shadow-none'
+                    : 'cursor-pointer bg-[#0f3b2b] text-white hover:bg-transparent hover:text-[#0f3b2b]'
+                }`}
               >
-                Add to cart
+                {selectedSizeOutOfStock ? 'Out of stock' : 'Add to cart'}
               </button>
             )}
           </div>
@@ -305,7 +362,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
           {/* Selectors */}
           <div className="space-y-8 pt-4">
             {/* Size */}
-            {product.sizes && product.sizes.length > 0 && (
+            {hasSizes && (
               <div className="grid grid-cols-[100px_1fr] items-start gap-6">
                 <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Size:</span>
                 <div className="w-full max-w-[420px]">
@@ -317,7 +374,10 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
                         <button
                           key={size.id}
                           type="button"
-                          onClick={() => !disabled && setSelectedSize(size.name)}
+                          onClick={() => {
+                            setStockError(false);
+                            if (!disabled) setSelectedSize(size.name);
+                          }}
                           aria-pressed={selected}
                           aria-disabled={disabled}
                           disabled={disabled}
@@ -349,15 +409,22 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
                   type="button"
                   onClick={handleIncrement}
                   aria-label="Increase quantity"
-                  className="px-3 py-2 border cursor-pointer border-neutral-300 rounded hover:bg-neutral-100"
+                  disabled={getSelectedSizeStock() <= 0}
+                  className="px-3 py-2 border border-neutral-300 rounded hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 >
                   <Plus size={14} />
                 </button>
               </div>
             </div>
 
-            {showValidationErrors && product.sizes && product.sizes.length > 0 && !selectedSize && (
+            {showValidationErrors && hasSizes && !selectedSize && (
               <p className="text-sm text-red-600 mt-2">Please select a size.</p>
+            )}
+
+            {stockError && selectedSize && (
+              <p className="text-sm text-red-600 mt-2">
+                Only {getSelectedSizeStock()} left in size {selectedSize}. Please reduce the quantity.
+              </p>
             )}
 
             {/* Description */}

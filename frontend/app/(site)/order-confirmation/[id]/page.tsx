@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, Package, Truck } from 'lucide-react';
+import { formatPrice } from '@/lib/pricing';
 
 interface OrderItem {
   id: string;
@@ -149,7 +150,7 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
           {/* Total Amount */}
           <div className="bg-white rounded-lg p-6 border border-red-200 bg-red-50 shadow-sm">
             <p className="text-sm text-red-600 font-medium mb-2">Total Amount</p>
-            <p className="text-3xl font-bold text-red-600">NPR {delivery.payment_amount?.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-red-600">{formatPrice(delivery.payment_amount)}</p>
           </div>
         </div>
 
@@ -176,7 +177,7 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-gray-900 text-lg">NPR {item.price}</p>
+                      <p className="font-bold text-gray-900 text-lg">{formatPrice(item.price)}</p>
                     </div>
                   </div>
                 ))}
@@ -224,25 +225,25 @@ const API_BASE_URL = API_BASE_URL1.replace(/\/shop\/?$/, '');
               <div className="space-y-3 mb-6 pb-6 border-b">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-semibold text-gray-900">NPR {computedSubtotal.toLocaleString()}</span>
+                  <span className="font-semibold text-gray-900">{formatPrice(computedSubtotal)}</span>
                 </div>
                 {computedDiscount > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Discount</span>
-                    <span className="font-semibold text-green-600">-NPR {computedDiscount.toLocaleString()}</span>
+                    <span className="font-semibold text-green-600">-{formatPrice(computedDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
                   <span className="font-semibold text-gray-900">
-                    {delivery.shipping_cost === 0 ? 'FREE' : `NPR ${delivery.shipping_cost}`}
+                    {delivery.shipping_cost === 0 ? 'FREE' : formatPrice(delivery.shipping_cost)}
                   </span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center mb-6 pb-6 border-b">
                 <span className="text-lg font-bold text-gray-900">Total</span>
-                <span className="text-2xl font-bold text-red-500">NPR {delivery.payment_amount?.toLocaleString()}</span>
+                <span className="text-2xl font-bold text-red-500">{formatPrice(delivery.payment_amount)}</span>
               </div>
             </div>
 
