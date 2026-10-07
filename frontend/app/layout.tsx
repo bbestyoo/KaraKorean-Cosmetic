@@ -110,6 +110,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/images/banner/kara-banner.avif"
+          type="image/avif"
+          fetchPriority="high"
+        />
         <link rel="icon" href="/images/logos/karalogo.png" />
         <script
           type="application/ld+json"

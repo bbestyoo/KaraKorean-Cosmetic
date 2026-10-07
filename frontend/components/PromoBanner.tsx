@@ -40,8 +40,8 @@ export function PromoBanner() {
         if (Array.isArray(data) && data.length > 0) {
           setBanner({ banner: data[0], hasBanners: true });
         } else {
-          // Admin explicitly has no active banners → hide the promo bar.
-          setBanner({ banner: null, hasBanners: false });
+          // No active banners configured → keep showing default fallback instead of hiding
+          setBanner({ banner: null, hasBanners: true });
         }
       })
       .catch(() => {
@@ -61,7 +61,7 @@ export function PromoBanner() {
   const linkUrl = (banner.banner?.link_url || "").trim() || "/products";
 
   return (
-    <div className="bg-pink-300  text-center font-serif text-black font-extrabold py-3 px-4 relative z-50 text-xs md:text-lg tracking-wide">
+    <div className="bg-pink-300  text-center font-serif text-black font-extrabold py-2 sm:py-3 px-3 sm:px-4 relative z-50 text-[10px] sm:text-xs md:text-lg tracking-wide">
       <p>
         {text}{" "}
         <Link

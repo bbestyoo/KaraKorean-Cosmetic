@@ -296,7 +296,7 @@ export function SiteHeader() {
       >
         <PromoBanner />
 
-        <div className="h-16 sm:h-20 md:h-24 xl:h-16 2xl:h-24 px-6 lg:px-8 2xl:px-8 xl:px-0 flex items-center justify-between relative">
+        <div className="h-16 sm:h-20 md:h-24 xl:h-16 2xl:h-28 px-6 lg:px-8 2xl:px-8 xl:px-0 flex items-center justify-between relative">
           {/* Hamburger */}
           <button
             className="xl:hidden p-2 -ml-2 text-neutral-800 transition-transform duration-200 active:scale-90"
@@ -335,7 +335,7 @@ export function SiteHeader() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex md:gap-5 lg:gap-8 xl:gap-5 items-center absolute left-1/6 xl:left-1/7 2xl:left-1/5 2xl:gap-[1.9vw] text-[#5c6e69]">
+          <nav className="hidden xl:flex md:gap-5 lg:gap-8 xl:gap-5 items-center absolute left-1/6 xl:left-1/7 2xl:left-1/5 2xl:gap-[1.9vw] font-sans text-[#5c6e69]">
             {NAV_LINKS.map(({ label, href }) => {
               // Insert dropdowns after "Products"
               if (label === "Products") {
@@ -400,7 +400,9 @@ export function SiteHeader() {
 
           {/* Right icons */}
           <div className="flex items-center gap-1">
-            <NavSearch />
+            <div className="hidden xl:block">
+              <NavSearch />
+            </div>
             <Link
               href="/wishlist"
               className="relative p-2 hidden md:block hover:bg-gray-100 rounded-lg transition-colors"
@@ -542,6 +544,9 @@ export function SiteHeader() {
             <div className="h-0.5 w-full bg-gradient-to-r from-[#0f3b2b]/20 via-[#c9a46b]/40 to-[#0f3b2b]/20" />
 
             <div className="px-6 pt-5 pb-6 flex flex-col gap-1">
+              <div className="py-3.5 border-b border-neutral-100">
+                <NavSearch />
+              </div>
               {NAV_LINKS.map(({ label, href }, i) => (
                 <Link
                   key={href}

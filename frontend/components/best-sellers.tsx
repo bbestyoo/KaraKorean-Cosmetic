@@ -5,22 +5,22 @@ import { RevealOnScroll } from "@/components/RevealOnScroll";
 const cards = [
 
   {
-    title: "AntiAging",
+    title: "Cream",
     subtitle: "Browse Products",
     image: "/images/model1.webp",
-    link: "/shop/toner",
+    link: "/products?category=cream",
   },
   {
-    title: "Pigmentation",
+    title: "Toner",
     subtitle: "Browse Products",
     image: "/images/model2.webp",
-    link: "/shop/ampoule",
+    link: "/products?category=toner",
   },
   {
-    title: "Acne Control",
+    title: "Essence",
     subtitle: "Browse Products",
     image: "/images/model3.webp",
-    link: "/shop/essence",
+    link: "/products?category=essence",
   },
 ];
 
@@ -37,10 +37,7 @@ export default function BestSellers() {
           >
 
             <Link
-              href={(() => {
-                const slug = (card.title || '').toString().replace(/\s+/g, '').toLowerCase();
-                return `/products?usecase=${encodeURIComponent(slug)}`;
-              })()}
+              href={card.link}
               className="group relative w-full h-full overflow-hidden block"
             >
               {/* Background Image */}

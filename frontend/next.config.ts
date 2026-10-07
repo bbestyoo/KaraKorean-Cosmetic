@@ -41,6 +41,28 @@ const nextConfig = {
     experimental: {
       optimizePackageImports: ['lucide-react', '@radix-ui'],
     },
+    async headers() {
+      return [
+        {
+          source: '/images/banner/:path*',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'public, max-age=31536000, immutable',
+            },
+          ],
+        },
+        {
+          source: '/images/:path*.(avif|webp|jpg|jpeg|png)',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'public, max-age=31536000, immutable',
+            },
+          ],
+        },
+      ];
+    },
   };
 
 export default nextConfig;

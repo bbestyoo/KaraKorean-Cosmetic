@@ -76,8 +76,8 @@ export default function Footer() {
           <div className="grid grid-cols-3 gap-4 sm:gap-8">
             {/* Column 1 */}
             <div className="flex flex-col gap-4">
-              <h3 className="text-xl text-white font-sans mb-2">Company</h3>
-              <ul className="flex flex-col gap-3">
+              <h3 className="text-lg sm:text-xl text-white font-sans mb-2">Company</h3>
+              <ul className="flex flex-col gap-2 sm:gap-3">
                 {[
                   { label: "Home", href: "/" },
                   { label: "About Us", href: "/about" },
@@ -86,7 +86,7 @@ export default function Footer() {
                   { label: "Quiz", href: "/quiz" },
                 ].map(({ label, href }) => (
                   <li key={label}>
-                    <Link href={href} className="text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
+                    <Link href={href} className="text-[11px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
                       {label}
                     </Link>
                   </li>
@@ -96,8 +96,8 @@ export default function Footer() {
 
             {/* Column 2 */}
             <div className="flex flex-col gap-4">
-              <h3 className="text-xl text-white font-sans mb-2">Support</h3>
-              <ul className="flex flex-col gap-3">
+              <h3 className="text-lg sm:text-xl text-white font-sans mb-2">Support</h3>
+              <ul className="flex flex-col gap-2 sm:gap-3">
                 {[
                   { label: "Contact Us", href: "/contact" },
                   { label: "Terms & Conditions", href: "/terms" },
@@ -105,7 +105,7 @@ export default function Footer() {
                   { label: "FAQ", href: "/faq" },
                 ].map(({ label, href }) => (
                   <li key={label}>
-                    <Link href={href} className="text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
+                    <Link href={href} className="text-[11px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
                       {label}
                     </Link>
                   </li>
@@ -115,14 +115,14 @@ export default function Footer() {
 
             {/* Column 3 */}
             <div className="flex flex-col gap-4">
-              <h3 className="text-xl text-white font-sans mb-2">Account</h3>
-              <ul className="flex flex-col gap-3">
+              <h3 className="text-lg sm:text-xl text-white font-sans mb-2">Account</h3>
+              <ul className="flex flex-col gap-2 sm:gap-3">
                 {[
                   { label: "User Profile", href: isLoggedIn ? "/account" : "/login" },
                   { label: "Order History", href: isLoggedIn ? "/account?tab=orders" : "/login" },
                 ].map(({ label, href }) => (
                   <li key={label}>
-                    <Link href={href} className="text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
+                    <Link href={href} className="text-[11px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase text-white hover:text-[#555f59] transition-colors">
                       {label}
                     </Link>
                   </li>
@@ -133,23 +133,23 @@ export default function Footer() {
 
           {/* Social & Legal (below categories) */}
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 sm:gap-6 mt-8 sm:mt-16 pt-6 sm:pt-8 border-t border-[#E85D8A]/20">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
               <Link href="" className="text-white hover:scale-110 transition-transform">
-                <FiFacebook size={22} />
+                <FiFacebook size={20} className="sm:w-[22px] sm:h-[22px]" />
               </Link>
 
               <Link href="https://www.instagram.com/kara_korean_store?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" className="text-white hover:scale-110 transition-transform">
-                <FiInstagram size={22} />
+                <FiInstagram size={20} className="sm:w-[22px] sm:h-[22px]" />
               </Link>
               <Link href="https://www.tiktok.com/@karakoreanstore" className="text-white hover:scale-110 transition-transform">
-                < FaTiktok size={22} />
+                <FaTiktok size={20} className="sm:w-[22px] sm:h-[22px]" />
               </Link>
               <Link href="#" className="text-white hover:scale-110 transition-transform">
-                <FiYoutube size={22} />
+                <FiYoutube size={20} className="sm:w-[22px] sm:h-[22px]" />
               </Link>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 md:gap-6">
+            <div className="flex flex-wrap items-center gap-4 md:gap-6 text-[11px] sm:text-sm">
               Copyright © 2026. Kara Korean Beauty Store All Rights Reserved.
             </div>
           </div>

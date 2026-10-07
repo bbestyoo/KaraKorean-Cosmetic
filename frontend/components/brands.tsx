@@ -19,7 +19,7 @@ const slugify = (str: string) =>
 
 export default function Brands() {
     return (
-        <div className="w-full -mt-10 md:absolute md:bottom-0 relative overflow-hidden py-4 sm:py-5 lg:py-10 bg-white/5 z-10 border-t border-white/10 md:mt-0">
+        <div className="w-full h-[10vh] pt-4 md:absolute md:bottom-0 relative overflow-hidden bg-white/5 z-10 border-t border-white/10 ">
             <style>{`
                 @keyframes marquee {
                     0%   { transform: translateX(0); }

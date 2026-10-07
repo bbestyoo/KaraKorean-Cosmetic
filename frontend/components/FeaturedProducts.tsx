@@ -85,28 +85,28 @@ export default function FeaturedProducts() {
 
   return (
     <section className="w-full bg-white  px-6 md:px-12 lg:px-20 overflow-hidden">
-      <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-5 sm:mb-12">
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between my-4 sm:my-5 sm:mb-12">
         <div>
           <RevealOnScroll direction="up">
-            <p className="text-xs tracking-widest text-neutral-400 font-semibold mb-2">OUR BEST</p>
+            <p className="text-[10px] sm:text-xs tracking-widest text-neutral-400 font-semibold md:mb-2">OUR BEST</p>
           </RevealOnScroll>
           <RevealOnScroll direction="up" delay={100}>
-            <h2 className="text-3xl md:text-6xl font-serif text-[#0f3b2b] tracking-tight">Featured Products</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-6xl font-serif text-[#0f3b2b] tracking-tight">Featured Products</h2>
           </RevealOnScroll>
         </div>
         <RevealOnScroll direction="left" delay={200}>
-          <Link href="/products?featured=true" className="mt-2 md:mt-0 px-6 py-3 border border-neutral-300 text-xs font-bold tracking-widest text-neutral-800 hover:bg-[#0f3b2b] cursor-pointer hover:text-white transition-colors inline-block text-center">VIEW ALL PRODUCTS</Link>
+          <Link href="/products?featured=true" className="mt-2 md:mt-0 px-4 py-2 sm:px-6 sm:py-3 border border-neutral-300 text-[10px] sm:text-xs font-bold tracking-widest text-neutral-800 hover:bg-[#0f3b2b] cursor-pointer hover:text-white transition-colors inline-block text-center">VIEW ALL PRODUCTS</Link>
         </RevealOnScroll>
       </div>
 
-      <div className="overflow-hidden cursor-grab active:cursor-grabbing -mx-4 px-4 pb-8" ref={emblaRef}>
-        <div className="flex -ml-6">
+      <div className="overflow-hidden cursor-grab active:cursor-grabbing -mx-2 sm:-mx-4 px-2 sm:px-4 pb-6 sm:pb-8" ref={emblaRef}>
+        <div className="flex -ml-4 sm:-ml-6">
           {products.map((product, index) => (
-            <div key={product.product_id || index} className="flex-[0_0_80%] sm:flex-[0_0_50%] lg:flex-[0_0_25%] min-w-0 pl-6">
+            <div key={product.product_id || index} className="flex-[0_0_70%] sm:flex-[0_0_50%] lg:flex-[0_0_25%] min-w-0 pl-4 sm:pl-6">
               <RevealOnScroll direction="up" delay={index * 150} className="h-full">
                 <Link href={`/products/${product.product_id}`} className="block">
                   <div
-                    className="relative bg-white rounded-t-lg pt-4 px-3 pb-5 sm:pt-6 sm:px-5 sm:pb-8 h-full flex flex-col group"
+                    className="relative bg-white rounded-t-lg pt-3 px-2.5 pb-4 sm:pt-6 sm:px-5 sm:pb-8 h-full flex flex-col group"
                   // style={{
                   //   maskImage: "linear-gradient(to bottom, black calc(100% - 10px), transparent calc(100% - 10px)), radial-gradient(circle at 10px 100%, transparent 10px, black 10.5px)",
                   //   maskSize: "100% 100%, 20px 10px",
@@ -119,7 +119,7 @@ export default function FeaturedProducts() {
                   // }}
                   >
                     <div className="flex justify-between items-start z-10 relative">
-                      <span className="bg-[#E9F3A4] text-neutral-900 text-[0.65rem] font-bold tracking-widest px-2 py-1 rounded">{product.badge}</span>
+                      <span className="bg-[#E9F3A4] text-neutral-900 text-[0.55rem] sm:text-[0.65rem] font-bold tracking-widest px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">{product.badge}</span>
                       <button
                         onClick={(e) => {
                           e.preventDefault();
@@ -141,7 +141,7 @@ export default function FeaturedProducts() {
                         className="text-white hover:text-red-500 transition-colors"
                         aria-label={`Toggle wishlist for ${product.name}`}
                       >
-                        <Heart className={`w-6 cursor-pointer h-6 transition-colors ${isInWishlist(product.product_id || `featured-${index}`) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'fill-none text-white hover:text-[#c9a46b]'} }`} />
+                        <Heart className={`w-5 sm:w-6 cursor-pointer h-5 sm:h-6 transition-colors ${isInWishlist(product.product_id || `featured-${index}`) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'fill-none text-white hover:text-[#c9a46b]'} }`} />
                       </button>
                     </div>
 
@@ -156,16 +156,16 @@ export default function FeaturedProducts() {
                     </div>
 
                     <div className="mt-auto relative z-10">
-                      <h3 className="font-semibold text-sm sm:text-lg truncate text-neutral-900 mb-1 leading-tight">{product.name}</h3>
-                      <p className="text-[0.8rem] font-bold tracking-widest text-[#ec7cfd] uppercase mb-2 sm:mb-4 border-b border-neutral-300 border-dashed pb-2 sm:pb-4">{product.category}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-wrap items-baseline gap-2">
+                      <h3 className="font-semibold text-xs sm:text-sm md:text-lg truncate text-neutral-900 mb-0.5 sm:mb-1 leading-tight">{product.name}</h3>
+                      <p className="text-[0.7rem] sm:text-[0.8rem] font-bold tracking-widest text-[#ec7cfd] uppercase mb-1 sm:mb-4 border-b border-neutral-300 border-dashed pb-1 sm:pb-4">{product.category}</p>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-baseline gap-1 sm:gap-2">
                           {getDiscountPercentage(product.price, product.old_price) > 0 && (
-                            <span className="text-xl text-[#ec7cfd] line-through">{formatPrice(product.old_price)}</span>
+                            <span className="text-base sm:text-xl text-[#ec7cfd] line-through">{formatPrice(product.old_price)}</span>
                           )}
-                          <span className="text-base sm:text-xl font-medium text-neutral-900">{formatPrice(product.price)}</span>
+                          <span className="text-sm sm:text-xl font-medium text-neutral-900">{formatPrice(product.price)}</span>
                           {getDiscountPercentage(product.price, product.old_price) > 0 && (
-                            <span className="text-[0.65rem] sm:text-xs font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1.5 py-0.5">
+                            <span className="text-[0.5rem] sm:text-[0.65rem] sm:text-xs font-semibold text-[#0f3b2b] bg-[#E9F3A4] px-1 py-0.5">
                               {getDiscountPercentage(product.price, product.old_price)}% OFF
                             </span>
                           )}
@@ -198,9 +198,9 @@ export default function FeaturedProducts() {
                                 ? `Select a size for ${product.name}`
                                 : `Add ${product.name} to cart`
                           }
-                          className={`${product.in_stock === false ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' : 'bg-[#0f3b2b] text-white hover:bg-black hover:scale-105'} p-3 rounded-full transition-all`}
+                          className={`${product.in_stock === false ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' : 'bg-[#0f3b2b] text-white hover:bg-black hover:scale-105'} p-2 sm:p-3 rounded-full transition-all`}
                         >
-                          <ShoppingCart className="w-4 h-4 cursor-pointer" />
+                          <ShoppingCart className="w-3.5 sm:w-4 h-3.5 sm:h-4 cursor-pointer" />
                         </button>
                       </div>
                     </div>
