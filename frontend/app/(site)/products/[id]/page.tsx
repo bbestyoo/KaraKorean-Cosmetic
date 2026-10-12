@@ -40,6 +40,7 @@ function normalizeProduct(product: ApiProduct): Product {
     stock_count: sizes.length > 0 ? sizeStock : (product.stock_count ?? 0),
     in_stock: sizes.length > 0 ? sizes.some((s) => s.stock > 0) : Number(product.stock_count ?? 0) > 0,
     category: product.category || 'Uncategorized',
+    category_name: product.category_name ?? null,
     images: Array.isArray(product.images)
       ? product.images.map((img) => ({
           ...img,

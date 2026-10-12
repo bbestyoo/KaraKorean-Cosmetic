@@ -75,6 +75,7 @@ export interface Product {
   name: string;
   description?: string | null;
   category: string;
+  category_name?: string | null;
   price: number;
   old_price: number | null;
   before_deal_price: number | null;
@@ -344,7 +345,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
       <div className="contents lg:flex lg:flex-col lg:order-2 lg:w-1/2 lg:sticky lg:top-0 lg:bg-white lg:px-20 lg:py-20">
         {/* Title */}
         <div className="order-1 lg:order-none px-6 pt-8 pb-5 sm:px-12 sm:pt-10 sm:pb-6 lg:p-0">
-          {product.category && (
+          {product.category_name && (
             <span className="block mb-2.5 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.28em] text-[#c9a46b]">
               {product.category_name}
             </span>
