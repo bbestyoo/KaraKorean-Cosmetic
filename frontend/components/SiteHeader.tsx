@@ -8,12 +8,9 @@ import { NavSearch } from "@/components/NavSearch";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { PromoBanner } from "./PromoBanner";
+import { PromoBanner, type BannerData } from "./PromoBanner";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-const API_ORIGIN = API_BASE_URL.replace(/\/shop\/?$/, "");
 
 const NAV_LINKS = [
   { label: "Products", href: "/products" },
@@ -192,7 +189,15 @@ function NavDropdown({
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({
+  banner = null,
+  navCategories = [],
+  navBrands = [],
+}: {
+  banner?: BannerData | null;
+  navCategories?: string[];
+  navBrands?: string[];
+}) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [menuMounted, setMenuMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -205,43 +210,10 @@ export function SiteHeader() {
   const { isLoggedIn, user, logout } = useAuth();
 
   // Categories & Brands for nav dropdowns
-  const [navCategories, setNavCategories] = useState<string[]>([]);
-  const [navBrands, setNavBrands] = useState<string[]>([]);
+  const catItems = navCategories;
+  const brandItems = navBrands;
   const [mobileCatOpen, setMobileCatOpen] = useState(false);
   const [mobileBrandOpen, setMobileBrandOpen] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const [catRes, brandRes] = await Promise.all([
-          fetch(`${API_ORIGIN}/shop/category/`),
-          fetch(`${API_ORIGIN}/shop/brand/`),
-        ]);
-        const catData = await (catRes.ok ? catRes.json() : Promise.resolve([]));
-        const brandData = await (brandRes.ok ? brandRes.json() : Promise.resolve([]));
-
-        const parseList = (arr: unknown[]): string[] => {
-          if (!Array.isArray(arr)) return [];
-          return arr
-            .map((it) => {
-              if (typeof it === "string") return it;
-              const obj = it as Record<string, unknown>;
-              return (obj?.name ?? obj?.category_name ?? obj?.title ?? obj?.label ?? "") as string;
-            })
-            .filter(Boolean);
-        };
-
-        if (mounted) {
-          setNavCategories(Array.from(new Set(parseList(catData))).sort((a, b) => a.localeCompare(b)));
-          setNavBrands(Array.from(new Set(parseList(brandData))).sort((a, b) => a.localeCompare(b)));
-        }
-      } catch (err) {
-        console.error("Failed to fetch nav categories/brands", err);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -294,7 +266,7 @@ export function SiteHeader() {
           isVisible ? "translate-y-0" : "-translate-y-full"
         )}
       >
-        <PromoBanner />
+        <PromoBanner banner={banner} />
 
         <div className="h-16 sm:h-20 md:h-24 xl:h-16 2xl:h-28 px-6 lg:px-8 2xl:px-8 xl:px-0 flex items-center justify-between relative">
           {/* Hamburger */}
@@ -357,18 +329,18 @@ export function SiteHeader() {
                       />
                     </Link>
 
-                    {navCategories.length > 0 && (
+                    {catItems.length > 0 && (
                       <NavDropdown
                         label="Categories"
-                        items={navCategories}
+                        items={catItems}
                         buildHref={(item) => `/products?category=${encodeURIComponent(item)}`}
                       />
                     )}
 
-                    {navBrands.length > 0 && (
+                    {brandItems.length > 0 && (
                       <NavDropdown
                         label="Brands"
-                        items={navBrands}
+                        items={brandItems}
                         buildHref={(item) => `/products?brand=${encodeURIComponent(item)}`}
                       />
                     )}
@@ -565,7 +537,7 @@ export function SiteHeader() {
               ))}
 
               {/* Mobile Categories — click accordion */}
-              {navCategories.length > 0 && (
+              {catItems.length > 0 && (
                 <div className="border-b border-neutral-100">
                   <button
                     onClick={() => setMobileCatOpen((v) => !v)}
@@ -584,7 +556,7 @@ export function SiteHeader() {
                     )}
                   >
                     <div className="flex flex-wrap gap-2">
-                      {[...navCategories].sort((a, b) => a.localeCompare(b)).map((cat) => (
+                      {[...catItems].sort((a, b) => a.localeCompare(b)).map((cat) => (
                         <Link
                           key={cat}
                           href={`/products?category=${encodeURIComponent(cat)}`}
@@ -600,7 +572,7 @@ export function SiteHeader() {
               )}
 
               {/* Mobile Brands — click accordion */}
-              {navBrands.length > 0 && (
+              {brandItems.length > 0 && (
                 <div className="border-b border-neutral-100">
                   <button
                     onClick={() => setMobileBrandOpen((v) => !v)}
@@ -619,7 +591,7 @@ export function SiteHeader() {
                     )}
                   >
                     <div className="flex flex-wrap gap-2">
-                      {[...navBrands].sort((a, b) => a.localeCompare(b)).map((brand) => (
+                      {[...brandItems].sort((a, b) => a.localeCompare(b)).map((brand) => (
                         <Link
                           key={brand}
                           href={`/products?brand=${encodeURIComponent(brand)}`}

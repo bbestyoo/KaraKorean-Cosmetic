@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { ChevronDown, Minus, Plus } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { ProductRecommendations } from '@/components/ProductRecommendations';
@@ -111,7 +112,8 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
   const [openPolicy, setOpenPolicy] = useState<string | null>(null);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [stockError, setStockError] = useState(false);
-  const { addItem } = useCart();
+  const { addItem, closeCart } = useCart();
+  const router = useRouter();
 
   // Refresh live stock after mount so size/count changes show without a hard
   // refresh (bypasses Next's fetch/router caches, which can serve stale data).
@@ -228,144 +230,166 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
   const hasSizes = Boolean(product?.sizes && product.sizes.length > 0);
   const selectedSizeOutOfStock = hasSizes && selectedSizeObj?.stock === 0;
 
-  const handleAddToCart = () => {
-    if (!product || !product.in_stock) return;
+  const validateSelection = () => {
+    if (!product || !product.in_stock) return false;
 
     if (hasSizes && !selectedSize) {
       setShowValidationErrors(true);
-      return;
+      return false;
     }
 
     if (getSelectedSizeStock() < quantity) {
       setStockError(true);
-      return;
+      return false;
     }
 
     setStockError(false);
-
-    if (product && mainImage) {
-      addItem({
-        product_id: product.product_id,
-        name: product.name,
-        price: getFinalPrice(),
-        size: selectedSize || '',
-        quantity,
-        image: mainImage,
-      });
-
-      if (typeof window !== 'undefined' && 'gtag' in window) {
-        (
-          window as Window & {
-            gtag?: (event: string, action: string, data: Record<string, unknown>) => void;
-          }
-        ).gtag?.('event', 'add_to_cart', {
-          currency: 'NPR',
-          value: getFinalPrice() * quantity,
-          items: [
-            {
-              item_id: product.product_id,
-              item_name: product.name,
-              price: getFinalPrice(),
-              quantity,
-              item_category: product.category,
-              item_variant: selectedSize || undefined,
-            },
-          ],
-        });
-      }
-
-      setQuantity(1);
-      setShowValidationErrors(false);
-    }
+    return true;
   };
+
+  const addSelectionToCart = () => {
+    if (!product || !mainImage) return;
+
+    addItem({
+      product_id: product.product_id,
+      name: product.name,
+      price: getFinalPrice(),
+      size: selectedSize || '',
+      quantity,
+      image: mainImage,
+    });
+
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      (
+        window as Window & {
+          gtag?: (event: string, action: string, data: Record<string, unknown>) => void;
+        }
+      ).gtag?.('event', 'add_to_cart', {
+        currency: 'NPR',
+        value: getFinalPrice() * quantity,
+        items: [
+          {
+            item_id: product.product_id,
+            item_name: product.name,
+            price: getFinalPrice(),
+            quantity,
+            item_category: product.category,
+            item_variant: selectedSize || undefined,
+          },
+        ],
+      });
+    }
+
+    setQuantity(1);
+    setShowValidationErrors(false);
+  };
+
+  const handleAddToCart = () => {
+    if (!validateSelection()) return;
+    addSelectionToCart();
+  };
+
+  const handleBuyNow = () => {
+    if (!validateSelection()) return;
+    addSelectionToCart();
+    // addItem opens the cart drawer; keep it closed so checkout is clean.
+    closeCart();
+    router.push('/checkout');
+  };
+
+  // Shown inside the right column on desktop, and below the gallery on mobile.
+  const infoSections = (
+    <>
+      {/* Description */}
+      <div className="items-start gap-6">
+        <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Description:</span>
+        <div
+          className="product-description text-md text-neutral-700 mt-[10px]"
+          dangerouslySetInnerHTML={{
+            __html: safeSanitize(product.description ?? "No description available."),
+          }}
+        />
+      </div>
+
+      {/* Accordions */}
+      <div className="pt-8">
+        <ul className="flex flex-col">
+          {POLICY_SECTIONS.map((section) => {
+            const isOpen = openPolicy === section.id;
+            return (
+              <li key={section.id} className="border-b border-neutral-300">
+                <button
+                  onClick={() => setOpenPolicy(isOpen ? null : section.id)}
+                  className="w-full flex items-center  justify-between py-5 text-sm md:text-base font-bold tracking-widest uppercase text-neutral-800 focus:outline-none"
+                  aria-expanded={isOpen}
+                >
+                  <span>{section.title}</span>
+                  <ChevronDown className={`transform transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
+                </button>
+                <div className={`${isOpen ? 'block' : 'hidden'} pb-6 text-base md:text-lg leading-relaxed text-neutral-600`}>
+                  {section.body}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </>
+  );
 
   return <main className="min-h-screen bg-white text-neutral-900">
     <div className="flex flex-col lg:flex-row lg:items-start">
-      <section
-        className="w-full lg:w-1/2 flex flex-col "
-        aria-label="Product gallery"
-      >
-        {(product.images.length > 0 ? product.images : [{ image: '/images/placeholder.png' }]).map((img, idx) => (
-          <div key={`${img.image}-${idx}`} className="w-full bg-neutral-100 overflow-hidden">
-            <Image
-              src={img.image}
-              alt={`${product.name} — view ${idx + 1}`}
-              width={1200}
-              height={1600}
-              className="w-full h-auto object-contain  select-none pointer-events-none"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              priority={idx === 0}
-            />
-          </div>
-        ))}
-      </section>
+      {/* On mobile this wrapper is `contents` so the gallery can sit between the
+          title and the purchase panel; on desktop it is the sticky right column. */}
+      <div className="contents lg:flex lg:flex-col lg:order-2 lg:w-1/2 lg:sticky lg:top-0 lg:bg-white lg:px-20 lg:py-20">
+        {/* Title */}
+        <div className="order-1 lg:order-none px-6 pt-8 pb-5 sm:px-12 sm:pt-10 sm:pb-6 lg:p-0">
+          {product.category && (
+            <span className="block mb-2.5 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.28em] text-[#c9a46b]">
+              {product.category_name}
+            </span>
+          )}
+          <h1
+            className="text-[1.7rem] sm:text-4xl lg:text-[2.6rem] capitalize font-normal leading-[1.12] tracking-tight text-neutral-900"
+            style={{ fontFamily: 'var(--font-playfair), serif' }}
+          >
+            {product.name}
+          </h1>
+        </div>
 
-      <aside className="w-full  lg:w-1/2 lg:sticky lg:top-0 bg-white px-6 py-10 sm:px-12 sm:py-14 lg:p-20">
-        <div className="max-w-[880px] space-y-3">
-          {/* Header / Title */}
-          <header className="space-y-6">
-            <h1 className="text-3xl sm:text-4xl lg:text-[2.5rem] capitalize font-light tracking-wide text-neutral-900 leading-tight">
-              {product.name}
-            </h1>
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-              {discountPercentage > 0 && getOriginalPrice() !== null && (
-                <>
-                  <p
-                    className="text-base sm:text-lg text-[#ec7cfd] line-through"
-                    style={{ fontFamily: 'var(--font-playfair), serif' }}
-                  >
-                    {formatPrice(getOriginalPrice())}
-                  </p>
-                  <span className="text-xs font-semibold tracking-widest text-[#0f3b2b] bg-[#E9F3A4] px-2 py-0.5">
-                    {discountPercentage}% OFF
-                  </span>
-                </>
-              )}
-              <p
-                className="text-2xl sm:text-3xl lg:text-[2rem] text-neutral-800"
-                style={{ fontFamily: 'var(--font-playfair), serif' }}
-              >
-                {formatPrice(getFinalPrice())}
-              </p>
-            </div>
-            {hasSizes && (
-              <p className="text-xs text-neutral-500">
-                {selectedSize
-                  ? `Price for size ${selectedSize}`
-                  : 'Select a size to see its price and availability'}
-              </p>
+        {/* Price, CTA & options */}
+        <div className="order-3 lg:order-none px-6 pb-8 pt-5 sm:px-12 lg:p-0 lg:pt-8 space-y-4">
+          {/* Price */}
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+            {discountPercentage > 0 && getOriginalPrice() !== null && (
+              <>
+                <p
+                  className="text-base sm:text-lg text-[#ec7cfd] line-through"
+                  style={{ fontFamily: 'var(--font-playfair), serif' }}
+                >
+                  {formatPrice(getOriginalPrice())}
+                </p>
+                <span className="text-xs font-semibold tracking-widest text-[#0f3b2b] bg-[#E9F3A4] px-2 py-0.5">
+                  {discountPercentage}% OFF
+                </span>
+              </>
             )}
-          </header>
-
-          {/* Add to Cart Button */}
-          <div>
-            {!product.in_stock ? (
-              <div className="w-full max-w-[320px] border border-neutral-300 bg-neutral-100 py-4.5 text-sm font-semibold tracking-widest text-neutral-500 uppercase rounded-md text-center">
-                Out of stock
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                disabled={selectedSizeOutOfStock}
-                className={`w-full max-w-[320px] border border-[#0f3b2b] py-4.5 text-sm font-semibold tracking-widest uppercase transition-all duration-300 rounded-md shadow-md ${
-                  selectedSizeOutOfStock
-                    ? 'cursor-not-allowed bg-neutral-200 text-neutral-400 border-neutral-200 shadow-none'
-                    : 'cursor-pointer bg-[#0f3b2b] text-white hover:bg-transparent hover:text-[#0f3b2b]'
-                }`}
-              >
-                {selectedSizeOutOfStock ? 'Out of stock' : 'Add to cart'}
-              </button>
-            )}
+            <p
+              className="text-2xl sm:text-3xl lg:text-[2rem] text-neutral-800"
+              style={{ fontFamily: 'var(--font-playfair), serif' }}
+            >
+              {formatPrice(getFinalPrice())}
+            </p>
           </div>
-
           {/* Selectors */}
-          <div className="space-y-8 pt-4">
-            {/* Size */}
-            {hasSizes && (
-              <div className="grid grid-cols-[100px_1fr] items-start gap-6">
-                <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Size:</span>
-                <div className="w-full max-w-[420px]">
+          <div className="space-y-4">
+            <div className="flex flex-row items-start gap-5 sm:flex-col sm:gap-7">
+              {/* Size */}
+              {hasSizes && (
+                <div className="flex-[1.4] min-w-0 space-y-2.5">
+                  <span className="block text-[11px] font-medium uppercase tracking-[0.2em] text-black">
+                    Size
+                  </span>
                   <div className="flex flex-wrap gap-2">
                     {product.sizes.map((size) => {
                       const disabled = size.stock <= 0;
@@ -381,39 +405,48 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
                           aria-pressed={selected}
                           aria-disabled={disabled}
                           disabled={disabled}
-                          className={`px-3 py-2  border rounded-md text-sm font-medium ${selected ? 'bg-[#0f3b2b] text-white border-[#0f3b2b]' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-100'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                          title={disabled ? `${size.name} — out of stock` : size.name}
+                          className={`min-w-[52px] px-3.5 py-2 text-xs sm:text-[13px] font-medium tracking-wide border rounded-full transition-all duration-200 ${
+                            selected
+                              ? 'bg-[#0f3b2b] text-white border-[#0f3b2b] shadow-sm'
+                              : 'bg-white text-black border-neutral-300 hover:border-neutral-900'
+                          } ${disabled ? 'opacity-40 cursor-not-allowed line-through' : 'cursor-pointer'}`}
                         >
-                          {size.name}{disabled ? ' — out of stock' : ''}
+                          {size.name}
                         </button>
                       );
                     })}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Quantity */}
-            <div className="grid grid-cols-[100px_1fr] items-center gap-6 pt-2">
-              <span className="text-base md:text-lg font-semibold text-neutral-900">Quantity:</span>
-              <div className="flex items-center gap-3 pl-3">
-                <button
-                  type="button"
-                  onClick={handleDecrement}
-                  aria-label="Decrease quantity"
-                  className="px-3 py-2 cursor-pointer border border-neutral-300 rounded hover:bg-neutral-100"
-                >
-                  <Minus size={14} />
-                </button>
-                <span className="w-10 text-center text-base md:text-lg">{quantity}</span>
-                <button
-                  type="button"
-                  onClick={handleIncrement}
-                  aria-label="Increase quantity"
-                  disabled={getSelectedSizeStock() <= 0}
-                  className="px-3 py-2 border border-neutral-300 rounded hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                >
-                  <Plus size={14} />
-                </button>
+              {/* Quantity */}
+              <div className="flex-1 min-w-0 space-y-2.5">
+                <span className="block text-[11px] font-medium uppercase tracking-[0.2em] text-black">
+                  Quantity
+                </span>
+                <div className="inline-flex items-center rounded-full border border-neutral-300 bg-white">
+                  <button
+                    type="button"
+                    onClick={handleDecrement}
+                    aria-label="Decrease quantity"
+                    className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-l-full text-black transition-colors hover:bg-neutral-100"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span className="w-10 text-center text-sm font-medium tabular-nums text-neutral-900">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleIncrement}
+                    aria-label="Increase quantity"
+                    disabled={getSelectedSizeStock() <= 0}
+                    className="flex h-9 w-9 items-center justify-center rounded-r-full text-black transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -427,43 +460,76 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
               </p>
             )}
 
-            {/* Description */}
-            <div className=" items-start gap-6">
-              <span className="text-base md:text-lg font-semibold text-neutral-900 pt-2">Description:</span>
-              <div
-                className="product-description text-md text-neutral-700 mt-[10px]"
-                dangerouslySetInnerHTML={{
-                  __html: safeSanitize(product.description ?? "No description available."),
-                }}
-              />
-            </div>
           </div>
 
-          {/* Accordions */}
-          <div className="pt-8 1">
-            <ul className="flex flex-col">
-              {POLICY_SECTIONS.map((section) => {
-                const isOpen = openPolicy === section.id;
-                return (
-                  <li key={section.id} className="border-b border-neutral-300">
-                    <button
-                      onClick={() => setOpenPolicy(isOpen ? null : section.id)}
-                      className="w-full flex items-center  justify-between py-5 text-sm md:text-base font-bold tracking-widest uppercase text-neutral-800 focus:outline-none"
-                      aria-expanded={isOpen}
-                    >
-                      <span>{section.title}</span>
-                      <ChevronDown className={`transform transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
-                    </button>
-                    <div className={`${isOpen ? 'block' : 'hidden'} pb-6 text-base md:text-lg leading-relaxed text-neutral-600`}>
-                      {section.body}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+          {/* Add to Cart / Buy Now */}
+          <div>
+            {!product.in_stock ? (
+              <div className="w-full max-w-[320px] border border-neutral-300 bg-neutral-100 py-4.5 text-sm font-semibold tracking-widest text-neutral-500 uppercase rounded-md text-center">
+                Out of stock
+              </div>
+            ) : (
+              <div className="flex flex-row gap-3 max-w-[520px]">
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={selectedSizeOutOfStock}
+                  className={`flex-1 border border-[#0f3b2b] py-4.5 px-2 text-xs sm:text-sm font-semibold tracking-widest uppercase transition-all duration-300 rounded-md shadow-md ${
+                    selectedSizeOutOfStock
+                      ? 'cursor-not-allowed bg-neutral-200 text-neutral-400 border-neutral-200 shadow-none'
+                      : 'cursor-pointer bg-[#0f3b2b] text-white hover:bg-transparent hover:text-[#0f3b2b]'
+                  }`}
+                >
+                  {selectedSizeOutOfStock ? 'Out of stock' : 'Add to cart'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  disabled={selectedSizeOutOfStock}
+                  className={`flex-1 border border-[#c9a46b] py-4.5 px-2 text-xs sm:text-sm font-semibold tracking-widest uppercase transition-all duration-300 rounded-md shadow-md ${
+                    selectedSizeOutOfStock
+                      ? 'cursor-not-allowed bg-neutral-200 text-neutral-400 border-neutral-200 shadow-none'
+                      : 'cursor-pointer bg-[#c9a46b] text-white hover:bg-transparent hover:text-[#c9a46b]'
+                  }`}
+                >
+                  Buy now
+                </button>
+              </div>
+            )}
           </div>
         </div>
-      </aside>
+
+        {/* Description & policies (desktop) */}
+        <div className="order-4 lg:order-none hidden lg:block lg:pt-8 space-y-3">{infoSections}</div>
+      </div>
+
+      {/* Gallery — horizontal snap slider on mobile, stacked column on desktop */}
+      <section
+        className="order-2 lg:order-1 w-full lg:w-1/2 flex flex-row items-start lg:flex-col lg:items-stretch overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory lg:snap-none scroll-smooth"
+        aria-label="Product gallery"
+      >
+        {(product.images.length > 0 ? product.images : [{ image: '/images/placeholder.png' }]).map((img, idx) => (
+          <div
+            key={`${img.image}-${idx}`}
+            className="w-full shrink-0 lg:shrink snap-center lg:snap-align-none bg-neutral-100 overflow-hidden"
+          >
+            <Image
+              src={img.image}
+              alt={`${product.name} — view ${idx + 1}`}
+              width={1260}
+              height={1344}
+              className="block w-full h-auto select-none pointer-events-none"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority={idx === 0}
+            />
+          </div>
+        ))}
+      </section>
+    </div>
+
+    {/* Description & policies (mobile) */}
+    <div className="lg:hidden bg-white px-6 pb-12 sm:px-12">
+      <div className="space-y-3">{infoSections}</div>
     </div>
 
 

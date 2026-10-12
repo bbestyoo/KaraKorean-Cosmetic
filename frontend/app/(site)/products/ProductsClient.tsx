@@ -4,11 +4,12 @@ import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { ChevronDown, ChevronLeft, ChevronRight, X, Heart, ShoppingBag } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, X, Heart } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
 import { hasSizes, type ProductSizeLite } from '@/lib/cart';
+import QuickAddModal from '@/components/QuickAddModal';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -196,6 +197,7 @@ function ProductsContent({
   const [loading, setLoading] = useState(!initialProducts || initialProducts.length === 0);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(initialProducts.length > 0);
   const [error, setError] = useState('');
+  const [quickAddProduct, setQuickAddProduct] = useState<Product | null>(null);
 
   // Filters state
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -294,6 +296,7 @@ function ProductsContent({
 
         const usecaseParam = sp.get('usecase');
         const featuredParam = sp.get('featured');
+        const trendingParam = sp.get('trending');
 
         const apiParams = new URLSearchParams();
         apiParams.set('page', pageParam);
@@ -333,6 +336,9 @@ function ProductsContent({
         }
         if (featuredParam) {
           apiParams.set('featured', featuredParam);
+        }
+        if (trendingParam) {
+          apiParams.set('trending', trendingParam);
         }
 
         const response = await fetch(`${API_BASE_URL}/api/?${apiParams.toString()}`);
@@ -659,49 +665,6 @@ function ProductsContent({
                           className={`${isInWishlist(product.product_id) ? 'fill-[#c9a46b] text-[#c9a46b]' : 'text-neutral-900'}} hover:text-[#c9a46b] `}
                         />
                       </button>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (product.in_stock === false) return;
-                          // Sized products need a size chosen on the detail page,
-                          // which is also where that size's own price is picked.
-                          if (hasSizes(product.sizes)) {
-                            router.push(`/products/${product.product_id}`);
-                            return;
-                          }
-                          addItem({
-                            product_id: product.product_id,
-                            name: product.name,
-                            price: product.price,
-                            size: '',
-                            quantity: 1,
-                            image: product.images[0]?.image || '/images/placeholder.png',
-                          });
-                        }}
-                        disabled={product.in_stock === false}
-                        aria-disabled={product.in_stock === false}
-                        aria-label={
-                          product.in_stock === false
-                            ? 'Out of stock'
-                            : hasSizes(product.sizes)
-                              ? 'Select size'
-                              : 'Add to cart'
-                        }
-                        title={
-                          product.in_stock === false
-                            ? 'Out of stock'
-                            : hasSizes(product.sizes)
-                              ? 'Select a size'
-                              : 'Add to cart'
-                        }
-                        className={`p-2 rounded-full bg-white shadow-sm transition-all text-neutral-900 ${product.in_stock === false ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:scale-105'}`}
-                      >
-                        <ShoppingBag
-                          size={20}
-                          className="text-neutral-900 hover:text-[#c9a46b] transition-colors "
-                        />
-                      </button>
                     </div>
 
                     {/* Details */}
@@ -725,6 +688,39 @@ function ProductsContent({
                         )}
                       </div>
                     </Link>
+
+                    {/* Add to Cart */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (product.in_stock === false) return;
+                        // Sized products need a size chosen, so open the quick
+                        // view where the size (and its price/stock) can be picked.
+                        if (hasSizes(product.sizes)) {
+                          setQuickAddProduct(product);
+                          return;
+                        }
+                        addItem({
+                          product_id: product.product_id,
+                          name: product.name,
+                          price: product.price,
+                          size: '',
+                          quantity: 1,
+                          image: product.images[0]?.image || '/images/placeholder.png',
+                        });
+                      }}
+                      disabled={product.in_stock === false}
+                      aria-disabled={product.in_stock === false}
+                      className={`mt-3 w-full border py-2.5 text-[11px] md:text-xs font-semibold tracking-[0.15em] uppercase rounded-md transition-all duration-300 ${
+                        product.in_stock === false
+                          ? 'cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-400'
+                          : 'cursor-pointer border-[#0f3b2b] bg-[#0f3b2b] text-white hover:bg-transparent hover:text-[#0f3b2b]'
+                      }`}
+                    >
+                      {product.in_stock === false ? 'Out of Stock' : 'Add to Cart'}
+                    </button>
                   </div>
                 ))}
               </div>
@@ -788,6 +784,11 @@ function ProductsContent({
           ) : null}
         </div>
       </main>
+
+      <QuickAddModal
+        product={quickAddProduct}
+        onClose={() => setQuickAddProduct(null)}
+      />
     </>
   );
 }

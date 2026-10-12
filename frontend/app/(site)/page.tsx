@@ -2,6 +2,7 @@ import BestSellers from "@/components/best-sellers";
 import Brands from "../../components/brands";
 import Collections from "@/components/collections";
 import FeaturedProductsDeferred from "@/components/FeaturedProductsDeferred";
+import TrendingProductsDeferred from "@/components/TrendingProductsDeferred";
 import Image from "next/image";
 import Link from "next/link";
 import NewnessSection from "@/components/NewnessSection";
@@ -37,6 +38,7 @@ export default function Home() {
                     <BestSellers />
         </div>
         <Collections />
+        <TrendingProductsDeferred />
         <NewnessSection />
         <SpringCollection />
       </main>
