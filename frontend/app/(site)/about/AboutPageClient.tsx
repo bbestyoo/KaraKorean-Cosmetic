@@ -130,7 +130,7 @@ export default function AboutPage() {
             <Reveal className="grid grid-cols-2 gap-4">
               <div className="relative aspect-[3/4] overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop"
+                  src="/images/about-product-1.webp"
                   alt="Korean skincare products"
                   fill
                   className="object-cover"
@@ -138,10 +138,10 @@ export default function AboutPage() {
               </div>
               <div className="relative aspect-[3/4] overflow-hidden mt-10">
                 <Image
-                  src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop"
+                  src="/images/about-product-2.jpg"
                   alt="Skincare routine"
                   fill
-                  className="object-cover"
+                  className="object-cover object-left"
                 />
               </div>
             </Reveal>
@@ -185,7 +185,7 @@ export default function AboutPage() {
         <Reveal>
           <section className="relative w-full h-[60vh] lg:h-[80vh] overflow-hidden">
             <Image
-              src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=1800&auto=format&fit=crop"
+              src="/images/about-banner-1.jpg"
               alt="Korean beauty skincare flat lay"
               fill
               className="object-cover"
@@ -213,13 +213,13 @@ export default function AboutPage() {
             {[
               {
                 label: 'Our Story',
-                img: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop',
+                img: '/images/about-product-3.webp',
                 body: 'Founded in 2019, Kara started as a passion project between two friends obsessed with Korean skincare routines. What began as personal imports quickly grew into Nepal\'s most trusted K-beauty destination.',
                 link: '/about',
               },
               {
                 label: 'Our Mission',
-                img: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&auto=format&fit=crop',
+                img: '/images/about-product-4.webp',
                 body: 'We believe everyone deserves access to skincare that actually works. Our mission is to demystify K-beauty, educate our community, and make the best Korean formulations available at fair prices.',
                 link: '/quiz',
               },
@@ -292,34 +292,34 @@ export default function AboutPage() {
         {/* ══════════════════════════════════════════════════════════ */}
         {/* IMAGE MOSAIC                                               */}
         {/* ══════════════════════════════════════════════════════════ */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-12 py-24">
-          <Reveal>
-            <p className="text-[11px] tracking-[0.35em] uppercase text-neutral-400 mb-4 text-center">Life at Kara</p>
-            <h2
-              className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-center mb-14"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
-              Behind the Shelves
-            </h2>
-          </Reveal>
-          <Reveal delay={100}>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { src: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=600&auto=format&fit=crop', tall: true },
-                { src: 'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=600&auto=format&fit=crop', tall: false },
-                { src: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop', tall: false },
-                { src: 'https://images.unsplash.com/photo-1614159102043-d3b56a98b8bc?w=600&auto=format&fit=crop', tall: true },
-              ].map(({ src, tall }, i) => (
-                <div
-                  key={i}
-                  className={`relative overflow-hidden ${tall ? 'aspect-[3/4]' : 'aspect-square'}`}
-                >
-                  <Image src={src} alt={`Gallery ${i + 1}`} fill className="object-cover hover:scale-105 transition-transform duration-700" />
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </section>
+        {/* <section className="max-w-7xl mx-auto px-6 lg:px-12 py-24"> */}
+        {/*   <Reveal> */}
+        {/*     <p className="text-[11px] tracking-[0.35em] uppercase text-neutral-400 mb-4 text-center">Life at Kara</p> */}
+        {/*     <h2 */}
+        {/*       className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-center mb-14" */}
+        {/*       style={{ fontFamily: 'Georgia, serif' }} */}
+        {/*     > */}
+        {/*       Behind the Shelves */}
+        {/*     </h2> */}
+        {/*   </Reveal> */}
+        {/*   <Reveal delay={100}> */}
+        {/*     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4"> */}
+        {/*       {[ */}
+        {/*         { src: '/images/about-bts-1.jpg', tall: false }, */}
+        {/*         { src: 'https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=600&auto=format&fit=crop', tall: false }, */}
+        {/*         { src: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop', tall: false }, */}
+        {/*         { src: 'https://images.unsplash.com/photo-1614159102043-d3b56a98b8bc?w=600&auto=format&fit=crop', tall: true }, */}
+        {/*       ].map(({ src, tall }, i) => ( */}
+        {/*         <div */}
+        {/*           key={i} */}
+        {/*           className={`relative overflow-hidden ${tall ? 'aspect-[3/4]' : 'aspect-square'}`} */}
+        {/*         > */}
+        {/*           <Image src={src} alt={`Gallery ${i + 1}`} fill className="object-cover hover:scale-105 transition-transform duration-700" /> */}
+        {/*         </div> */}
+        {/*       ))} */}
+        {/*     </div> */}
+        {/*   </Reveal> */}
+        {/* </section> */}
 
         {/* ══════════════════════════════════════════════════════════ */}
         {/* CTA STRIP                                                  */}
