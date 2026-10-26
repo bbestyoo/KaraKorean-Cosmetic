@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/cart/', views.CartView.as_view(), name="cart"),
     path('api/cart/update/', views.CartView.as_view(), name="cart-update"),
     path('api/cart/merge/', views.MergeCartView.as_view(), name="cart-merge"),
+    path('api/meta/event/', views.MetaEventAPIView.as_view(), name="meta-event"),
     path('api/order/', views.OrderAPIView.as_view(), name="order"),
     # path('api/order/<str:order_id>/', views.OrderDetailAPIView.as_view(), name="order-detail"),
     path('api/coupon/', views.CouponView.as_view(), name="coupon"),

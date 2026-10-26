@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { trackMetaEvent } from '@/lib/meta';
 
 export interface CartItem {
   product_id: string;
@@ -69,6 +70,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       return [...prevItems, newItem];
     });
+
+    trackMetaEvent('AddToCart', {
+      currency: 'NPR',
+      value: newItem.price * newItem.quantity,
+      content_ids: [newItem.product_id],
+      content_name: newItem.name,
+      content_type: 'product',
+      contents: [
+        {
+          id: newItem.product_id,
+          quantity: newItem.quantity,
+          item_price: newItem.price,
+        },
+      ],
+      num_items: newItem.quantity,
+    });
+
     setIsOpen(true);
   };
 

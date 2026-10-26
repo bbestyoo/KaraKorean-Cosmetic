@@ -6,6 +6,9 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { LenisProvider } from "@/components/LenisProvider";
+import { MetaPixelPageView } from "@/components/MetaPixelPageView";
+
+const META_PIXEL_ID = (process.env.NEXT_PUBLIC_META_PIXEL_ID || "").trim();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -122,6 +125,14 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
+        {META_PIXEL_ID && (
+          <script
+            id="meta-pixel"
+            dangerouslySetInnerHTML={{
+              __html: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${META_PIXEL_ID}');if(!window.location.pathname.startsWith('/admin')){fbq('track','PageView');}`,
+            }}
+          />
+        )}
         {/* Google Analytics */}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-X327RLYMX5" />
         <Script id="google-analytics">
@@ -135,6 +146,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased min-h-full bg-[var(--background)] text-[color:var(--foreground)] selection:bg-[var(--foreground)] selection:text-[var(--background)]`}
       >
         <LenisProvider>
+          <MetaPixelPageView />
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>

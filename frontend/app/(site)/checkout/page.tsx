@@ -1,12 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Lock, Mail, MapPin, CreditCard, Truck } from 'lucide-react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { formatPrice } from '@/lib/pricing';
+import {
+  createMetaEventId,
+  getMetaCookie,
+  trackMetaEvent,
+} from '@/lib/meta';
 
 interface DeliveryFormData {
   fullName: string;
@@ -31,6 +36,18 @@ interface CouponResult {
   amount?: string;
   percentage?: string;
   code?: string;
+}
+
+interface CheckoutOrderResponse {
+  id: string;
+  order_items?: Array<{
+    product_id: string;
+    quantity: number;
+    price: number;
+  }>;
+  delivery?: {
+    payment_amount?: number;
+  };
 }
 
 type ShippingTier = 'kathmandu_pokhara' | 'tier2' | 'tier3' | 'remote';
@@ -69,6 +86,7 @@ export default function CheckoutPage() {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const hasTrackedInitiateCheckout = useRef(false);
 
   const API_BASE_URL = (() => {
     const base = process.env.NEXT_PUBLIC_API_BASE_URL || '';
@@ -145,6 +163,24 @@ export default function CheckoutPage() {
 
   const total = subtotal + shippingCost - discountAmount;
 
+  useEffect(() => {
+    if (hasTrackedInitiateCheckout.current || items.length === 0) return;
+
+    hasTrackedInitiateCheckout.current = true;
+    trackMetaEvent('InitiateCheckout', {
+      currency: 'NPR',
+      value: subtotal,
+      content_ids: items.map((item) => item.product_id),
+      content_type: 'product',
+      contents: items.map((item) => ({
+        id: item.product_id,
+        quantity: item.quantity,
+        item_price: item.price,
+      })),
+      num_items: items.reduce((sum, item) => sum + item.quantity, 0),
+    });
+  }, [items, subtotal]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
@@ -194,6 +230,7 @@ export default function CheckoutPage() {
     // Submit order to backend
     setIsLoading(true);
     try {
+      const metaEventId = createMetaEventId('purchase');
       const orderPayload = {
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
@@ -212,6 +249,12 @@ export default function CheckoutPage() {
           quantity: item.quantity,
           size: item.size,
         })),
+        meta: {
+          event_id: metaEventId,
+          fbp: getMetaCookie('_fbp'),
+          fbc: getMetaCookie('_fbc'),
+          source_url: window.location.href,
+        },
       };
 
       // Debug: confirm the discounted values being sent
@@ -230,7 +273,26 @@ export default function CheckoutPage() {
         return;
       }
 
-      const orderData = await response.json();
+      const orderData: CheckoutOrderResponse = await response.json();
+      const purchasedItems = orderData.order_items ?? [];
+
+      trackMetaEvent(
+        'Purchase',
+        {
+          currency: 'NPR',
+          value: Number(orderData.delivery?.payment_amount ?? total),
+          content_ids: purchasedItems.map((item) => item.product_id),
+          content_type: 'product',
+          contents: purchasedItems.map((item) => ({
+            id: item.product_id,
+            quantity: item.quantity,
+            item_price: item.price,
+          })),
+          num_items: purchasedItems.reduce((sum, item) => sum + item.quantity, 0),
+          order_id: orderData.id,
+        },
+        { eventId: metaEventId, server: false }
+      );
 
       // Clear cart
       clearCart();

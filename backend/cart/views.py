@@ -3,6 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Order, OrderItem, Cart, Coupon, Delivery
 from .serializers import OrderSerializer, DeliverySerializer, CartSerializer
+from .meta_capi import (
+    META_EVENT_WHITELIST,
+    build_user_data,
+    send_meta_event,
+    send_purchase_event,
+)
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import random
 from rest_framework import generics
@@ -198,6 +204,17 @@ class CheckoutAPIView(APIView):
                 delivery = delivery_serializer.save(order=order)
                 send_order_confirmation(order)
                 logger.error("DELIVERY SAVED: %s", delivery)
+
+                meta_context = data.get("meta") if isinstance(data.get("meta"), dict) else {}
+                send_purchase_event(
+                    order,
+                    delivery,
+                    request,
+                    event_id=meta_context.get("event_id"),
+                    fbp=meta_context.get("fbp"),
+                    fbc=meta_context.get("fbc"),
+                    event_source_url=meta_context.get("source_url"),
+                )
             else:
                 logger.error("DELIVERY SERIALIZER ERRORS: %s", delivery_serializer.errors)
                 order.delete()
@@ -215,6 +232,48 @@ class CheckoutAPIView(APIView):
         # Return order info
         order_serializer = OrderSerializer(order)
         return Response(order_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class MetaEventAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        event_name = str(request.data.get("event_name", "")).strip()
+        if event_name not in META_EVENT_WHITELIST:
+            return Response(
+                {"detail": "Unsupported event"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        event_id = request.data.get("event_id")
+        if not event_id:
+            return Response(
+                {"detail": "event_id is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        custom_data = request.data.get("custom_data")
+        if not isinstance(custom_data, dict):
+            custom_data = {}
+
+        user_data = build_user_data(
+            external_id=request.user.pk if request.user.is_authenticated else None,
+            fbp=request.data.get("fbp"),
+            fbc=request.data.get("fbc"),
+            request=request,
+        )
+
+        send_meta_event(
+            event_name,
+            event_id=event_id,
+            event_source_url=request.data.get("event_source_url")
+            or request.META.get("HTTP_REFERER"),
+            custom_data=custom_data,
+            user_data=user_data,
+            request=request,
+        )
+
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 
 class OrderDetailAPIView(APIView):

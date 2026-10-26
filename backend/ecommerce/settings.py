@@ -155,6 +155,13 @@ BREVO_API_KEY = os.getenv("SENDINBLUE_API_KEY")
 DEFAULT_FROM_EMAIL_ADDRESS = "contact@karakoreanbeauty.com"
 DEFAULT_FROM_EMAIL_NAME = "Kara Korean Beauty Store"
 
+# Meta Conversions API / Pixel
+META_PIXEL_ID = os.getenv("META_PIXEL_ID", "")
+META_ACCESS_TOKEN = os.getenv("META_ACCESS_TOKEN", "")
+META_TEST_EVENT_CODE = os.getenv("META_TEST_EVENT_CODE") or None
+META_API_VERSION = os.getenv("META_API_VERSION", "v23.0")
+META_CURRENCY = os.getenv("META_CURRENCY", "NPR")
+
 
 
 # Static files (CSS, JavaScript, Images)

@@ -8,6 +8,7 @@ import { useCart } from '@/context/CartContext';
 import { ProductRecommendations } from '@/components/ProductRecommendations';
 import ProductReviews from '@/components/ProductReviews';
 import { formatPrice, getDiscountPercentage } from '@/lib/pricing';
+import { trackMetaEvent } from '@/lib/meta';
 import DOMPurify from "dompurify";
 
 function safeSanitize(html: string): string {
@@ -115,6 +116,25 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
   const [stockError, setStockError] = useState(false);
   const { addItem, closeCart } = useCart();
   const router = useRouter();
+
+  useEffect(() => {
+    const sellablePrices = initialProduct.sizes
+      .filter((size) => size.stock > 0)
+      .map((size) => size.price)
+      .filter((price) => price > 0);
+    const value = sellablePrices.length > 0
+      ? Math.min(...sellablePrices)
+      : initialProduct.price;
+
+    trackMetaEvent('ViewContent', {
+      currency: 'NPR',
+      value,
+      content_ids: [initialProduct.product_id],
+      content_name: initialProduct.name,
+      content_category: initialProduct.category_name || initialProduct.category,
+      content_type: 'product',
+    });
+  }, [initialProduct]);
 
   // Refresh live stock after mount so size/count changes show without a hard
   // refresh (bypasses Next's fetch/router caches, which can serve stale data).
