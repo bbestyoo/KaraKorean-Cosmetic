@@ -213,6 +213,12 @@ class CheckoutAPIView(APIView):
                     event_id=meta_context.get("event_id"),
                     fbp=meta_context.get("fbp"),
                     fbc=meta_context.get("fbc"),
+                    external_id=meta_context.get("external_id"),
+                    city=meta_context.get("city"),
+                    state=meta_context.get("state"),
+                    zip_code=meta_context.get("zip") or meta_context.get("zip_code"),
+                    country=meta_context.get("country"),
+                    user_agent=meta_context.get("user_agent"),
                     event_source_url=meta_context.get("source_url"),
                 )
             else:
@@ -256,10 +262,52 @@ class MetaEventAPIView(APIView):
         if not isinstance(custom_data, dict):
             custom_data = {}
 
+        client_user_data = request.data.get("user_data")
+        if not isinstance(client_user_data, dict):
+            client_user_data = {}
+
+        def _first_value(*keys):
+            for key in keys:
+                for source in (request.data, client_user_data):
+                    value = source.get(key)
+                    if value not in (None, ""):
+                        return value
+            return None
+
+        email = _first_value("email", "em")
+        phone = _first_value("phone", "phone_number", "ph")
+        full_name = _first_value("full_name", "name")
+        city = _first_value("city", "ct")
+        country = _first_value("country")
+        external_id = _first_value("external_id")
+
+        if request.user.is_authenticated:
+            user = request.user
+            # Prefer stable, server-owned identifiers over the anonymous browser
+            # ID so logged-in events match across devices.
+            external_id = str(getattr(user, "uuid", None) or user.pk)
+            email = email or user.email
+            full_name = full_name or user.name
+            phone = phone or getattr(user, "phone_number", None)
+            city = city or getattr(user, "city", None)
+            country = country or getattr(user, "country", None)
+
         user_data = build_user_data(
-            external_id=request.user.pk if request.user.is_authenticated else None,
-            fbp=request.data.get("fbp"),
-            fbc=request.data.get("fbc"),
+            email=email,
+            phone=phone,
+            full_name=full_name,
+            first_name=_first_value("first_name", "fn"),
+            last_name=_first_value("last_name", "ln"),
+            external_id=external_id,
+            fbp=_first_value("fbp"),
+            fbc=_first_value("fbc"),
+            country=country,
+            city=city,
+            state=_first_value("state", "st"),
+            zip_code=_first_value("zip", "zip_code", "postal_code", "zp"),
+            date_of_birth=_first_value("date_of_birth", "dob", "db"),
+            fb_login_id=_first_value("fb_login_id"),
+            user_agent=_first_value("user_agent"),
             request=request,
         )
 

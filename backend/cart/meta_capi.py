@@ -1,4 +1,5 @@
 import hashlib
+import ipaddress
 import logging
 import re
 import time
@@ -55,16 +56,83 @@ def _split_name(full_name):
     parts = str(full_name).strip().lower().split()
     if not parts:
         return None, None
-    return " ".join(parts[:1]) or None, " ".join(parts[1:]) or None
+    if len(parts) == 1:
+        return parts[0], None
+    # Meta matches on first/last name; keep a middle name out of the last-name
+    # field so "Sita Kumari Sharma" becomes fn=sita, ln=sharma.
+    return parts[0], parts[-1]
+
+
+def _normalize_city(city):
+    if not city:
+        return None
+    return re.sub(r"\s+", "", str(city).strip().lower()) or None
+
+
+def _normalize_state(state):
+    if not state:
+        return None
+    return re.sub(r"\s+", "", str(state).strip().lower()) or None
+
+
+def _normalize_zip(zip_code):
+    if not zip_code:
+        return None
+    return str(zip_code).strip().lower() or None
+
+
+def _normalize_dob(date_of_birth):
+    if not date_of_birth:
+        return None
+    digits = re.sub(r"\D", "", str(date_of_birth))
+    return digits or None
+
+
+def _normalize_country(country):
+    if not country:
+        return None
+    text = str(country).strip().lower()
+    aliases = {"nepal": "np", "nep": "np"}
+    return aliases.get(text, text) or None
+
+
+def _is_public_ip(value):
+    try:
+        address = ipaddress.ip_address(str(value).strip())
+    except ValueError:
+        return False
+    return address.is_global
 
 
 def _client_ip(request):
     if request is None:
         return None
+
+    candidates = [
+        request.META.get("HTTP_CF_CONNECTING_IP"),
+        request.META.get("HTTP_TRUE_CLIENT_IP"),
+        request.META.get("HTTP_X_REAL_IP"),
+    ]
     forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
+    candidates.extend(part.strip() for part in forwarded.split(",") if part.strip())
+    candidates.append(request.META.get("REMOTE_ADDR"))
+
+    for candidate in candidates:
+        if candidate and _is_public_ip(candidate):
+            return str(candidate).strip()
+
+    # Never forward a private/loopback proxy address to Meta: an incorrect IP is
+    # worse than no IP for matching.
+    return None
+
+
+def _hashed(value, normalizer=None):
+    if value is None:
+        return None
+    normalized = normalizer(value) if normalizer else str(value).strip().lower()
+    if not normalized:
+        return None
+    return [_sha256(normalized)]
 
 
 def build_user_data(
@@ -72,27 +140,48 @@ def build_user_data(
     email=None,
     phone=None,
     full_name=None,
+    first_name=None,
+    last_name=None,
     external_id=None,
     fbp=None,
     fbc=None,
     country=None,
+    city=None,
+    state=None,
+    zip_code=None,
+    date_of_birth=None,
+    fb_login_id=None,
     request=None,
+    user_agent=None,
+    ip_address=None,
 ):
-    first_name, last_name = _split_name(full_name)
+    if full_name and not (first_name or last_name):
+        first_name, last_name = _split_name(full_name)
+
     data = {
-        "em": [_sha256(_normalize_email(email))] if _normalize_email(email) else None,
-        "ph": [_sha256(_normalize_phone(phone))] if _normalize_phone(phone) else None,
-        "fn": [_sha256(first_name)] if first_name else None,
-        "ln": [_sha256(last_name)] if last_name else None,
-        "external_id": [_sha256(external_id)] if external_id is not None else None,
-        "country": [_sha256(str(country).lower())] if country else None,
+        "em": _hashed(email, _normalize_email),
+        "ph": _hashed(phone, _normalize_phone),
+        "fn": _hashed(first_name),
+        "ln": _hashed(last_name),
+        "external_id": _hashed(external_id),
+        "country": _hashed(country, _normalize_country),
+        "ct": _hashed(city, _normalize_city),
+        "st": _hashed(state, _normalize_state),
+        "zp": _hashed(zip_code, _normalize_zip),
+        "db": _hashed(date_of_birth, _normalize_dob),
+        "fb_login_id": _hashed(fb_login_id),
         "fbp": fbp or None,
         "fbc": fbc or None,
     }
 
     if request is not None:
-        data["client_ip_address"] = _client_ip(request)
-        data["client_user_agent"] = request.META.get("HTTP_USER_AGENT")
+        data["client_ip_address"] = ip_address or _client_ip(request)
+        data["client_user_agent"] = (
+            user_agent or request.META.get("HTTP_USER_AGENT")
+        )
+    elif ip_address or user_agent:
+        data["client_ip_address"] = ip_address
+        data["client_user_agent"] = user_agent
 
     return {key: value for key, value in data.items() if value not in (None, "", [])}
 
@@ -168,6 +257,17 @@ def send_meta_event(
         )
         return result
 
+    events_received = (result or {}).get("events_received")
+    messages = (result or {}).get("messages")
+    if not events_received:
+        logger.warning(
+            "Meta CAPI %s was accepted but no events were received: %s",
+            event_name,
+            result,
+        )
+    elif messages:
+        logger.warning("Meta CAPI %s response messages: %s", event_name, messages)
+
     logger.info("Meta CAPI %s sent with event_id=%s", event_name, event["event_id"])
     return result
 
@@ -180,6 +280,13 @@ def send_purchase_event(
     event_id=None,
     fbp=None,
     fbc=None,
+    external_id=None,
+    city=None,
+    state=None,
+    zip_code=None,
+    country=None,
+    user_agent=None,
+    ip_address=None,
     event_source_url=None,
 ):
     order_items = list(order.order_items.select_related("product", "size"))
@@ -207,15 +314,24 @@ def send_purchase_event(
         "order_id": str(order.id),
     }
 
+    resolved_external_id = external_id
+    if order.user_id:
+        resolved_external_id = getattr(order.user, "uuid", None) or order.user_id
+
     user_data = build_user_data(
         email=delivery.email,
         phone=delivery.phone_number,
         full_name=delivery.full_name,
-        external_id=order.user_id,
+        external_id=resolved_external_id,
         fbp=fbp,
         fbc=fbc,
-        country="NP",
+        country=country or "NP",
+        city=city,
+        state=state,
+        zip_code=zip_code,
         request=request,
+        user_agent=user_agent,
+        ip_address=ip_address,
     )
 
     source_url = event_source_url or (

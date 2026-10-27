@@ -9,7 +9,9 @@ import { useAuth } from '@/context/AuthContext';
 import { formatPrice } from '@/lib/pricing';
 import {
   createMetaEventId,
-  getMetaCookie,
+  getMetaExternalId,
+  getMetaFbc,
+  getMetaFbp,
   trackMetaEvent,
 } from '@/lib/meta';
 
@@ -251,8 +253,12 @@ export default function CheckoutPage() {
         })),
         meta: {
           event_id: metaEventId,
-          fbp: getMetaCookie('_fbp'),
-          fbc: getMetaCookie('_fbc'),
+          fbp: getMetaFbp(),
+          fbc: getMetaFbc(),
+          external_id: getMetaExternalId(),
+          city: formData.city || undefined,
+          country: formData.country || undefined,
+          user_agent: window.navigator.userAgent,
           source_url: window.location.href,
         },
       };
