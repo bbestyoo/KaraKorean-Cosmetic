@@ -16,7 +16,7 @@ export default function Home() {
     <>
       <section className="relative w-full mt-12 md:mt-0 h-[25vh] md:h-[85vh] overflow-hidden bg-primary-container">
         <Image
-          src="/images/main-banner.webp"
+          src="/images/proper-size.webp"
           alt="Kara Korean Beauty - Premium Korean Cosmetics"
           width={2560}
           height={1016}
