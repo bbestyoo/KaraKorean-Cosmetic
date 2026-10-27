@@ -25,7 +25,7 @@ export default function Home() {
           fetchPriority="high"
           placeholder="blur"
           blurDataURL="data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAACwAwCdASoUAAgAPu1iqk2ppaQiMAgBMB2JYwC7ABog287xQLld4AD+yWh+jXeSSHlNWDTdG3a1Q1+Cgb64EvAM33X48Rr5J69QAA=="
-          className="block w-full h-[25vh] md:h-[75vh] object-contain"
+          className="block w-full h-[25vh] md:h-[77vh] object-cover"
         />
         <Brands />
       </section>
